@@ -334,11 +334,11 @@
     }
   }
 </style>
-</style>
 </head>
 <body>
-  <audio id="valkyries" src="assets/valkyries.mp3" preload="auto"></audio>
-  <script src="assets/music-sync.js"></script>
+  <!-- Fixed asset references -->
+  <audio id="valkyries" src="/keikahdus/assets/valkyries.mp3" preload="auto"></audio>
+  <script src="/keikahdus/assets/music-sync.js"></script>
 
 <script src="https://static.app/js/static.js" type="text/javascript"></script>
 </body>
@@ -501,7 +501,7 @@ function toggleNavbar() {
   const status = $('#status');
   const tulosSection = $('#tulosSection');
   const sounds = {
-    cheer: new Audio('cheer.mp3'),
+    cheer: new Audio('/keikahdus/assets/cheer.mp3'),
   };
 
   // Overlay elements
@@ -998,30 +998,18 @@ console.log(generateTeamNames(30).join('\n'));
   clearBtn.addEventListener('click', clearResult);
   exportCsvBtn.addEventListener('click', exportCSV);
 
-  // Generator toggle
-  genToggle.addEventListener('change', () => {
-    genPanel.style.display = genToggle.checked ? 'block' : 'none';
-  });
-
-  // Keyboard shortcuts
-  document.addEventListener('keydown', (e) => {
-    // Ignore if focus is in an input or textarea
-    const tag = document.activeElement.tagName.toLowerCase();
-    if (tag === 'textarea' || tag === 'input' || document.activeElement.isContentEditable) {
-      return;
-    }
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doDraw(); }
-    if (e.key.toLowerCase() === 'r') { rerollAll(); }
-    if (e.key.toLowerCase() === 'l') { themeToggle.click(); }
-    if (e.key === 'Escape') { clearResult(); }
-  });
-
-  // Live counters
-  updateNameCount();
+// Placeholder for music-sync.js functionality
+function playMusicAndReveal(speed, totalReveals) {
+  // This would be implemented in the music-sync.js file
+  console.log("Music playback would start here");
+  // If the valkyries audio element exists, try to play it
+  const valkyriesAudio = document.getElementById('valkyries');
+  if (valkyriesAudio) {
+    valkyriesAudio.play().catch(e => console.log("Audio playback prevented:", e));
+  }
+}
 
 })();
 </script>
-
-<script src="https://static.app/js/static.js" type="text/javascript"></script>
 </body>
 </html>
