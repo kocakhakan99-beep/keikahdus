@@ -1,678 +1,630 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Keikahdusliiga</title>
-<link href="https://fonts.googleapis.com/css?family=Press+Start+2P|Orbitron:700,900" rel="stylesheet">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-/* ---------- CORE THEME / GENERAL ---------- */
-body {
-  font-family: 'Press Start 2P','Orbitron',Arial,sans-serif;
-  margin:0;
-  background: radial-gradient(circle,#111 50%,#24006b 100%);
-  color:#fff;
-  text-shadow:0 0 2px #00ffea,0 0 6px #000;
-}
-h1,h2 {
-  color:#ff00c8;
-  text-shadow:0 0 8px #ff00c8,0 0 2px #fff;
-  letter-spacing:2.5px;
-  font-family:'Press Start 2P','Orbitron',Arial,sans-serif;
-}
-.section {
-  margin-bottom:2em;
-  background:linear-gradient(135deg,#2b0057 50%,#1e1e2a 100%);
-  padding:1.2em 2em;
-  border-radius:12px;
-  box-shadow:0 4px 24px #b200ff88;
-}
-.btn {
-  background:linear-gradient(90deg,#00ffd0 0%,#ff00c8 100%);
-  color:#111;
-  border:none;
-  border-radius:8px;
-  padding:10px 18px;
-  cursor:pointer;
-  margin:4px 1px;
-  font-family:'Press Start 2P','Orbitron',Arial,sans-serif;
-  font-size:1em;
-  box-shadow:0 0 8px #ff00c8,0 0 3px #00ffd0;
-  transition:filter .2s, transform .1s;
-}
-.btn:active { filter:brightness(1.3) saturate(2); transform:scale(.96); }
-.btn:disabled { background:#444; color:#aaa; box-shadow:none; cursor:not-allowed; }
-input[type="number"], input[type="text"] {
-  padding:7px;
-  border-radius:6px;
-  border:2px solid #ff00c8;
-  background:#181828;
-  color:#00ffd0;
-  font-family:'Orbitron',Arial,sans-serif;
-  font-size:1em;
-}
-.team-list, .fixture-list { margin-top:1em; }
-.team {
-  background:linear-gradient(90deg,#2b0057 60%,#00ffd0 100%);
-  margin-bottom:9px;
-  padding:8px;
-  border-radius:8px;
-  color:#fff;
-  text-shadow:0 0 2px #00ffd0;
-  box-shadow:0 0 8px #00ffd099;
-  font-family:'Orbitron',Arial,sans-serif;
-}
-.fixture-card {
-  background:#18003a;
-  border-radius:12px;
-  padding:1.2em;
-  margin-bottom:1em;
-  box-shadow:0 0 24px #ff00c855;
-  display:flex;
-  flex-direction:column;
-  gap:.7em;
-  border:2px solid #00ffd0;
-}
-.game-title { font-weight:bold; color:#ff00c8; font-size:1.08em; margin-bottom:2px; text-shadow:0 0 6px #ff00c8; }
-.game-result { color:#00ffd0; font-weight:bold; font-size:1.11em; margin-top:2px; text-shadow:0 0 6px #00ffd0; }
-#resetBtn {
-  background:linear-gradient(90deg,#ffb700 0%,#ff00c8 100%);
-  color:#222;
-  box-shadow:0 0 8px #ffb700;
-}
-.flex { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  <meta charset="UTF-8">
+  <title>Keikahdusliiga</title>
+  <link href="https://fonts.googleapis.com/css?family=Press+Start+2P|Orbitron:700,900" rel="stylesheet">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    /* === BASE / GLOBAL STYLES === */
+    body {
+      font-family: 'Press Start 2P', 'Orbitron', Arial, sans-serif;
+      margin: 0;
+      background: radial-gradient(circle, #111 50%, #24006b 100%);
+      color: #fff;
+      text-shadow: 0 0 2px #00ffea, 0 0 6px #000;
+    }
+    h1, h2 {
+      color: #ff00c8;
+      text-shadow: 0 0 8px #ff00c8, 0 0 2px #fff;
+      letter-spacing: 2.5px;
+      font-family: 'Press Start 2P', 'Orbitron', Arial, sans-serif;
+    }
+    .section {
+      margin-bottom: 2em;
+      background: linear-gradient(135deg, #2b0057 50%, #1e1e2a 100%);
+      padding: 1.2em 2em;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px #b200ff88;
+    }
+    .btn {
+      background: linear-gradient(90deg, #00ffd0 0%, #ff00c8 100%);
+      color: #111;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 18px;
+      cursor: pointer;
+      margin: 4px 1px;
+      font-family: 'Press Start 2P', 'Orbitron', Arial, sans-serif;
+      font-size: 1em;
+      box-shadow: 0 0 8px #ff00c8, 0 0 3px #00ffd0;
+      transition: filter 0.2s, transform 0.1s;
+    }
+    .btn:active { filter: brightness(1.3) saturate(2); transform: scale(0.96); }
+    .btn:disabled { background:#444; color:#aaa; box-shadow:none; cursor:not-allowed; }
+    input[type="number"], input[type="text"], input[type="range"] {
+      padding: 7px;
+      border-radius: 6px;
+      border: 2px solid #ff00c8;
+      background: #181828;
+      color: #00ffd0;
+      font-family: 'Orbitron', Arial, sans-serif;
+      font-size: 1em;
+    }
+    .team-list, .fixture-list { margin-top: 1em; }
+    .team {
+      background: linear-gradient(90deg, #2b0057 60%, #00ffd0 100%);
+      margin-bottom: 9px;
+      padding: 8px;
+      border-radius: 8px;
+      color: #fff;
+      text-shadow: 0 0 2px #00ffd0;
+      box-shadow: 0 0 8px #00ffd099;
+      font-family: 'Orbitron', Arial, sans-serif;
+    }
+    .fixture-card {
+      background: #18003a;
+      border-radius: 12px;
+      padding: 1.2em;
+      margin-bottom: 1em;
+      box-shadow: 0 0 24px #ff00c855;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7em;
+      border: 2px solid #00ffd0;
+      font-family: 'Orbitron', Arial, sans-serif;
+    }
+    .game-title {
+      font-weight: bold;
+      color: #ff00c8;
+      font-size: 1.08em;
+      margin-bottom: 2px;
+      text-shadow: 0 0 6px #ff00c8;
+    }
+    .game-result {
+      color: #00ffd0;
+      font-weight: bold;
+      font-size: 1.11em;
+      margin-top: 2px;
+      text-shadow: 0 0 6px #00ffd0;
+    }
 
-/* ---------- MATCH / CUPS LAYOUT ---------- */
-.cups-area {
-  position:relative;
-  width:420px;
-  min-height:200px;
-  margin:0 auto 12px auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#400299;
-  border-radius:20px;
-  box-shadow:0 0 32px #00ffd099;
-}
-.table-img {
-  position:absolute;
-  left:0; top:0;
-  width:100%; height:100%;
-  object-fit:contain;
-  pointer-events:none;
-  z-index:0;
-  opacity:.8;
-}
-.cup-set {
-  margin:0 18px;
-  position:relative;
-  z-index:1;
-  flex:1 1 50%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-.cup-set.left { transform:rotate(-90deg); }
-.cup-set.right { transform:rotate(90deg); }
+    /* Cups area (shared) */
+    .cups-area {
+      position: relative;
+      width: 420px;
+      min-height: 200px;
+      margin: 0 auto 12px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #400299;
+      border-radius: 20px;
+      box-shadow: 0 0 32px #00ffd099;
+      overflow: hidden;
+    }
+    .table-img {
+      position: absolute;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.8;
+    }
+    .cup-set {
+      margin: 0 18px;
+      position: relative;
+      z-index: 1;
+      flex: 1 1 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .cup-set.left { transform: rotate(-90deg); }
+    .cup-set.right { transform: rotate(90deg); }
+    .cup-label {
+      text-align: center;
+      color: #00ffd0;
+      font-size: 1.1em;
+      margin-bottom: 3px;
+      text-shadow: 0 0 6px #00ffd0;
+      font-family: 'Orbitron', Arial, sans-serif;
+    }
+    .cup-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 5px; }
+    .cup-row.reverse { flex-direction: row-reverse; }
+    .cup-btn {
+      width: 45px; height: 45px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 2px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+      transition: filter 0.2s;
+    }
+    .cup-btn img {
+      width: 45px; height: 45px;
+      border-radius: 50%;
+      pointer-events: none;
+      user-select: none;
+      border: 2px solid #ff00c8;
+      box-shadow: 0 0 12px #ff00c8;
+      background: #222;
+    }
+    .cup-btn.hit img {
+      filter: grayscale(100%) brightness(0.4) drop-shadow(0 0 8px #00ffd0);
+      opacity: 0.3;
+      border: 2px solid #00ffd0;
+      box-shadow: 0 0 18px #00ffd0;
+    }
 
-.cup-row { display:flex; gap:10px; justify-content:center; margin-bottom:5px; }
-.cup-row.reverse { flex-direction:row-reverse; }
+    /* Fullscreen modals */
+    .fullscreen-modal {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(25,10,40,0.97);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: modalShow 0.25s ease;
+    }
+    .modal-content {
+      background: #18003a;
+      border-radius: 16px;
+      padding: 2em;
+      min-width: 320px;
+      max-width: 99vw;
+      color: #fff;
+      box-shadow: 0 0 24px #ff00c8dd;
+      border: 2px solid #00ffd0;
+      position: relative;
+    }
+    @keyframes modalShow { 0% {opacity:0; filter:blur(10px);} 100% {opacity:1; filter:blur(0);} }
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2.5em;
+      background: none;
+      border: none;
+      color: #ff00c8;
+      text-shadow: 0 0 12px #ff00c8;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .close-btn:hover { color: #00ffd0; }
 
-.cup-btn {
-  width:45px; height:45px;
-  background:transparent; border:none; padding:0; margin:2px;
-  cursor:pointer;
-  display:inline-flex; align-items:center; justify-content:center;
-  outline:none;
-  transition:filter .2s;
-}
-.cup-btn img {
-  width:45px; height:45px;
-  border-radius:50%;
-  display:block;
-  pointer-events:none;
-  user-select:none;
-  border:2px solid #ff00c8;
-  box-shadow:0 0 12px #ff00c8;
-  background:#222;
-}
-.cup-btn.hit img {
-  filter:grayscale(100%) brightness(.4) drop-shadow(0 0 8px #00ffd0);
-  opacity:.3;
-  border:2px solid #00ffd0;
-  box-shadow:0 0 18px #00ffd0;
-}
+    /* Timer & state badges */
+    .timer {
+      font-weight: bold;
+      color: #00ffd0;
+      font-size: 1.25em;
+      text-shadow: 0 0 10px #00ffd0;
+      font-family: 'Press Start 2P', 'Orbitron', Arial, sans-serif;
+    }
 
-.cup-label {
-  text-align:center;
-  color:#00ffd0;
-  font-size:1.15em;
-  margin-bottom:3px;
-  text-shadow:0 0 6px #00ffd0;
-  font-family:'Orbitron',Arial,sans-serif;
-}
+    /* Standings table */
+    table.standings {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+      background: #2b0057;
+      color: #fff;
+      font-family: 'Orbitron', Arial, sans-serif;
+      font-size: 0.95em;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    table.standings th, table.standings td {
+      padding: 9px 8px;
+      border: 1px solid #ff00c8;
+      text-align: center;
+    }
+    table.standings th {
+      background: #18003a;
+      color: #00ffd0;
+      text-shadow: 0 0 4px #00ffd0;
+    }
 
-/* ---------- MODALS ---------- */
-.fullscreen-modal {
-  position:fixed;
-  top:0; left:0;
-  width:100vw; height:100vh;
-  background:rgba(25,10,40,0.97);
-  z-index:9999;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  animation:modalShow .25s ease;
-}
-@keyframes modalShow {
-  0% { opacity:0; filter:blur(10px); }
-  100% { opacity:1; filter:blur(0); }
-}
-.modal-content {
-  background:#18003a;
-  border-radius:16px;
-  padding:2em;
-  min-width:320px;
-  max-width:99vw;
-  color:#fff;
-  box-shadow:0 0 24px #ff00c8dd;
-  border:2px solid #00ffd0;
-  position:relative;
-}
-.close-btn {
-  position:absolute;
-  top:20px;
-  right:30px;
-  font-size:2.5em;
-  background:none;
-  border:none;
-  color:#ff00c8;
-  text-shadow:0 0 12px #ff00c8;
-  cursor:pointer;
-  transition:color .2s;
-}
-.close-btn:hover { color:#00ffd0; }
-.timer {
-  font-weight:bold;
-  color:#00ffd0;
-  font-size:1.25em;
-  text-shadow:0 0 10px #00ffd0;
-  font-family:'Press Start 2P','Orbitron',Arial,sans-serif;
-}
+    /* Sidebar standings overlay */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 230px;
+      height: 100vh;
+      background: #18003aee;
+      z-index: 10001;
+      padding: 1em 0.6em;
+      box-shadow: -3px 0 28px #ff00c888;
+      color: #00ffd0;
+      font-size: 1.08em;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7em;
+      border-left: 3px solid #00ffd0;
+      font-family: 'Orbitron', Arial, sans-serif;
+    }
+    .sidebar-overlay table { width:100%; border-collapse:collapse; font-size:0.98em; }
+    .sidebar-overlay th, .sidebar-overlay td {
+      padding: 6px 3px; border: 1px solid #00ffd0; text-align: center;
+    }
+    .sidebar-overlay th { background:#2b0057; color:#ff00c8; text-shadow:0 0 4px #ff00c8; }
+    .sidebar-overlay tr.active-team { background:#ffb700; color:#222; font-weight:bold; }
+    .sidebar-overlay tr.active-team td { border:2px solid #00ffd0cc; }
 
-/* ---------- STANDINGS TABLE ---------- */
-table.standings {
-  width:100%;
-  border-collapse:collapse;
-  margin-top:1em;
-  background:#2b0057;
-  color:#fff;
-  font-family:'Orbitron',Arial,sans-serif;
-  font-size:.95em;
-  border-radius:10px;
-  overflow:hidden;
-}
-table.standings th, table.standings td {
-  padding:9px 8px;
-  border:1px solid #ff00c8;
-  text-align:center;
-}
-table.standings th {
-  background:#18003a;
-  color:#00ffd0;
-  text-shadow:0 0 4px #00ffd0;
-}
+    /* Match intro animation */
+    .match-intro-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 10001;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+    }
+    .match-intro-bars { position: relative; width: 100vw; height: 100vh; display:flex; align-items:center; justify-content:center; }
+    .bar {
+      position:absolute; left:0; width:100vw; height:0;
+      background: linear-gradient(90deg, #ff00c8 0%, #00ffd0 100%);
+      opacity:0.97;
+      transition: height 0.7s cubic-bezier(.5,1.8,.5,1), top 0.7s, bottom 0.7s;
+      box-shadow:0 0 24px #ff00c8; z-index:1;
+    }
+    .bar.top { top:0; }
+    .bar.bottom { bottom:0; }
+    .match-intro-names {
+      position: absolute;
+      left:50%; top:50%; transform:translate(-50%, -50%);
+      width:100vw;
+      display:flex; flex-direction:column; align-items:center;
+      opacity:0;
+      z-index:2;
+      transition: opacity 0.4s 0.7s;
+      font-size:2.5em; font-weight:bold; letter-spacing:3px;
+      font-family:'Press Start 2P','Orbitron',Arial,sans-serif;
+      text-shadow:0 0 16px #ff00c8, 0 0 6px #00ffd0;
+    }
+    .match-intro-names .team { min-width:330px; text-align:center; opacity:0; position:relative; }
+    .match-intro-names .team.top {
+      left:-400px; color:#00ffd0;
+      transition:left 0.7s cubic-bezier(.5,1.8,.5,1), opacity 0.4s 0.7s;
+      margin-bottom:12px;
+    }
+    .match-intro-names .team.bottom {
+      right:-400px; color:#ff00c8;
+      transition:right 0.7s cubic-bezier(.5,1.8,.5,1), opacity 0.4s 0.7s;
+      margin-top:14px;
+    }
+    .match-intro-names .vs {
+      color:#ffb700; font-size:1.2em; font-weight:bold;
+      opacity:0; margin:0 0 14px 0;
+      text-shadow:0 0 12px #ffb700;
+      transition:opacity 0.3s 1s;
+    }
+    .match-intro-overlay.animate .bar.top,
+    .match-intro-overlay.animate .bar.bottom { height:35vh; }
+    .match-intro-overlay.animate .match-intro-names,
+    .match-intro-overlay.animate .team.top,
+    .match-intro-overlay.animate .team.bottom,
+    .match-intro-overlay.animate .vs { opacity:1; }
+    .match-intro-overlay.animate .team.top { left:0; }
+    .match-intro-overlay.animate .team.bottom { right:0; }
 
-/* ---------- SIDEBAR ---------- */
-.sidebar-overlay {
-  position:fixed;
-  top:0; right:0;
-  width:230px;
-  height:100vh;
-  background:#18003aee;
-  z-index:10001;
-  padding:1em .6em;
-  box-shadow:-3px 0 28px #ff00c888;
-  color:#00ffd0;
-  font-size:1.08em;
-  overflow-y:auto;
-  display:flex;
-  flex-direction:column;
-  gap:.7em;
-  border-left:3px solid #00ffd0;
-  font-family:'Orbitron',Arial,sans-serif;
-}
-.sidebar-overlay table { width:100%; border-collapse:collapse; font-size:.98em; }
-.sidebar-overlay th, .sidebar-overlay td {
-  padding:6px 3px;
-  border:1px solid #00ffd0;
-  text-align:center;
-}
-.sidebar-overlay th {
-  background:#2b0057;
-  color:#ff00c8;
-  text-shadow:0 0 4px #ff00c8;
-}
-.sidebar-overlay tr.active-team {
-  background:#ffb700;
-  color:#222;
-  font-weight:bold;
-}
-.sidebar-overlay tr.active-team td {
-  border:2px solid #00ffd0cc;
-}
+    .flex { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 
-/* ---------- MATCH INTRO ANIMATION ---------- */
-.match-intro-overlay {
-  position:fixed;
-  top:0; left:0;
-  width:100vw; height:100vh;
-  z-index:10001;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  background:transparent;
-}
-.match-intro-bars {
-  position:relative;
-  width:100vw;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-}
-.bar {
-  position:absolute;
-  left:0;
-  width:100vw;
-  height:0;
-  background:linear-gradient(90deg,#ff00c8 0%,#00ffd0 100%);
-  opacity:.97;
-  transition:height .7s cubic-bezier(.5,1.8,.5,1), top .7s, bottom .7s;
-  box-shadow:0 0 24px #ff00c8;
-  z-index:1;
-}
-.bar.top { top:0; }
-.bar.bottom { bottom:0; }
-.match-intro-names {
-  position:absolute;
-  left:50%; top:50%;
-  transform:translate(-50%,-50%);
-  width:100vw;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  z-index:2;
-  transition:opacity .4s .7s;
-  font-size:2.5em;
-  font-weight:bold;
-  letter-spacing:3px;
-  font-family:'Press Start 2P','Orbitron',Arial,sans-serif;
-  text-shadow:0 0 16px #ff00c8, 0 0 6px #00ffd0;
-}
-.match-intro-names .team {
-  min-width:330px;
-  text-align:center;
-  opacity:0;
-  position:relative;
-}
-.match-intro-names .team.top {
-  left:-400px;
-  color:#00ffd0;
-  transition:left .7s cubic-bezier(.5,1.8,.5,1), opacity .4s .7s;
-  margin-bottom:12px;
-}
-.match-intro-names .vs {
-  color:#ffb700;
-  font-size:1.2em;
-  font-weight:bold;
-  opacity:0;
-  margin:0 0 14px 0;
-  text-shadow:0 0 12px #ffb700;
-  transition:opacity .3s 1s;
-}
-.match-intro-names .team.bottom {
-  right:-400px;
-  color:#ff00c8;
-  transition:right .7s cubic-bezier(.5,1.8,.5,1), opacity .4s .7s;
-  margin-top:14px;
-}
-.match-intro-overlay.animate .bar.top,
-.match-intro-overlay.animate .bar.bottom { height:35vh; }
-.match-intro-overlay.animate .match-intro-names { opacity:1; }
-.match-intro-overlay.animate .team.top { left:0; opacity:1; }
-.match-intro-overlay.animate .team.bottom { right:0; opacity:1; }
-.match-intro-overlay.animate .vs { opacity:1; }
+    /* Toggles */
+    .toggle-switch { position:relative; display:inline-block; width:60px; height:28px; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider {
+      position:absolute; cursor:pointer; inset:0; background:#18003a;
+      border:2px solid #ff00c8; transition:.4s; border-radius:34px; box-shadow:0 0 10px #ff00c8;
+    }
+    .toggle-slider:before {
+      position:absolute; content:""; height:20px; width:20px; left:4px; bottom:4px;
+      background:#00ffd0; transition:.4s; border-radius:50%; box-shadow:0 0 8px #00ffd0;
+    }
+    input:checked + .toggle-slider {
+      background:#2b0057; border-color:#00ffd0; box-shadow:0 0 10px #00ffd0;
+    }
+    input:checked + .toggle-slider:before {
+      transform:translateX(30px); background:#ff00c8; box-shadow:0 0 8px #ff00c8;
+    }
+    .toggle-container { display:flex; align-items:center; gap:6px; }
+    .toggle-label { color:#ffb700; font-size:0.78em; text-shadow:0 0 6px #ffb70055; }
 
-/* ---------- TOP RIGHT CONTROLS ---------- */
-.top-right-controls {
-  position:fixed;
-  top:12px;
-  right:12px;
-  z-index:11000;
-  display:flex;
-  gap:10px;
-  align-items:center;
-  background:rgba(24,0,58,0.75);
-  padding:8px 12px;
-  border-radius:10px;
-  border:2px solid #00ffd0;
-  box-shadow:0 6px 20px #0008,0 0 18px #00ffd022;
-  backdrop-filter:blur(6px);
-  font-family:'Orbitron',Arial,sans-serif;
-}
-.toggle-container { display:flex; align-items:center; gap:8px; }
-.toggle-label { color:#ffb700; font-size:.82em; text-shadow:0 0 6px #ffb70044; }
+    /* Top right control panel */
+    .top-right-controls {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 11000;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      background: rgba(24,0,58,0.75);
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 2px solid #00ffd0;
+      box-shadow: 0 6px 20px #0008, 0 0 18px #00ffd022;
+      backdrop-filter: blur(6px);
+      font-family: 'Orbitron', Arial, sans-serif;
+    }
 
-.toggle-switch { position:relative; display:inline-block; width:60px; height:28px; }
-.toggle-switch input { opacity:0; width:0; height:0; }
-.toggle-slider {
-  position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0;
-  background:#18003a;
-  border:2px solid #ff00c8;
-  transition:.4s;
-  border-radius:34px;
-  box-shadow:0 0 10px #ff00c8;
-}
-.toggle-slider:before {
-  position:absolute; content:"";
-  height:20px; width:20px;
-  left:4px; bottom:4px;
-  background:#00ffd0;
-  transition:.4s;
-  border-radius:50%;
-  box-shadow:0 0 8px #00ffd0;
-}
-input:checked + .toggle-slider {
-  background:#2b0057;
-  border-color:#00ffd0;
-  box-shadow:0 0 10px #00ffd0;
-}
-input:checked + .toggle-slider:before {
-  transform:translateX(30px);
-  background:#ff00c8;
-  box-shadow:0 0 8px #ff00c8;
-}
+    /* Big alert modal */
+    #bigAlertModal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 12000;
+      background: linear-gradient(180deg, rgba(8,4,20,0.96), rgba(12,6,32,0.98));
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    #bigAlertInner {
+      max-width: 920px;
+      width: 96%;
+      background: linear-gradient(180deg, #1a0036, #10001f);
+      border: 2px solid #00ffd0;
+      box-shadow: 0 10px 60px rgba(0,0,0,0.6), 0 0 28px #00ffd099;
+      border-radius: 14px;
+      padding: 22px;
+      color: #fff;
+      font-family: 'Orbitron', Arial, sans-serif;
+    }
+    #bigAlertInner h2 {
+      margin: 0 0 10px 0;
+      color: #ffb700;
+      text-shadow: 0 0 12px #ffb70066;
+      font-size: 1.15em;
+    }
+    #bigAlertInner p { margin: 6px 0 10px 0; color: #00ffd0; white-space: pre-wrap; }
+    #bigAlertInner .big-alert-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
+    #bigAlertInner .big-close {
+      background: linear-gradient(90deg,#ff00c8,#00ffd0);
+      border: none; padding: 8px 12px;
+      border-radius: 8px; cursor: pointer; font-weight: bold;
+    }
 
-/* ---------- BIG ALERT MODAL ---------- */
-#bigAlertModal {
-  position:fixed; inset:0;
-  display:none;
-  z-index:12000;
-  background:linear-gradient(180deg,rgba(8,4,20,0.96),rgba(12,6,32,0.98));
-  align-items:center;
-  justify-content:center;
-  padding:20px;
-}
-#bigAlertInner {
-  max-width:920px; width:96%;
-  background:linear-gradient(180deg,#1a0036,#10001f);
-  border:2px solid #00ffd0;
-  box-shadow:0 10px 60px rgba(0,0,0,.6),0 0 28px #00ffd099;
-  border-radius:14px;
-  padding:22px;
-  color:#fff;
-  text-align:left;
-  font-family:'Orbitron',Arial,sans-serif;
-}
-#bigAlertInner h2 {
-  margin:0 0 10px 0;
-  color:#ffb700;
-  text-shadow:0 0 12px #ffb70066;
-  font-size:1.15em;
-}
-#bigAlertInner p {
-  margin:6px 0 10px 0;
-  color:#00ffd0;
-  white-space:pre-wrap;
-}
-#bigAlertInner .big-alert-actions {
-  display:flex;
-  gap:10px;
-  justify-content:flex-end;
-  margin-top:12px;
-}
-#bigAlertInner .big-close {
-  background:linear-gradient(90deg,#ff00c8,#00ffd0);
-  border:none;
-  padding:8px 12px;
-  border-radius:8px;
-  cursor:pointer;
-  font-weight:bold;
-}
+    /* === VIINAHARAVA (LOSERS GAME) ENHANCED LAYOUT === */
+    :root {
+      --vh-grid-size: 210px;  /* overall width/height of 4x4 grid */
+      --cup-size: 38px;       /* single cup size */
+      --table-scale: 0.9;     /* scale factor for rotated table image */
+      --grid-offset-y: 0px;   /* vertical nudge of cup grid */
+    }
+    #losersGameModal { z-index: 20050 !important; }
+    #losersGameModal .modal-content {
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #losersGameModal .cups-area {
+      width: 400px;
+      height: 640px;
+      min-height: 640px;
+      border-radius: 30px;
+      background: #2a0064;
+      overflow: hidden;
+      box-shadow: 0 0 40px #00ffd055, inset 0 0 20px #000;
+    }
+    #losersGameModal .cups-area .table-wrapper {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    #losersGameModal .cups-area .table-wrapper img.table-img {
+      width: auto;
+      height: 100%;
+      max-height: 100%;
+      transform: rotate(90deg) scale(var(--table-scale));
+      transform-origin: center center;
+      opacity: 0.9;
+      filter: drop-shadow(0 0 16px #000);
+    }
+    #losersGameModal #losersGrid {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, calc(-50% + var(--grid-offset-y)));
+      width: var(--vh-grid-size);
+      height: var(--vh-grid-size);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      gap: 14px;
+      z-index: 5;
+      pointer-events: auto;
+    }
+    #losersGameModal #losersGrid .cup-btn {
+      width: var(--cup-size);
+      height: var(--cup-size);
+      margin: 0;
+    }
+    #losersGameModal #losersGrid .cup-btn img {
+      width: var(--cup-size);
+      height: var(--cup-size);
+      box-shadow: 0 0 10px #ff00c8;
+    }
+    #losersGameModal #losersGrid .cup-btn.hit img {
+      box-shadow: 0 0 16px #00ffd0;
+    }
+    #losersGameModal.losers-ended #losersGrid {
+      opacity: 0.55;
+      filter: grayscale(60%);
+      pointer-events: none;
+    }
+    #throwResult .result-drink {
+      font-size: 1.55em;
+      padding: 8px 18px;
+    }
 
-/* ---------- VIINAHARAVA (Losers Game) OVERRIDES ---------- */
-:root {
-  --vh-grid-size: 210px;
-  --cup-size: 38px;
-  --table-scale: 0.9;
-  --grid-offset-y: 0px;
-}
-#losersGameModal { z-index:20050 !important; }
-#losersGameModal .modal-content {
-  max-width:560px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-#losersGameModal .cups-area {
-  width:380px;
-  height:620px;
-  min-height:620px;
-  border-radius:28px;
-  background:#2a0064;
-  overflow:hidden;
-  box-shadow:0 0 40px #00ffd055, inset 0 0 20px #000;
-}
-#losersGameModal .cups-area .table-wrapper {
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  pointer-events:none;
-  z-index:0;
-}
-#losersGameModal .cups-area .table-wrapper img.table-img {
-  width:auto;
-  height:100%;
-  transform:rotate(90deg) scale(var(--table-scale));
-  transform-origin:center center;
-  opacity:.9;
-  filter:drop-shadow(0 0 16px #000);
-}
-#losersGrid {
-  position:absolute;
-  top:50%; left:50%;
-  transform:translate(-50%, calc(-50% + var(--grid-offset-y)));
-  width:var(--vh-grid-size);
-  height:var(--vh-grid-size);
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  grid-template-rows:repeat(4,1fr);
-  gap:14px;
-  z-index:5;
-  pointer-events:auto;
-}
-#losersGrid .cup-btn {
-  width:var(--cup-size);
-  height:var(--cup-size);
-  margin:0;
-}
-#losersGrid .cup-btn img {
-  width:var(--cup-size);
-  height:var(--cup-size);
-  box-shadow:0 0 10px #ff00c8;
-}
-#losersGrid .cup-btn.hit img { box-shadow:0 0 16px #00ffd0; }
-#losersGameModal.losers-ended #losersGrid {
-  opacity:.55;
-  filter:grayscale(60%);
-  pointer-events:none;
-}
-#throwResult .result-drink {
-  font-size:1.6em;
-  padding:8px 18px;
-  background:#2b0057;
-  border:2px solid #ff00c8;
-  border-radius:8px;
-  text-shadow:0 0 5px currentColor;
-  box-shadow:0 0 15px #ff00c8;
-}
-
-/* ---------- RESPONSIVE ---------- */
-@media (max-width:600px) {
-  .container { padding:0.3em; }
-  .modal-content { padding:0.8em; }
-  .cups-area { width:98vw; min-width:0; }
-  .table-img { width:100vw; height:auto; }
-  .cup-set { margin:0 4px; }
-  .cup-btn, .cup-btn img { width:28px; height:28px; }
-  .match-intro-bars .match-intro-names { font-size:1.3em; }
-  .match-intro-names .team { min-width:140px; }
-  .sidebar-overlay {
-    width:98vw; left:0; top:auto; bottom:0; height:180px;
-    flex-direction:row;
-    font-size:.88em;
-    border-radius:0;
-    border-left:none;
-    border-top:3px solid #00ffd0;
-    box-shadow:0 -3px 28px #ff00c888;
-  }
-  .sidebar-overlay table { font-size:.88em; }
-  .top-right-controls { right:8px; top:8px; padding:6px; gap:6px; }
-  #bigAlertInner { padding:12px; border-radius:10px; }
-  /* Losers game adjustments */
-  #losersGameModal .cups-area {
-    width:300px;
-    height:520px;
-    min-height:520px;
-  }
-  :root {
-    --vh-grid-size: 180px;
-    --cup-size: 32px;
-    --table-scale: 0.82;
-  }
-}
-</style>
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .container { padding: 0.3em; }
+      .cups-area { width: 98vw; min-width: 0; }
+      .table-img { width: 100vw; height: auto; }
+      .cup-set { margin: 0 4px; }
+      .cup-btn, .cup-btn img { width: 28px; height: 28px; }
+      .match-intro-names { font-size: 1.3em; }
+      .match-intro-names .team { min-width: 140px; }
+      .sidebar-overlay {
+        width: 98vw;
+        left: 0;
+        top: auto;
+        bottom: 0;
+        height: 180px;
+        flex-direction: row;
+        font-size: 0.88em;
+        border-radius: 0;
+        border-left: none;
+        border-top: 3px solid #00ffd0;
+        box-shadow: 0 -3px 28px #ff00c888;
+      }
+      .sidebar-overlay table { font-size: 0.88em; }
+      .top-right-controls { right: 8px; top: 8px; padding: 6px; gap: 8px; }
+      #bigAlertInner { padding: 12px; border-radius: 10px; }
+      #losersGameModal .cups-area {
+        width: 310px;
+        height: 520px;
+        min-height: 520px;
+      }
+      :root {
+        --vh-grid-size: 185px;
+        --cup-size: 32px;
+        --table-scale: 0.82;
+      }
+    }
+  </style>
 </head>
 <body>
-<!-- TOP-RIGHT CONTROLS -->
-<div class="top-right-controls">
-  <div class="toggle-container">
-    <span class="toggle-label">Äänet</span>
-    <label class="toggle-switch" title="Äänet On/Off">
-      <input type="checkbox" id="soundToggle">
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
-  <div class="toggle-container">
-    <span class="toggle-label">Testitoiminnot</span>
-    <label class="toggle-switch" title="Testitoiminnot On/Off">
-      <input type="checkbox" id="testFeaturesToggle">
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
-</div>
-
-<div class="container">
-  <h1>Keikahdusliiga</h1>
-  <div class="section" id="setup">
-    <h2>Luo liigaturnaus</h2>
-    <div class="flex" style="flex-wrap:wrap;">
-      <label>Joukkuekoko:
-        <input type="range" min="1" max="4" value="2" id="teamSizeSlider" style="width:100px;">
-        <span id="teamSizeVal">2</span>
+  <!-- TOP-RIGHT CONTROLS -->
+  <div class="top-right-controls">
+    <div class="toggle-container">
+      <span class="toggle-label">Äänet</span>
+      <label class="toggle-switch" title="Äänet On/Off">
+        <input type="checkbox" id="soundToggle">
+        <span class="toggle-slider"></span>
       </label>
-      <label><input type="checkbox" id="goldenGoalCheckbox" style="margin-right:6px;"> Golden goal?</label>
-      <label>Peliaika:
-        <input type="number" id="timerInput" min="1" max="60" value="10" style="width:60px;"> min
+    </div>
+    <div class="toggle-container">
+      <span class="toggle-label">Testitoiminnot</span>
+      <label class="toggle-switch" title="Testitoiminnot On/Off">
+        <input type="checkbox" id="testFeaturesToggle">
+        <span class="toggle-slider"></span>
       </label>
-      <button class="btn" id="addTeamBtn">Lisää</button>
-      <label for="csvInput" class="custom-file-label">Tuo .CSV</label>
-      <input type="file" accept=".csv" id="csvInput" style="margin-left:1em;">
-      <button class="btn" id="testModeBtn">Testaus</button>
-      <button class="btn" id="resetBtn">Nollaa</button>
-    </div>
-    <div class="team-list" id="teamList"></div>
-    <button id="startTournamentBtn" class="btn" style="display:none;" onclick="beginTournament()">Käynnistä turnaus</button>
-  </div>
-
-  <div class="section" id="fixturesSection" style="display:none;">
-    <h2>Ottelukaavio</h2>
-    <div class="fixture-list" id="fixtureList"></div>
-  </div>
-
-  <div class="section" id="standingsSection" style="display:none;">
-    <h2>Sarjataulukko</h2>
-    <div id="standingsTable"></div>
-  </div>
-</div>
-
-<!-- Match modal -->
-<div class="fullscreen-modal" id="fullscreenModal" style="display:none;">
-  <div class="modal-content" id="modalContent"></div>
-  <div id="sidebarOverlay" class="sidebar-overlay" style="display:none;"></div>
-  <button class="close-btn" id="closeModalBtn">&times;</button>
-</div>
-
-<!-- Big Alert -->
-<div id="bigAlertModal" aria-hidden="true">
-  <div id="bigAlertInner">
-    <h2 id="bigAlertTitle">Alert</h2>
-    <p id="bigAlertMessage">Message</p>
-    <div class="big-alert-actions">
-      <button class="big-close btn" id="bigAlertCloseBtn">Sulje</button>
     </div>
   </div>
-</div>
 
-<!-- Match intro -->
-<div class="match-intro-overlay" id="matchIntroOverlay" style="display:none;">
-  <div class="match-intro-bars">
-    <div class="bar top"></div>
-    <div class="bar bottom"></div>
-    <div class="match-intro-names">
-      <span class="team top" id="introTeamTop"></span>
-      <span class="vs">VS</span>
-      <span class="team bottom" id="introTeamBottom"></span>
-    </div>
-  </div>
-</div>
-
-<!-- Viinaharava (Losers Game) -->
-<div id="losersGameModal" class="fullscreen-modal" style="display:none;">
-  <div class="modal-content">
-    <h2>Viinaharava</h2>
-    <div style="margin-bottom:15px; font-size:1.05em; text-align:center;">
-      <span id="loserTeamName" style="color:#00ffd0;text-shadow:0 0 8px #00ffd0;"></span> |
-      <span id="currentThrower" style="color:#ff00c8;text-shadow:0 0 8px #ff00c8;"></span> heittää
-    </div>
-    <div class="cups-area">
-      <div class="table-wrapper">
-        <img src="assets/table.png" class="table-img" alt="Table">
+  <div class="container">
+    <h1>Keikahdusliiga</h1>
+    <div class="section" id="setup">
+      <h2>Luo liigaturnaus</h2>
+      <div class="flex" style="flex-wrap: wrap;">
+        <label>Joukkuekoko:
+          <input type="range" min="1" max="4" value="2" id="teamSizeSlider" style="width:100px;">
+          <span id="teamSizeVal">2</span>
+        </label>
+        <label>
+          <input type="checkbox" id="goldenGoalCheckbox" style="margin-right:6px;">
+          Golden goal?
+        </label>
+        <label>
+          Peliaika:
+          <input type="number" id="timerInput" min="1" max="60" value="10" style="width:60px;"> min
+        </label>
+        <button class="btn" id="addTeamBtn">Lisää</button>
+        <label for="csvInput" class="custom-file-label">Tuo .CSV</label>
+        <input type="file" accept=".csv" id="csvInput" style="margin-left:1em;">
+        <button class="btn" id="testModeBtn">Testaus</button>
+        <button class="btn" id="resetBtn">Nollaa</button>
       </div>
-      <div id="losersGrid"></div>
+      <div class="team-list" id="teamList"></div>
+      <button id="startTournamentBtn" class="btn" style="display:none;" onclick="beginTournament()">Käynnistä turnaus</button>
     </div>
-    <div id="throwResult"
-         style="display:none; margin:20px auto; max-width:400px; text-align:center; padding:15px;
-                background:#18003a; border-radius:12px; border:2px solid #00ffd0;">
-      <h3 id="resultTitle">Osuma!</h3>
-      <div id="resultContent" class="result-content"></div>
+    <div class="section" id="fixturesSection" style="display:none;">
+      <h2>Ottelukaavio</h2>
+      <div class="fixture-list" id="fixtureList"></div>
     </div>
-    <div style="display:flex; justify-content:center; gap:15px; margin-top:20px;">
-      <button class="btn" id="finishLosersGameBtn">Sulje peli</button>
+    <div class="section" id="standingsSection" style="display:none;">
+      <h2>Sarjataulukko</h2>
+      <div id="standingsTable"></div>
     </div>
   </div>
-  <button class="close-btn" id="closeLosersGameBtn">&times;</button>
-</div>
+
+  <!-- Match modal -->
+  <div class="fullscreen-modal" id="fullscreenModal" style="display:none;">
+    <div class="modal-content" id="modalContent"></div>
+    <div id="sidebarOverlay" class="sidebar-overlay" style="display:none;"></div>
+    <button class="close-btn" id="closeModalBtn" type="button">&times;</button>
+  </div>
+
+  <!-- Big alert -->
+  <div id="bigAlertModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div id="bigAlertInner" role="document">
+      <h2 id="bigAlertTitle">Alert</h2>
+      <p id="bigAlertMessage">Message</p>
+      <div class="big-alert-actions">
+        <button class="big-close btn" id="bigAlertCloseBtn">Sulje</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Intro animation -->
+  <div class="match-intro-overlay" id="matchIntroOverlay" style="display:none;">
+    <div class="match-intro-bars">
+      <div class="bar top"></div>
+      <div class="bar bottom"></div>
+      <div class="match-intro-names">
+        <span class="team top" id="introTeamTop"></span>
+        <span class="vs">VS</span>
+        <span class="team bottom" id="introTeamBottom"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Viinaharava modal -->
+  <div id="losersGameModal" class="fullscreen-modal" style="display:none;">
+    <div class="modal-content">
+      <h2>Viinaharava</h2>
+      <div style="margin-bottom: 15px; font-size: 1.05em; text-align: center;">
+        <span id="loserTeamName" style="color:#00ffd0;text-shadow:0 0 8px #00ffd0;"></span> |
+        <span id="currentThrower" style="color:#ff00c8;text-shadow:0 0 8px #ff00c8;"></span> heittää
+      </div>
+      <div class="cups-area">
+        <div class="table-wrapper">
+          <img src="assets/table.png" class="table-img" alt="Table">
+        </div>
+        <div id="losersGrid"></div>
+      </div>
+      <div id="throwResult"
+           style="display:none; margin:20px auto; max-width:420px; text-align:center; padding:15px;
+                  background:#18003a; border-radius:12px; border:2px solid #00ffd0;">
+        <h3 id="resultTitle">Osuma!</h3>
+        <div id="resultContent" class="result-content"></div>
+      </div>
+      <div style="display:flex; justify-content:center; gap:15px; margin-top:20px;">
+        <button class="btn" id="finishLosersGameBtn" type="button">Sulje peli</button>
+      </div>
+    </div>
+    <button class="close-btn" id="closeLosersGameBtn" type="button">&times;</button>
+  </div>
 
 <script>
-/* ---------- STATE ---------- */
+/* ===================== STATE ===================== */
 let teams = [];
 let teamInputs = [];
 let teamSize = 2;
@@ -697,31 +649,30 @@ let losersPlayers = [];
 let currentLoserIndex = 0;
 let losersCupResults = [];
 
-/* Toggles */
+/* Feature toggles */
 let soundEnabled = false;
 let testFeaturesEnabled = false;
+
 const soundToggleEl = document.getElementById('soundToggle');
 const testFeaturesToggleEl = document.getElementById('testFeaturesToggle');
 const testModeBtn = document.getElementById('testModeBtn');
-
-/* ---------- TOGGLES SETUP ---------- */
-if (soundToggleEl) soundToggleEl.checked = soundEnabled;
-if (testFeaturesToggleEl) testFeaturesToggleEl.checked = testFeaturesEnabled;
 if (testModeBtn) testModeBtn.disabled = !testFeaturesEnabled;
 
-soundToggleEl?.addEventListener('change', e => {
-  soundEnabled = e.target.checked;
-});
+/* ===================== TOGGLE LISTENERS ===================== */
+if (soundToggleEl) {
+  soundToggleEl.addEventListener('change', e => {
+    soundEnabled = e.target.checked;
+  });
+}
+if (testFeaturesToggleEl) {
+  testFeaturesToggleEl.addEventListener('change', e => {
+    testFeaturesEnabled = e.target.checked;
+    if (testModeBtn) testModeBtn.disabled = !testFeaturesEnabled;
+    renderFixtures();
+  });
+}
 
-testFeaturesToggleEl?.addEventListener('change', e => {
-  testFeaturesEnabled = e.target.checked;
-  if (testModeBtn) testModeBtn.disabled = !testFeaturesEnabled;
-  const vhBtn = document.getElementById('viinaharavaBtn');
-  if (vhBtn) vhBtn.disabled = !testFeaturesEnabled;
-  renderFixtures();
-});
-
-/* ---------- VIINAHARAVA CONFIG ---------- */
+/* ===================== VIINAHARAVA CONFIG ===================== */
 const losersCupTypes = [
   { type: 'BAILEYS', count: 4, color: '#A67B5B' },
   { type: 'SALMARI', count: 4, color: '#000000' },
@@ -731,34 +682,67 @@ const losersCupTypes = [
   { type: 'MINTTU', count: 3, color: '#00ffd0' }
 ];
 
-/* ---------- VIINAHARAVA LOGIC ---------- */
+/* ===================== HELPER: ALERT MODAL ===================== */
+const bigAlertModal = document.getElementById('bigAlertModal');
+const bigAlertTitleEl = document.getElementById('bigAlertTitle');
+const bigAlertMessageEl = document.getElementById('bigAlertMessage');
+const bigAlertCloseBtn = document.getElementById('bigAlertCloseBtn');
+
+function showBigAlert(title, message, opts = {}) {
+  bigAlertTitleEl.textContent = title || 'Info';
+  bigAlertMessageEl.textContent = typeof message === 'string' ? message : JSON.stringify(message, null, 2);
+  bigAlertModal.style.display = 'flex';
+  bigAlertModal.setAttribute('aria-hidden', 'false');
+  if (bigAlertModal._timer) {
+    clearTimeout(bigAlertModal._timer);
+    bigAlertModal._timer = null;
+  }
+  if (opts.autoCloseMs) {
+    bigAlertModal._timer = setTimeout(() => {
+      hideBigAlert();
+      if (typeof opts.onClose === 'function') opts.onClose();
+    }, opts.autoCloseMs);
+  }
+}
+function hideBigAlert() {
+  bigAlertModal.style.display = 'none';
+  bigAlertModal.setAttribute('aria-hidden', 'true');
+  if (bigAlertModal._timer) {
+    clearTimeout(bigAlertModal._timer);
+    bigAlertModal._timer = null;
+  }
+}
+if (bigAlertCloseBtn) bigAlertCloseBtn.addEventListener('click', hideBigAlert);
+
+/* ===================== VIINAHARAVA FUNCTIONS ===================== */
 function startLosersGame(losingTeam, onComplete) {
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  if (!losingTeam || !losingTeam.players || !losingTeam.players.length) {
+  if (!losingTeam || !losingTeam.players?.length) {
     if (onComplete) onComplete();
     return;
   }
-  document.getElementById('fullscreenModal').style.display = 'none';
   document.getElementById('matchIntroOverlay').style.display = 'none';
+  document.getElementById('fullscreenModal').style.display = 'none';
   hideSidebar();
 
   losersGameActive = true;
   losersGameEnded = false;
   losersTeam = losingTeam;
-
-  // Only first two players count (if only one exists, we handle early end after their non-RETHROW)
+  // Only first two players matter for the early end rule
   losersPlayers = losingTeam.players.slice(0, 2);
   currentLoserIndex = 0;
   window.losersGameCompleteCallback = onComplete || null;
 
-  // Build randomized cup results
-  const pool = [];
-  losersCupTypes.forEach(t => { for (let i=0;i<t.count;i++) pool.push({...t}); });
-  for (let i=pool.length-1; i>0; i--) {
-    const j = Math.floor(Math.random() * (i+1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
+  // Distribution
+  const allResults = [];
+  losersCupTypes.forEach(t => {
+    for (let i = 0; i < t.count; i++) allResults.push({...t});
+  });
+  for (let i = allResults.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allResults[i], allResults[j]] = [allResults[j], allResults[i]];
   }
-  losersCupResults = pool;
+  losersCupResults = allResults;
 
   document.getElementById('loserTeamName').textContent = losingTeam.name;
   document.getElementById('currentThrower').textContent = losersPlayers[currentLoserIndex] || 'Unknown';
@@ -768,18 +752,20 @@ function startLosersGame(losingTeam, onComplete) {
   const modal = document.getElementById('losersGameModal');
   modal.classList.remove('losers-ended');
   modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden', 'false');
 }
 
 function renderLosersCups() {
   const grid = document.getElementById('losersGrid');
   if (!grid) return;
   grid.innerHTML = '';
-  for (let i=0; i<16; i++) {
+  for (let i = 0; i < 16; i++) {
     const btn = document.createElement('button');
-    btn.className = 'cup-btn';
+    btn.className = 'cup-btn losers-cup';
+    btn.dataset.index = i;
     const img = document.createElement('img');
     img.src = 'assets/redcup.png';
-    img.onerror = function(){ this.src = 'redcup.png'; };
+    img.onerror = function() { this.src = 'redcup.png'; };
     img.alt = 'Cup';
     btn.appendChild(img);
     btn.addEventListener('click', () => handleLosersCupClick(btn, i));
@@ -787,21 +773,24 @@ function renderLosersCups() {
   }
 }
 
-function handleLosersCupClick(btn, index) {
-  if (!losersGameActive || losersGameEnded || btn.classList.contains('hit')) return;
+function handleLosersCupClick(btn, idx) {
+  if (!losersGameActive || losersGameEnded) return;
+  if (btn.classList.contains('hit')) return;
   btn.classList.add('hit');
 
-  const result = losersCupResults[index];
+  const result = losersCupResults[idx];
+
   document.getElementById('resultTitle').textContent = 'OSUMA!';
   const resultContent = document.getElementById('resultContent');
   resultContent.innerHTML = `
-    <div class="result-drink" style="background-color:${result.color}20;color:${result.color};border-color:${result.color}">
+    <div class="result-drink"
+         style="background-color:${result.color}20;color:${result.color};border-color:${result.color}">
       ${result.type}
     </div>
     <button class="btn" id="nextThrowBtn">
       ${result.type === 'RETHROW'
         ? (currentLoserIndex === 1 ? 'UUDELLEENHEITTO (2. Pelaaja)' : 'UUDELLEENHEITTO')
-        : (currentLoserIndex === 0 && losersPlayers.length > 1 ? 'SEURAAVA HEITTÄJÄ' : 'LOPETA')}
+        : (currentLoserIndex === 0 ? 'SEURAAVA HEITTÄJÄ' : 'LOPETA')}
     </button>
   `;
   document.getElementById('throwResult').style.display = 'block';
@@ -809,21 +798,20 @@ function handleLosersCupClick(btn, index) {
   document.getElementById('nextThrowBtn').addEventListener('click', () => {
     document.getElementById('throwResult').style.display = 'none';
 
-    if (result.type === 'RETHROW') {
-      // Same player throws again
-      return;
-    }
+    // Rethrow: same player
+    if (result.type === 'RETHROW') return;
 
-    // Advance player
+    // Move to next player
     currentLoserIndex++;
 
-    // If second player (index 1) just completed non-RETHROW (or only one player existed):
-    if (currentLoserIndex >= losersPlayers.length || currentLoserIndex >= 2) {
+    // End if second player has thrown a non-rethrow (or no second player exists)
+    if (currentLoserIndex >= 2 || currentLoserIndex >= losersPlayers.length) {
       endLosersGame();
     } else {
-      document.getElementById('currentThrower').textContent = losersPlayers[currentLoserIndex] || 'Unknown';
+      document.getElementById('currentThrower').textContent =
+        losersPlayers[currentLoserIndex] || 'Unknown';
     }
-  }, { once:true });
+  }, { once: true });
 }
 
 function endLosersGame() {
@@ -839,12 +827,15 @@ function endLosersGame() {
 function disableLosersCups() {
   const grid = document.getElementById('losersGrid');
   if (!grid) return;
-  [...grid.querySelectorAll('.cup-btn')].forEach(b => b.style.pointerEvents = 'none');
+  [...grid.querySelectorAll('.cup-btn')].forEach(b => {
+    b.style.pointerEvents = 'none';
+  });
 }
 
 function finishLosersGame() {
   const modal = document.getElementById('losersGameModal');
   modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
   losersGameActive = false;
   losersGameEnded = true;
   if (window.losersGameCompleteCallback) {
@@ -853,129 +844,110 @@ function finishLosersGame() {
   }
 }
 
-/* ---------- BIG ALERT ---------- */
-const bigAlertModal = document.getElementById('bigAlertModal');
-const bigAlertTitleEl = document.getElementById('bigAlertTitle');
-const bigAlertMessageEl = document.getElementById('bigAlertMessage');
-const bigAlertCloseBtn = document.getElementById('bigAlertCloseBtn');
-
-function showBigAlert(title, message, opts = {}) {
-  bigAlertTitleEl.textContent = title || 'Info';
-  bigAlertMessageEl.textContent = typeof message === 'string' ? message : JSON.stringify(message, null, 2);
-  bigAlertModal.style.display = 'flex';
-  bigAlertModal.setAttribute('aria-hidden', 'false');
-  if (bigAlertModal._autoCloseTimer) {
-    clearTimeout(bigAlertModal._autoCloseTimer);
-  }
-  if (opts.autoCloseMs && opts.autoCloseMs > 0) {
-    bigAlertModal._autoCloseTimer = setTimeout(() => {
-      hideBigAlert();
-      if (typeof opts.onClose === 'function') opts.onClose();
-    }, opts.autoCloseMs);
-  }
-}
-function hideBigAlert() {
-  bigAlertModal.style.display = 'none';
-  bigAlertModal.setAttribute('aria-hidden', 'true');
-  if (bigAlertModal._autoCloseTimer) {
-    clearTimeout(bigAlertModal._autoCloseTimer);
-    bigAlertModal._autoCloseTimer = null;
-  }
-}
-bigAlertCloseBtn?.addEventListener('click', hideBigAlert);
-
-/* ---------- TEST HELPERS ---------- */
-function randomLoserScore() {
-  const r = Math.random();
-  if (r < 0.03) return 1;
-  if (r < 0.10) return 2;
-  if (r < 0.45) return 3;
-  if (r < 0.80) return 4;
-  return 5;
-}
-
-function applyTestResultToMatch(match, winnerIdx, winnerScore, loserScore) {
-  if (!match || !match.teams || match.teams.length < 2) return;
-  match.winner = match.teams[winnerIdx].name;
-  match.score = winnerIdx === 0 ? [winnerScore, loserScore] : [loserScore, winnerScore];
-  match.awaitingConfirm = false;
-  match.time = undefined;
-  const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
-  startLosersGame(losingTeam, () => {
-    ongoingMatchId = null;
-    renderFixtures();
-    renderStandings();
-    checkLeagueCompletion();
-    if (phase === "knockout") checkKnockoutProgression();
-  });
-}
-
-window.forceShowLosersGame = () => {
-  document.getElementById('losersGameModal').style.display = 'flex';
+/* Expose some test helpers */
+window.testLosersGame = function() {
+  startLosersGame({ name: "Joukkue 1", players: ["Pelaaja 1", "Pelaaja 2"] });
 };
 
-window.testLosersGame = () => {
-  startLosersGame({ name:"Joukkue 1", players:["Pelaaja 1","Pelaaja 2"] });
-};
-
-window.generateAllResults = function() {
-  if (!testFeaturesEnabled) return;
-  const allMatches = [...fixtures, ...knockoutFixtures];
-  allMatches.forEach(m => {
-    if (!m || m.winner) return;
-    const winnerIdx = Math.random() < 0.5 ? 0 : 1;
-    const loserScore = randomLoserScore();
-    const winnerScore = 6;
-    applyTestResultToMatch(m, winnerIdx, winnerScore, loserScore);
-  });
-  showBigAlert('Testitulokset', 'Testitulokset generoitu.', { autoCloseMs: 2500 });
-};
-
-window.promptAndApplyResult = function(matchId) {
-  if (!testFeaturesEnabled) return;
-  const match = getMatchById(matchId);
-  if (!match) return;
-  const input = prompt('Syötä tulos muodossa "6-0" (vasen-oikea)', '6-0');
-  if (!input) return;
-  const parts = input.trim().split('-');
-  if (parts.length !== 2) { showBigAlert('Virhe','Virheellinen muoto.'); return; }
-  const left = parseInt(parts[0],10);
-  const right = parseInt(parts[1],10);
-  if (Number.isNaN(left) || Number.isNaN(right)) { showBigAlert('Virhe','Ei numeroita.'); return; }
-  if (left === right) { showBigAlert('Virhe','Tasapeli ei sallittu.'); return; }
-  const winnerIdx = left > right ? 0 : 1;
-  match.winner = match.teams[winnerIdx].name;
-  match.score = [left, right];
-  match.awaitingConfirm = false;
-  ongoingMatchId = null;
-  match.time = undefined;
-  renderFixtures(); renderStandings(); checkLeagueCompletion();
-  if (phase === "knockout") checkKnockoutProgression();
-  showBigAlert('Tulos tallennettu', `${match.teams[0].name} ${left} - ${right} ${match.teams[1].name}`, { autoCloseMs: 2500 });
-};
-
-/* ---------- TEAM SETUP ---------- */
+/* ===================== TEAM SETUP & CSV ===================== */
 document.getElementById('teamSizeSlider').oninput = function() {
   teamSize = Number(this.value);
   document.getElementById('teamSizeVal').textContent = teamSize;
 };
+
 document.getElementById('addTeamBtn').onclick = () => {
   if (tournamentStarted) return;
-  teamInputs.push({ name:"", players:Array(teamSize).fill("") });
+  teamInputs.push({ name: "", players: Array(teamSize).fill("") });
   renderTeamList();
   updateStartButton();
 };
-document.getElementById('csvInput').onchange = handleCSVUpload;
-if (testModeBtn) testModeBtn.onclick = testMode;
-document.getElementById('resetBtn').onclick = resetAll;
-document.getElementById('goldenGoalCheckbox').onchange = function() {
-  goldenGoalEnabled = this.checked;
-};
-document.getElementById('timerInput').oninput = function() {
-  leagueTimer = Number(this.value) * 60;
-};
 
-function resetAll() {
+document.getElementById('csvInput').onchange = handleCSVUpload;
+
+function handleCSVUpload(e) {
+  let file = e.target.files[0];
+  if (!file) return;
+  let reader = new FileReader();
+  reader.onload = function(evt) {
+    let text;
+    try {
+      if (evt.target.result instanceof ArrayBuffer) {
+        text = new TextDecoder("utf-8").decode(evt.target.result);
+      } else {
+        text = evt.target.result;
+      }
+    } catch {
+      text = evt.target.result;
+    }
+    let delimiter = text.includes(";") ? ";" : ",";
+    let rows = text.trim().split('\n');
+    if (rows[0].toLowerCase().includes("joukkue") || rows[0].toLowerCase().includes("team")) {
+      rows = rows.slice(1);
+    }
+    let map = {};
+    for (let r=0; r<rows.length; r++) {
+      let row = rows[r].split(delimiter);
+      if (row.length < 2) continue;
+      let team = row[0].trim();
+      let player = row[1].trim();
+      if (!map[team]) map[team] = [];
+      map[team].push(player);
+    }
+    teamInputs = [];
+    teams = [];
+    for (let t in map) {
+      teamInputs.push({ name: t, players: map[t].slice() });
+      teams.push({ name: t, players: map[t].slice() });
+    }
+    renderTeamList();
+    updateStartButton();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ===================== TEST MODE FILL ===================== */
+if (testModeBtn) {
+  testModeBtn.onclick = testMode;
+}
+
+function testMode() {
+  let teamNames = ["Red Devils","Beer Bros","Cup Kings","Pong Stars","Sudden Death","Last Call"];
+  let playerNames = ["Alex","Sam","Jamie","Taylor","Jordan","Morgan","Riley","Casey","Reese","Charlie","Drew","Skyler"];
+  let nTeams = 6;
+  let tSize = Number(teamSize) || 2;
+
+  teams = [];
+  teamInputs = [];
+
+  let usedPlayers = [];
+  for (let i=0; i<nTeams; i++) {
+    let tn = teamNames[i % teamNames.length];
+    let ps = [];
+    for (let j=0; j<tSize; j++) {
+      let p;
+      let attempts = 0;
+      do {
+        p = playerNames[Math.floor(Math.random()*playerNames.length)];
+        attempts++;
+      } while (usedPlayers.includes(p) && attempts < 20);
+      usedPlayers.push(p);
+      ps.push(p);
+    }
+    teams.push({ name: tn, players: ps });
+    teamInputs.push({ name: tn, players: ps.slice() });
+  }
+
+  tournamentStarted = true;
+  renderTeamList();
+  generateFixtures();
+  document.getElementById('fixturesSection').style.display = '';
+  document.getElementById('standingsSection').style.display = '';
+  renderFixtures();
+  renderStandings();
+}
+
+/* ===================== RESET ===================== */
+document.getElementById('resetBtn').onclick = function() {
   teams = [];
   teamInputs = [];
   tournamentStarted = false;
@@ -987,81 +959,51 @@ function resetAll() {
   ongoingMatchId = null;
   teamSizeSlider.value = 2;
   teamSizeVal.textContent = 2;
-  ['teamList','fixtureList','standingsTable'].forEach(id => document.getElementById(id).innerHTML='');
-  document.getElementById('fixturesSection').style.display='none';
-  document.getElementById('standingsSection').style.display='none';
-  document.getElementById('fullscreenModal').style.display='none';
-  document.getElementById('sidebarOverlay').style.display='none';
-  document.getElementById('matchIntroOverlay').style.display='none';
-  document.getElementById('startTournamentBtn').style.display='none';
+  document.getElementById('teamList').innerHTML = '';
+  document.getElementById('fixtureList').innerHTML = '';
+  document.getElementById('standingsTable').innerHTML = '';
+  document.getElementById('fixturesSection').style.display = 'none';
+  document.getElementById('standingsSection').style.display = 'none';
+  document.getElementById('fullscreenModal').style.display = 'none';
+  document.getElementById('sidebarOverlay').style.display = 'none';
+  document.getElementById('matchIntroOverlay').style.display = 'none';
+  document.getElementById('startTournamentBtn').style.display = 'none';
   if (timerInterval) clearInterval(timerInterval);
+
   soundEnabled = false;
   testFeaturesEnabled = false;
-  if (soundToggleEl) soundToggleEl.checked = false;
-  if (testFeaturesToggleEl) testFeaturesToggleEl.checked = false;
-  if (testModeBtn) testModeBtn.disabled = true;
+  if (soundToggleEl) soundToggleEl.checked = soundEnabled;
+  if (testFeaturesToggleEl) testFeaturesToggleEl.checked = testFeaturesEnabled;
+  if (testModeBtn) testModeBtn.disabled = !testFeaturesEnabled;
   hideBigAlert();
   renderFixtures();
-}
+};
 
-function testMode() {
-  const teamNames = ["Red Devils","Beer Bros","Cup Kings","Pong Stars","Sudden Death","Last Call"];
-  const playerNames = ["Alex","Sam","Jamie","Taylor","Jordan","Morgan","Riley","Casey","Reese","Charlie","Drew","Skyler"];
-  let nTeams = 6;
-  let tSize = Number(teamSize) || 2;
-  teams = [];
-  teamInputs = [];
-  let usedPlayers = [];
-  for (let i=0; i<nTeams; i++) {
-    let tn = teamNames[i % teamNames.length];
-    let ps = [];
-    for (let j=0; j<tSize; j++) {
-      let p; let attempts=0;
-      do {
-        p = playerNames[Math.floor(Math.random()*playerNames.length)];
-        attempts++;
-      } while (usedPlayers.includes(p) && attempts < 20);
-      usedPlayers.push(p);
-      ps.push(p);
-    }
-    teams.push({ name: tn, players: ps });
-    teamInputs.push({ name: tn, players: ps.slice() });
-  }
-  tournamentStarted = true;
-  renderTeamList();
-  generateFixtures();
-  document.getElementById('fixturesSection').style.display = '';
-  document.getElementById('standingsSection').style.display = '';
-  renderFixtures();
-  renderStandings();
-}
+document.getElementById('goldenGoalCheckbox').onchange = function() {
+  goldenGoalEnabled = this.checked;
+};
+document.getElementById('timerInput').oninput = function() {
+  leagueTimer = Number(this.value) * 60;
+};
 
-function updateStartButton() {
-  const btn = document.getElementById('startTournamentBtn');
-  if (!tournamentStarted &&
-      teamInputs.length >= 2 &&
-      teamInputs.every(t => t.name && t.name.trim() && t.players.every(p => p && p.trim()))) {
-    btn.style.display = '';
-  } else {
-    btn.style.display = 'none';
-  }
-}
-
+/* ===================== TEAM LIST RENDER ===================== */
 function renderTeamList() {
   const el = document.getElementById('teamList');
   el.innerHTML = '';
-  const arr = tournamentStarted ? teams : teamInputs;
-  arr.forEach((team, idx) => {
-    const div = document.createElement('div');
-    div.className='team';
+  let source = tournamentStarted ? teams : teamInputs;
+
+  source.forEach((team, idx) => {
+    let div = document.createElement('div');
+    div.className = 'team';
     if (!tournamentStarted) {
       div.innerHTML = `
         <input type="text" placeholder="Joukkueen nimi" value="${team.name}"
-           oninput="updateTeamInput(${idx},'name',this.value)" style="margin-right:12px;">
-        ${team.players.map((p,i)=>`
-          <input type="text" placeholder="Pelaaja ${i+1}" value="${p}"
-             oninput="updateTeamInput(${idx},'player',this.value,${i})"
-             style="margin-right:10px;">`).join('')}
+          oninput="updateTeamInput(${idx}, 'name', this.value)" style="margin-right:12px;">
+        ${team.players.map((p, pi) =>
+          `<input type="text" placeholder="Pelaaja ${pi+1}" value="${p}"
+            oninput="updateTeamInput(${idx}, 'player', this.value, ${pi})"
+            style="margin-right:10px;">`
+        ).join('')}
         <button class="btn" style="float:right;" onclick="removeTeam(${idx})">Poista</button>
       `;
     } else {
@@ -1069,6 +1011,7 @@ function renderTeamList() {
     }
     el.appendChild(div);
   });
+
   updateStartButton();
 }
 
@@ -1078,15 +1021,31 @@ window.updateTeamInput = function(idx, field, value, pi) {
   else if (field === 'player') teamInputs[idx].players[pi] = value;
   updateStartButton();
 };
+
 window.removeTeam = function(idx) {
   teamInputs.splice(idx,1);
   renderTeamList();
   updateStartButton();
 };
 
+function updateStartButton() {
+  const btnEl = document.getElementById('startTournamentBtn');
+  if (!tournamentStarted &&
+      teamInputs.length >= 2 &&
+      teamInputs.every(t => t.name && t.name.trim() && t.players.every(p => p && p.trim()))) {
+    btnEl.style.display = '';
+  } else {
+    btnEl.style.display = 'none';
+  }
+}
+
+/* ===================== TOURNAMENT SETUP ===================== */
 function beginTournament() {
   tournamentStarted = true;
-  teams = teamInputs.map(t => ({ name: t.name, players: t.players.slice() }));
+  teams = teamInputs.map(t => ({
+    name: t.name,
+    players: t.players.slice()
+  }));
   renderTeamList();
   generateFixtures();
   document.getElementById('fixturesSection').style.display = '';
@@ -1094,8 +1053,8 @@ function beginTournament() {
   renderFixtures();
   renderStandings();
 }
+window.beginTournament = beginTournament;
 
-/* ---------- FIXTURE GENERATION ---------- */
 function generateFixtures() {
   fixtures = [];
   matchResults = {};
@@ -1103,72 +1062,87 @@ function generateFixtures() {
   let rounds = n % 2 === 0 ? n - 1 : n;
   let leagueMatchCounter = 1;
   let teamList = teams.slice();
+
   if (n % 2 === 1) {
-    teamList.push({ name:"BYE", players:[] });
+    teamList.push({name: "BYE", players: []});
     n++;
   }
-  let maxGames = 10, gameCount = 0;
-  outer: for (let r=0; r<rounds; r++) {
-    for (let i=0; i<n/2; i++) {
-      let t1 = teamList[i], t2 = teamList[n-1-i];
+
+  let maxGames = 10;
+  let gameCount = 0;
+
+  outer: for (let round = 0; round < rounds; round++) {
+    for (let i = 0; i < n / 2; i++) {
+      let t1 = teamList[i];
+      let t2 = teamList[n - 1 - i];
       if (t1.name !== "BYE" && t2.name !== "BYE") {
         fixtures.push({
-          id:`R${r+1}_${i}`,
-          teams:[t1,t2],
-          phase:"league",
-          cups:leagueCups,
-          winner:null,
-          score:null,
-            suddenDeath:false,
-          time:null,
-          cupsHit:[0,0],
-          number:leagueMatchCounter++,
-          awaitingConfirm:false
+          id: `R${round+1}_${i}`,
+            teams: [t1, t2],
+            phase: "league",
+            cups: leagueCups,
+            winner: null,
+            score: null,
+            suddenDeath: false,
+            time: null,
+            cupsHit: [0,0],
+            number: leagueMatchCounter++,
+            awaitingConfirm: false
         });
         gameCount++;
         if (gameCount >= maxGames) break outer;
       }
     }
-    teamList.splice(1,0,teamList.pop());
+    teamList.splice(1, 0, teamList.pop());
   }
   phase = "league";
   knockoutFixtures = [];
   ongoingMatchId = null;
 }
 
-/* ---------- RENDERING / UTIL ---------- */
-function getMatchTitle(match, idx, koLen=0) {
-  if (match.phase === "league") return `Sarjaottelu ${match.number || (idx+1)}`;
+/* ===================== RENDER FIXTURES ===================== */
+function getMatchTitle(match, idx, knockoutArrLength=0) {
+  if(match.phase === "league") return `Sarjaottelu ${match.number || (idx+1)}`;
   if (match.id === "SF1") return "Semifinaali 1";
   if (match.id === "SF2") return "Semifinaali 2";
   if (match.id === "Final") return "Finaali";
   if (match.id === "Bronze") return "Pronssiottelu";
-  return `Karsintaottelu ${idx - koLen + 1}`;
+  return `Karsintaottelu ${idx - knockoutArrLength + 1}`;
 }
+
 function getMatchResultText(match) {
-  if (!match.winner || !match.score) return "";
-  const [s1,s2] = match.score;
-  return `${match.teams[0].name} ${s1} - ${s2} ${match.teams[1].name} (${match.winner} on voittaja)`;
+  if(!match.winner || !match.score) return "";
+  let t1 = match.teams[0].name, t2 = match.teams[1].name;
+  let [s1,s2] = match.score;
+  return `${t1} ${s1} - ${s2} ${t2} (${match.winner} on voittaja)`;
 }
+
 function renderFixtures() {
-  const list = document.getElementById('fixtureList');
+  let list = document.getElementById('fixtureList');
   list.innerHTML = '';
-  const arr = phase === "knockout" ? knockoutFixtures : fixtures;
+  let showKnockout = phase === "knockout";
+  let arr = showKnockout ? knockoutFixtures : fixtures;
+
+  // Test feature button
   if (testFeaturesEnabled) {
     const headerDiv = document.createElement('div');
-    headerDiv.style.display='flex';
-    headerDiv.style.justifyContent='flex-end';
-    headerDiv.style.marginBottom='8px';
+    headerDiv.style.display = 'flex';
+    headerDiv.style.justifyContent = 'flex-end';
+    headerDiv.style.marginBottom = '8px';
     headerDiv.innerHTML = `<button class="btn" onclick="generateAllResults()">Generoi kaikki tulokset</button>`;
     list.appendChild(headerDiv);
   }
+
   arr.forEach((match, idx) => {
-    if (!match || !match.teams[0] || !match.teams[1]) return;
-    const div = document.createElement('div');
+    if (!match?.teams?.[0] || !match.teams[1]) return;
+    let div = document.createElement('div');
     div.className = 'fixture-card';
-    const title = getMatchTitle(match, idx, knockoutFixtures.length);
-    const winner = match.winner ? `<b>Voittaja:</b> ${match.winner}` : '';
-    const result = getMatchResultText(match);
+
+    let t1 = match.teams[0].name, t2 = match.teams[1].name;
+    let title = getMatchTitle(match, idx, knockoutFixtures.length);
+    let winner = match.winner ? `<b>Voittaja:</b> ${match.winner}` : '';
+    let result = getMatchResultText(match);
+
     let matchBtnHtml = "";
     if (!ongoingMatchId) {
       matchBtnHtml = `<button class="btn" onclick="startMatch('${match.id}')">Käynnistä ottelu</button>`;
@@ -1178,30 +1152,38 @@ function renderFixtures() {
       matchBtnHtml = `<button class="btn" disabled>Aloita ottelu</button>`;
     }
     if (match.winner) matchBtnHtml = "";
+
     let enterResultBtn = '';
     if (testFeaturesEnabled && !match.winner) {
       enterResultBtn = `<button class="btn" onclick="promptAndApplyResult('${match.id}')">Syötä tulos</button>`;
     }
+
     div.innerHTML = `
       <div class="game-title">${title}</div>
-      <div><b>${match.teams[0].name}</b> vs <b>${match.teams[1].name}</b></div>
+      <div><b>${t1}</b> vs <b>${t2}</b></div>
       ${winner}
       ${result ? `<div class="game-result">${result}</div>` : ""}
       <div class="flex">${matchBtnHtml}${enterResultBtn}</div>
-      <div><small>${match.cups} mukia${match.phase==='league' ? `, ${Math.round(leagueTimer/60)} min varsinainen peliaika` : ', Knockout'}</small></div>
+      <div><small>${match.cups} mukia${match.phase === 'league' ? `, ${Math.round(leagueTimer/60)} min` : ', Knockout'}</small></div>
       ${match.suddenDeath ? `<div class="timer">Golden goal käynnissä!</div>` : ''}
     `;
     list.appendChild(div);
   });
 }
 
+/* ===================== MATCH CONTROL ===================== */
 function getMatchById(id) {
   return [...fixtures, ...knockoutFixtures].find(m => m && m.id === id) || null;
 }
 
 function renderCupSet(teamIdx, match) {
-  if (!match || !match.teams[teamIdx]) return '';
-  let layout = match.cups === 6 ? [3,2,1] : [4,3,2,1];
+  if (!match?.teams?.[teamIdx]) return '';
+  let nCups = match.cups;
+  let layout = nCups === 6 ? [3,2,1] : [4,3,2,1];
+  let teamLabel = match.teams[teamIdx].name;
+  const labelColor = teamIdx === 0
+    ? 'color:#00ffd0;text-shadow:0 0 8px #00ffd0;'
+    : 'color:#ff00c8;text-shadow:0 0 8px #ff00c8;';
   let rows = [];
   let cupKey = `${match.id}_${teamIdx}`;
   let sideClass = teamIdx === 0 ? "left" : "right";
@@ -1210,25 +1192,21 @@ function renderCupSet(teamIdx, match) {
     let rowClass = teamIdx === 0 ? "" : "reverse";
     let row = `<div class="cup-row ${rowClass}">`;
     let cupIndices = [];
-    for (let i=0;i<n;i++) {
-      let offset = layout.slice(0,r).reduce((a,b)=>a+b,0);
-      let cupIdx = offset + i;
+    for (let i=0; i<n; i++) {
+      let cupIdx = layout.slice(0,r).reduce((a,b)=>a+b, 0)+i;
       cupIndices.push(cupIdx);
     }
     if (teamIdx === 1) cupIndices = cupIndices.reverse();
     cupIndices.forEach(cupIdx => {
       let hit = cupStates[cupKey]?.[cupIdx];
-      row += `<button class="cup-btn${hit?' hit':''}" id="cup_${cupKey}_${cupIdx}" onclick="toggleCup('${cupKey}',${cupIdx})">
+      row += `<button class="cup-btn${hit ? ' hit' : ''}" id="cup_${cupKey}_${cupIdx}" onclick="toggleCup('${cupKey}',${cupIdx})">
         <img src="assets/redcup.png" alt="Red Cup">
       </button>`;
     });
     row += '</div>';
     rows.push(row);
   });
-  const teamLabel = match.teams[teamIdx].name;
-  const labelColor = teamIdx === 0
-    ? 'color:#00ffd0;text-shadow:0 0 8px #00ffd0;'
-    : 'color:#ff00c8;text-shadow:0 0 8px #ff00c8;';
+
   return `<div class="cup-set ${sideClass}">
     <div class="cup-label" style="${labelColor}">${teamLabel}</div>
     ${rows.join('')}
@@ -1236,18 +1214,19 @@ function renderCupSet(teamIdx, match) {
 }
 
 window.toggleCup = function(cupKey, cupIdx) {
-  if (!cupStates[cupKey]) cupStates[cupKey] = Array(15).fill(false);
+  if(!cupStates[cupKey]) cupStates[cupKey] = Array(15).fill(false);
   cupStates[cupKey][cupIdx] = !cupStates[cupKey][cupIdx];
-  const btn = document.getElementById(`cup_${cupKey}_${cupIdx}`);
+  let btn = document.getElementById(`cup_${cupKey}_${cupIdx}`);
   if (btn) btn.classList.toggle('hit', cupStates[cupKey][cupIdx]);
 
   if (ongoingMatchId) {
-    const match = getMatchById(ongoingMatchId);
+    let match = getMatchById(ongoingMatchId);
     if (!match) return;
-    const leftKey = `${match.id}_0`;
-    const rightKey = `${match.id}_1`;
-    const leftDown = cupStates[leftKey]?.filter(Boolean).length || 0;
-    const rightDown = cupStates[rightKey]?.filter(Boolean).length || 0;
+    let leftKey = `${match.id}_0`;
+    let rightKey = `${match.id}_1`;
+    let leftDown = cupStates[leftKey]?.filter(Boolean).length || 0;
+    let rightDown = cupStates[rightKey]?.filter(Boolean).length || 0;
+
     if ((leftDown >= match.cups || rightDown >= match.cups) && !match.awaitingConfirm) {
       match.awaitingConfirm = true;
       setTimeout(() => showEndMatchModal(match, leftDown, rightDown), 400);
@@ -1256,25 +1235,22 @@ window.toggleCup = function(cupKey, cupIdx) {
 };
 
 function showEndMatchModal(match, leftDown, rightDown) {
-  const cupsTotal = match.cups;
+  if (!match) return;
+  let cupsTotal = match.cups;
   let winnerIdx = null;
-  let winnerScore = cupsTotal;
-  let loserScore = 0;
-  if (leftDown >= cupsTotal) {
-    winnerIdx = 1;
-    loserScore = rightDown;
-  } else if (rightDown >= cupsTotal) {
-    winnerIdx = 0;
-    loserScore = leftDown;
-  }
-  const winnerName = match.teams[winnerIdx].name;
-  const modal = document.getElementById('fullscreenModal');
-  const content = document.getElementById('modalContent');
+  let winnerScore = cupsTotal, loserScore = 0;
+  if (leftDown >= cupsTotal) { winnerIdx = 1; loserScore = rightDown; }
+  else if (rightDown >= cupsTotal) { winnerIdx = 0; loserScore = leftDown; }
+  let winnerName = match.teams[winnerIdx].name;
+  let team1 = match.teams[0].name, team2 = match.teams[1].name;
+
+  let modal = document.getElementById('fullscreenModal');
+  let content = document.getElementById('modalContent');
   content.innerHTML = `
     <h2>Voittaja: ${winnerName}</h2>
     <div style="font-size:1em; margin-bottom:10px;">
-      ${match.teams[0].name} upotetut mukit: ${rightDown}<br>
-      ${match.teams[1].name} upotetut mukit: ${leftDown}
+      ${team1} upotetut mukit: ${rightDown}<br>
+      ${team2} upotetut mukit: ${leftDown}
     </div>
     <div class="flex">
       <button class="btn" onclick="confirmAutoScore('${match.id}',${winnerIdx},${winnerScore},${loserScore})">Vahvista tulos</button>
@@ -1285,20 +1261,27 @@ function showEndMatchModal(match, leftDown, rightDown) {
 }
 
 window.confirmAutoScore = function(matchId, winnerIdx, winnerScore, loserScore) {
-  const match = getMatchById(matchId);
+  let match = getMatchById(matchId);
   if (!match) return;
   match.winner = match.teams[winnerIdx].name;
   match.score = winnerIdx === 0 ? [winnerScore, loserScore] : [loserScore, winnerScore];
   match.awaitingConfirm = false;
   match.time = undefined;
   ongoingMatchId = null;
-  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  document.getElementById('fullscreenModal').style.display='none';
+
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  document.getElementById('fullscreenModal').style.display = 'none';
   hideSidebar();
+
   const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
   setTimeout(() => {
     startLosersGame(losingTeam, () => {
-      renderFixtures(); renderStandings();
+      renderFixtures();
+      renderStandings();
       checkLeagueCompletion();
       if (phase === "knockout") checkKnockoutProgression();
     });
@@ -1306,10 +1289,10 @@ window.confirmAutoScore = function(matchId, winnerIdx, winnerScore, loserScore) 
 };
 
 window.returnToMatch = function(matchId) {
-  const match = getMatchById(matchId);
+  let match = getMatchById(matchId);
   if (!match) return;
   match.awaitingConfirm = false;
-  document.getElementById('fullscreenModal').style.display='none';
+  document.getElementById('fullscreenModal').style.display = 'none';
   showActiveMatch(matchId);
 };
 
@@ -1323,14 +1306,14 @@ window.spectateMatch = function(matchId) {
 };
 
 function playIntroAnimation(matchId, onDone) {
-  const match = getMatchById(matchId);
+  let match = getMatchById(matchId);
   if (!match) return;
   document.getElementById('introTeamTop').textContent = match.teams[0].name;
   document.getElementById('introTeamBottom').textContent = match.teams[1].name;
-  const overlay = document.getElementById('matchIntroOverlay');
+  let overlay = document.getElementById('matchIntroOverlay');
   overlay.style.display = 'flex';
-  setTimeout(()=>overlay.classList.add('animate'),10);
-  setTimeout(()=>{
+  setTimeout(()=>overlay.classList.add('animate'), 10);
+  setTimeout(() => {
     overlay.classList.remove('animate');
     overlay.style.display = 'none';
     if (onDone) onDone();
@@ -1338,23 +1321,26 @@ function playIntroAnimation(matchId, onDone) {
 }
 
 window.showActiveMatch = function(matchId) {
-  const match = getMatchById(matchId);
+  let match = getMatchById(matchId);
   if (!match) return;
-  const leftSet = renderCupSet(0, match);
-  const rightSet = renderCupSet(1, match);
-  const title = getMatchTitle(match, (phase === "knockout" ? knockoutFixtures.indexOf(match) : fixtures.indexOf(match)), knockoutFixtures.length);
-  const result = getMatchResultText(match);
-  let timerHtml = match.phase === 'league' ? `<div class="timer" id="modalTimer">${formatTime(typeof match.time === 'number' ? match.time : leagueTimer)}</div>` : '';
-  let confirmHtml = '';
+
+  let leftCupSet = renderCupSet(0, match);
+  let rightCupSet = renderCupSet(1, match);
+  let title = getMatchTitle(match, (phase === "knockout" ? knockoutFixtures.indexOf(match) : fixtures.indexOf(match)), knockoutFixtures.length);
+  let result = getMatchResultText(match);
+  let timerHtml = match.phase === 'league'
+    ? `<div class="timer" id="modalTimer">${formatTime(typeof match.time === 'number' ? match.time : leagueTimer)}</div>` : '';
+
+  let confirmButtonsHtml = '';
   if (match.awaitingConfirm) {
-    const leftKey = `${match.id}_0`;
-    const rightKey = `${match.id}_1`;
-    const leftDown = cupStates[leftKey]?.filter(Boolean).length || 0;
-    const rightDown = cupStates[rightKey]?.filter(Boolean).length || 0;
-    const winnerIdx = leftDown >= match.cups ? 1 : 0;
-    const winnerScore = match.cups;
-    const loserScore = winnerIdx === 0 ? leftDown : rightDown;
-    confirmHtml = `
+    let leftKey = `${match.id}_0`;
+    let rightKey = `${match.id}_1`;
+    let leftDown = cupStates[leftKey]?.filter(Boolean).length || 0;
+    let rightDown = cupStates[rightKey]?.filter(Boolean).length || 0;
+    let winnerIdx = leftDown >= match.cups ? 1 : 0;
+    let winnerScore = match.cups;
+    let loserScore = winnerIdx === 0 ? leftDown : rightDown;
+    confirmButtonsHtml = `
       <div style="background:#ff00c8; padding:10px; border-radius:8px; margin:10px 0;">
         <h3>Ottelu päättynyt!</h3>
         <div class="flex">
@@ -1364,8 +1350,9 @@ window.showActiveMatch = function(matchId) {
       </div>
     `;
   }
-  const modal = document.getElementById('fullscreenModal');
-  const content = document.getElementById('modalContent');
+
+  let modal = document.getElementById('fullscreenModal');
+  let content = document.getElementById('modalContent');
   content.innerHTML = `
     <div class="game-title">${title}</div>
     <h2>
@@ -1375,26 +1362,29 @@ window.showActiveMatch = function(matchId) {
     </h2>
     <div class="cups-area">
       <img src="assets/table.png" class="table-img" alt="Table">
-      ${leftSet}${rightSet}
+      ${leftCupSet}
+      ${rightCupSet}
     </div>
-    ${result ? `<div class="game-result">${result}</div>` : ''}
+    ${result ? `<div class="game-result">${result}</div>` : ""}
     ${timerHtml}
-    ${confirmHtml}
+    ${confirmButtonsHtml}
     ${match.suddenDeath ? `<div class="timer">Golden goal käynnissä!</div>` : ''}
-    <div><small>${match.cups} mukia${match.phase==='league' ? `, ${Math.round(leagueTimer/60)} min varsinainen peliaika` : ', Knockout'}</small></div>
+    <div><small>${match.cups} mukia${match.phase === 'league'
+      ? `, ${Math.round(leagueTimer/60)} min varsinainen peliaika`
+      : ', Knockout'}</small></div>
     <div class="flex" style="margin-top:1em;">
       <button class="btn" onclick="closeMatchView()">Pienennä</button>
     </div>
   `;
-  modal.style.display='flex';
+  modal.style.display = 'flex';
   showSidebar();
 
   if (match.phase === 'league' && !match.winner && ongoingMatchId === match.id) {
-    const timerEl = document.getElementById('modalTimer');
+    let timerEl = document.getElementById('modalTimer');
     if (timerEl) {
       let secs = typeof match.time === 'number' ? match.time : leagueTimer;
       if (timerInterval) clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
+      timerInterval = setInterval(()=>{
         if (document.getElementById('fullscreenModal').style.display === 'none' || match.winner) {
           clearInterval(timerInterval);
           match.time = secs;
@@ -1416,91 +1406,107 @@ window.showActiveMatch = function(matchId) {
 };
 
 window.closeMatchView = function() {
-  document.getElementById('fullscreenModal').style.display='none';
+  document.getElementById('fullscreenModal').style.display = 'none';
   hideSidebar();
-  const match = ongoingMatchId ? getMatchById(ongoingMatchId) : null;
+  let match = ongoingMatchId ? getMatchById(ongoingMatchId) : null;
   if (match && match.phase === "league" && !match.winner) {
-    const timerEl = document.getElementById('modalTimer');
+    let timerEl = document.getElementById('modalTimer');
     if (timerEl && timerEl.textContent.includes(':')) {
-      const [m,s] = timerEl.textContent.split(':').map(x=>parseInt(x,10));
-      match.time = m*60+s;
+      let [m,s] = timerEl.textContent.split(':').map(x=>parseInt(x,10));
+      match.time = m*60 + s;
     }
   }
   if (timerInterval) clearInterval(timerInterval);
 };
 
 document.getElementById('closeModalBtn').onclick = () => {
-  document.getElementById('fullscreenModal').style.display='none';
+  document.getElementById('fullscreenModal').style.display = 'none';
   hideSidebar();
   if (timerInterval) clearInterval(timerInterval);
 };
 
-function formatTime(total) {
-  const m = Math.floor(total/60), s = total%60;
-  return `${m}:${s<10?'0':''}${s}`;
+function formatTime(s) {
+  let m = Math.floor(s/60), ss = s%60;
+  return `${m}:${ss<10?'0':''}${ss}`;
 }
 
 window.manualScore = function(matchId, winnerIdx) {
-  const match = getMatchById(matchId);
+  let match = getMatchById(matchId);
   if (!match) return;
+  let nCups = match.cups;
   let leftKey = `${match.id}_0`;
   let rightKey = `${match.id}_1`;
   let leftTeamScore = cupStates[rightKey]?.filter(Boolean).length || 0;
   let rightTeamScore = cupStates[leftKey]?.filter(Boolean).length || 0;
-  const winnerScore = match.cups;
-  const loserScore = winnerIdx === 0 ? leftTeamScore : rightTeamScore;
+  let winnerScore = nCups;
+  let loserScore = winnerIdx === 0 ? leftTeamScore : rightTeamScore;
+
   match.winner = match.teams[winnerIdx].name;
   match.score = winnerIdx === 0 ? [winnerScore, loserScore] : [loserScore, winnerScore];
   match.awaitingConfirm = false;
   ongoingMatchId = null;
   match.time = undefined;
+
   if (timerInterval) clearInterval(timerInterval);
-  document.getElementById('fullscreenModal').style.display='none';
+
+  document.getElementById('fullscreenModal').style.display = 'none';
+
   const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
   startLosersGame(losingTeam, () => {
-    renderFixtures(); renderStandings(); checkLeagueCompletion();
+    renderFixtures();
+    renderStandings();
+    checkLeagueCompletion();
     if (phase === "knockout") checkKnockoutProgression();
   });
 };
 
-/* ---------- STANDINGS / SIDEBAR ---------- */
+/* ===================== STANDINGS ===================== */
 function abbreviateTeamName(name) {
-  const words = name.split(/\s+/).filter(Boolean);
+  let words = name.split(/\s+/).filter(Boolean);
   if (words.length === 1) return words[0].substring(0,3).toUpperCase();
   return words.slice(0,3).map(w=>w[0].toUpperCase()).join('');
 }
+
 function renderSidebarStandings() {
-  const arr = fixtures.concat(knockoutFixtures);
+  let arr = fixtures.concat(knockoutFixtures);
   let stats = {};
-  teams.forEach(t => stats[t.name] = { pts:0,S:0,SC:0,SD:0,played:0,W:0,L:0 });
-  arr.forEach(m => {
-    if (!m.winner || !m.score) return;
-    const t1 = m.teams[0].name;
-    const t2 = m.teams[1].name;
-    const [s1,s2] = m.score;
+  teams.forEach(t=>stats[t.name]={pts:0,S:0,SC:0,SD:0,played:0,W:0,L:0});
+  arr.forEach(m=>{
+    if(!m.winner || !m.score) return;
+    let t1 = m.teams[0].name, t2 = m.teams[1].name;
+    let [s1,s2] = m.score;
     stats[t1].played++; stats[t2].played++;
-    if (m.winner === t1) { stats[t1].pts+=2; stats[t1].W++; stats[t2].L++; }
-    else { stats[t2].pts+=2; stats[t2].W++; stats[t1].L++; }
-    stats[t1].S+=s1; stats[t1].SC+=s2;
-    stats[t2].S+=s2; stats[t2].SC+=s1;
+    if (m.winner === t1) {
+      stats[t1].pts+=2; stats[t1].W++; stats[t2].L++;
+    } else {
+      stats[t2].pts+=2; stats[t2].W++; stats[t1].L++;
+    }
+    stats[t1].S += s1; stats[t1].SC += s2;
+    stats[t2].S += s2; stats[t2].SC += s1;
   });
-  Object.keys(stats).forEach(name => { stats[name].SD = stats[name].S - stats[name].SC; });
-  const sorted = Object.entries(stats).sort((a,b)=>{
+  Object.keys(stats).forEach(n => stats[n].SD = stats[n].S - stats[n].SC);
+  let sorted = Object.entries(stats).sort((a, b) => {
     if (b[1].pts !== a[1].pts) return b[1].pts - a[1].pts;
     if (b[1].SD !== a[1].SD) return b[1].SD - a[1].SD;
     if (b[1].S !== a[1].S) return b[1].S - a[1].S;
     return b[1].SC - a[1].SC;
   });
+
   let activeTeams = [];
   if (ongoingMatchId) {
-    const match = getMatchById(ongoingMatchId);
-    if (match) activeTeams = [match.teams[0].name, match.teams[1].name];
+    let match = getMatchById(ongoingMatchId);
+    if (match && match.teams.length === 2) {
+      activeTeams = [match.teams[0].name, match.teams[1].name];
+    }
   }
+
   let table = `<table>
     <tr><th>Joukkue</th><th>P</th><th>W</th><th>L</th><th>Pisteet</th><th>SD</th></tr>`;
-  sorted.forEach(([name,s]) => {
-    table += `<tr${activeTeams.includes(name)?' class="active-team"':''}>
-      <td>${abbreviateTeamName(name)}</td>
+  sorted.forEach(([name,s])=>{
+    let abbr = abbreviateTeamName(name);
+    let isActive = activeTeams.includes(name);
+    table += `<tr${isActive?' class="active-team"':''}>
+      <td>${abbr}</td>
       <td>${s.played}</td>
       <td>${s.W}</td>
       <td>${s.L}</td>
@@ -1511,54 +1517,62 @@ function renderSidebarStandings() {
   table += '</table>';
   return table;
 }
-function showSidebar() {
-  const sidebar = document.getElementById('sidebarOverlay');
-  sidebar.innerHTML = `<h3>Sarjataulukko</h3>${renderSidebarStandings()}`;
-  sidebar.style.display='flex';
-}
-function hideSidebar() {
-  document.getElementById('sidebarOverlay').style.display='none';
-}
 
 function renderStandings() {
-  const all = fixtures.concat(knockoutFixtures);
+  let arr = fixtures.concat(knockoutFixtures);
   let stats = {};
-  teams.forEach(t => stats[t.name] = { pts:0,S:0,SC:0,SD:0,played:0,W:0,L:0 });
-  all.forEach(m => {
-    if (!m.winner || !m.score) return;
-    const [s1,s2] = m.score;
-    const t1 = m.teams[0].name;
-    const t2 = m.teams[1].name;
+  teams.forEach(t=>stats[t.name]={pts:0,S:0,SC:0,SD:0,played:0,W:0,L:0});
+
+  arr.forEach(m=>{
+    if(!m.winner || !m.score) return;
+    let t1 = m.teams[0].name, t2 = m.teams[1].name;
+    let [s1, s2] = m.score;
     stats[t1].played++; stats[t2].played++;
-    if (m.winner === t1) { stats[t1].pts+=2; stats[t1].W++; stats[t2].L++; }
+    if(m.winner === t1) { stats[t1].pts+=2; stats[t1].W++; stats[t2].L++; }
     else { stats[t2].pts+=2; stats[t2].W++; stats[t1].L++; }
-    stats[t1].S+=s1; stats[t1].SC+=s2;
-    stats[t2].S+=s2; stats[t2].SC+=s1;
+    stats[t1].S += s1; stats[t1].SC += s2;
+    stats[t2].S += s2; stats[t2].SC += s1;
   });
-  Object.keys(stats).forEach(n => stats[n].SD = stats[n].S - stats[n].SC);
-  const sorted = Object.entries(stats).sort((a,b)=>{
+  Object.keys(stats).forEach(n=>stats[n].SD= stats[n].S - stats[n].SC);
+  let sorted = Object.entries(stats).sort((a,b)=>{
     if (b[1].pts !== a[1].pts) return b[1].pts - a[1].pts;
     if (b[1].SD !== a[1].SD) return b[1].SD - a[1].SD;
     if (b[1].S !== a[1].S) return b[1].S - a[1].S;
     return b[1].SC - a[1].SC;
   });
-  let html = `<table class="standings"><tr>
+  let table = `<table class="standings"><tr>
     <th>Team</th><th>Played</th><th>W</th><th>L</th><th>Pts</th><th>S</th><th>SC</th><th>SD</th>
   </tr>`;
-  sorted.forEach(([name,s]) => {
-    html += `<tr>
-      <td>${name}</td><td>${s.played}</td><td>${s.W}</td><td>${s.L}</td><td>${s.pts}</td><td>${s.S}</td><td>${s.SC}</td><td>${s.SD}</td>
+  sorted.forEach(([name,s])=>{
+    table += `<tr>
+      <td>${name}</td>
+      <td>${s.played}</td>
+      <td>${s.W}</td>
+      <td>${s.L}</td>
+      <td>${s.pts}</td>
+      <td>${s.S}</td>
+      <td>${s.SC}</td>
+      <td>${s.SD}</td>
     </tr>`;
   });
-  html += '</table>';
-  document.getElementById('standingsTable').innerHTML = html;
+  table += '</table>';
+  document.getElementById('standingsTable').innerHTML = table;
 }
 
-/* ---------- PHASE PROGRESSION ---------- */
+function showSidebar() {
+  let sidebar = document.getElementById('sidebarOverlay');
+  sidebar.innerHTML = `<h3>Sarjataulukko</h3>${renderSidebarStandings()}`;
+  sidebar.style.display = 'flex';
+}
+function hideSidebar() {
+  document.getElementById('sidebarOverlay').style.display = 'none';
+}
+
+/* ===================== PROGRESSION ===================== */
 function checkLeagueCompletion() {
   if (phase !== "league") return;
-  const finished = fixtures.every(m => m.winner);
-  if (finished) {
+  let finished = fixtures.every(m=>m.winner);
+  if(finished) {
     phase = "knockout";
     generateKnockoutFixtures();
     renderFixtures();
@@ -1569,57 +1583,57 @@ function checkLeagueCompletion() {
 
 function generateKnockoutFixtures() {
   let stats = {};
-  teams.forEach(t => stats[t.name] = { pts:0, S:0, SC:0 });
-  fixtures.forEach(m => {
-    if (!m.winner || !m.score) return;
-    const [s1,s2] = m.score;
-    const t1 = m.teams[0].name;
-    const t2 = m.teams[1].name;
-    if (m.winner === t1) stats[t1].pts += 2; else stats[t2].pts += 2;
-    stats[t1].S += s1; stats[t1].SC += s2;
-    stats[t2].S += s2; stats[t2].SC += s1;
+  teams.forEach(t=>stats[t.name]={pts:0,S:0,SC:0});
+  fixtures.forEach(m=>{
+    if(!m.winner || !m.score) return;
+    let t1 = m.teams[0].name, t2 = m.teams[1].name;
+    let [s1,s2] = m.score;
+    if(m.winner === t1) stats[t1].pts+=2;
+    else stats[t2].pts+=2;
+    stats[t1].S+=s1; stats[t1].SC+=s2;
+    stats[t2].S+=s2; stats[t2].SC+=s1;
   });
-  const sorted = Object.entries(stats).sort((a,b)=>{
-    if (b[1].pts !== a[1].pts) return b[1].pts - a[1].pts;
-    if (b[1].S !== a[1].S) return b[1].S - a[1].S;
+  let sorted = Object.entries(stats).sort((a,b)=>{
+    if(b[1].pts!==a[1].pts) return b[1].pts - a[1].pts;
+    if(b[1].S!==a[1].S) return b[1].S - a[1].S;
     return b[1].SC - a[1].SC;
   }).map(([n])=>n);
-  const [t1,t2,t3,t4] = sorted;
+  let t1=sorted[0], t2=sorted[1], t3=sorted[2], t4=sorted[3];
   knockoutFixtures = [
-    { id:'SF1', teams:[getTeamByName(t1), getTeamByName(t4)], phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false },
-    { id:'SF2', teams:[getTeamByName(t2), getTeamByName(t3)], phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false }
+    {id: 'SF1', teams:[getTeamByName(t1), getTeamByName(t4)], phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false},
+    {id: 'SF2', teams:[getTeamByName(t2), getTeamByName(t3)], phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false},
   ];
 }
 
 function getTeamByName(name) {
-  return teams.find(t => t.name === name) || null;
+  return teams.find(t=>t.name===name) || null;
 }
 
 function checkKnockoutProgression() {
-  if (knockoutFixtures.length === 2 && knockoutFixtures.every(m => m.winner)) {
-    const sf1 = knockoutFixtures[0], sf2 = knockoutFixtures[1];
-    const finalists = [sf1.winner, sf2.winner];
-    const bronzeTeams = [
-      sf1.teams.find(t => t.name !== sf1.winner).name,
-      sf2.teams.find(t => t.name !== sf2.winner).name
+  if (knockoutFixtures.length === 2 && knockoutFixtures.every(m=>m.winner)) {
+    let sf1 = knockoutFixtures[0], sf2 = knockoutFixtures[1];
+    let finalists = [sf1.winner, sf2.winner];
+    let bronzeTeams = [
+      sf1.teams.find(t=>t.name!==sf1.winner).name,
+      sf2.teams.find(t=>t.name!==sf2.winner).name
     ];
     knockoutFixtures.push({
-      id:'Final',
-      teams:[getTeamByName(finalists[0]), getTeamByName(finalists[1])],
-      phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false
+      id: 'Final',
+      teams: [getTeamByName(finalists[0]), getTeamByName(finalists[1])],
+      phase: "knockout", cups: knockoutCups, winner:null, score:null, awaitingConfirm:false
     });
     knockoutFixtures.push({
-      id:'Bronze',
-      teams:[getTeamByName(bronzeTeams[0]), getTeamByName(bronzeTeams[1])],
-      phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false
+      id: 'Bronze',
+      teams: [getTeamByName(bronzeTeams[0]), getTeamByName(bronzeTeams[1])],
+      phase: "knockout", cups: knockoutCups, winner:null, score:null, awaitingConfirm:false
     });
     renderFixtures();
     renderStandings();
-    showBigAlert('Semifinaalit pelattu', 'Finaali ja pronssiottelu luotu.', { autoCloseMs: 3000 });
+    showBigAlert('Semifinaalit pelattu', 'Semifinaalit pelattu! Finaali ja pronssiottelu luotu.', { autoCloseMs: 3500 });
   }
-  if (knockoutFixtures.length === 4 && knockoutFixtures.slice(2).every(m => m.winner)) {
-    const final = knockoutFixtures.find(m => m.id === 'Final');
-    const bronze = knockoutFixtures.find(m => m.id === 'Bronze');
+  if (knockoutFixtures.length === 4 && knockoutFixtures.slice(2).every(m=>m.winner)) {
+    let final = knockoutFixtures.find(m=>m.id==='Final');
+    let bronze = knockoutFixtures.find(m=>m.id==='Bronze');
     if (final && bronze) {
       const msg = `Mestari: ${final.winner}\nHopea: ${final.teams.find(t=>t.name!==final.winner).name}\nPronssi: ${bronze.winner}`;
       showBigAlert('Turnaus valmis', msg);
@@ -1627,62 +1641,106 @@ function checkKnockoutProgression() {
   }
 }
 
-/* ---------- CSV IMPORT ---------- */
-function handleCSVUpload(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(evt) {
-    let text;
-    try {
-      text = evt.target.result instanceof ArrayBuffer
-        ? new TextDecoder("utf-8").decode(evt.target.result)
-        : evt.target.result;
-    } catch {
-      text = evt.target.result;
-    }
-    const delimiter = text.includes(";") ? ";" : ",";
-    let rows = text.trim().split('\n');
-    if (rows[0].toLowerCase().includes("joukkue") || rows[0].toLowerCase().includes("team")) {
-      rows = rows.slice(1);
-    }
-    const map = {};
-    rows.forEach(r => {
-      const cols = r.split(delimiter);
-      if (cols.length < 2) return;
-      const team = cols[0].trim();
-      const player = cols[1].trim();
-      if (!map[team]) map[team] = [];
-      map[team].push(player);
-    });
-    teams = [];
-    teamInputs = [];
-    for (let t in map) {
-      teams.push({ name:t, players: map[t].slice() });
-      teamInputs.push({ name:t, players: map[t].slice() });
-    }
-    renderTeamList();
-    updateStartButton();
-  };
-  reader.readAsArrayBuffer(file);
+/* ===================== TEST UTILITIES ===================== */
+function randomLoserScore() {
+  const r = Math.random();
+  if (r < 0.03) return 1;
+  if (r < 0.10) return 2;
+  if (r < 0.45) return 3;
+  if (r < 0.80) return 4;
+  return 5;
 }
 
-/* ---------- UTILITY / MISC ---------- */
+function applyTestResultToMatch(match, winnerIdx, winnerScore, loserScore) {
+  if (!match?.teams?.length) return;
+  match.winner = match.teams[winnerIdx].name;
+  match.score = winnerIdx === 0 ? [winnerScore, loserScore] : [loserScore, winnerScore];
+  match.awaitingConfirm = false;
+  match.time = undefined;
+  const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
+  startLosersGame(losingTeam, () => {
+    ongoingMatchId = null;
+    renderFixtures();
+    renderStandings();
+    checkLeagueCompletion();
+    if (phase === "knockout") checkKnockoutProgression();
+  });
+}
+
+window.generateAllResults = function() {
+  if (!testFeaturesEnabled) return;
+  const allMatches = [...fixtures, ...knockoutFixtures];
+  allMatches.forEach(m => {
+    if (!m || m.winner) return;
+    const winnerIdx = Math.random() < 0.5 ? 0 : 1;
+    const loserScore = randomLoserScore();
+    const winnerScore = 6;
+    applyTestResultToMatch(m, winnerIdx, winnerScore, loserScore);
+  });
+  showBigAlert('Testitulokset', 'Testitulokset generoitu.', { autoCloseMs: 3000 });
+};
+
+window.promptAndApplyResult = function(matchId) {
+  if (!testFeaturesEnabled) return;
+  const match = getMatchById(matchId);
+  if (!match) return;
+  const input = prompt('Syötä tulos muodossa "6-0" (vasen-oikea)', '6-0');
+  if (!input) return;
+  const parts = input.trim().split('-');
+  if (parts.length !== 2) {
+    showBigAlert('Virhe', 'Virheellinen muoto. Käytä esim. "6-0".');
+    return;
+  }
+  const left = parseInt(parts[0], 10);
+  const right = parseInt(parts[1], 10);
+  if (Number.isNaN(left) || Number.isNaN(right)) {
+    showBigAlert('Virhe', 'Arvot eivät ole numeroita.');
+    return;
+  }
+  if (left === right) {
+    showBigAlert('Virhe', 'Tasapeli ei ole sallittu.');
+    return;
+  }
+  const winnerIdx = left > right ? 0 : 1;
+  match.winner = match.teams[winnerIdx].name;
+  match.score = [left, right];
+  match.awaitingConfirm = false;
+  ongoingMatchId = null;
+  match.time = undefined;
+  renderFixtures();
+  renderStandings();
+  checkLeagueCompletion();
+  if (phase === "knockout") checkKnockoutProgression();
+  showBigAlert('Tulos tallennettu', `${match.teams[0].name} ${left} - ${right} ${match.teams[1].name}`, { autoCloseMs: 2500 });
+};
+
+/* ===================== SIDEBAR ===================== */
+function showSidebar() {
+  let sidebar = document.getElementById('sidebarOverlay');
+  sidebar.innerHTML = `<h3>Sarjataulukko</h3>${renderSidebarStandings()}`;
+  sidebar.style.display = 'flex';
+}
+function hideSidebar() {
+  document.getElementById('sidebarOverlay').style.display = 'none';
+}
+
+/* ===================== EXTRA BUTTON INJECTION (VIINAHARAVA TEST) ===================== */
 document.addEventListener('DOMContentLoaded', () => {
-  // Add Viinaharava test button right after Reset
   const resetBtn = document.getElementById('resetBtn');
   if (resetBtn) {
-    const vBtn = document.createElement('button');
-    vBtn.id = 'viinaharavaBtn';
-    vBtn.className = 'btn';
-    vBtn.textContent = 'Viinaharava';
-    vBtn.disabled = !testFeaturesEnabled;
-    resetBtn.parentNode.insertBefore(vBtn, resetBtn.nextSibling);
-    vBtn.addEventListener('click', () => {
-      startLosersGame({ name:"Joukkue 1", players:["Pelaaja 1","Pelaaja 2"] });
-    });
-    testFeaturesToggleEl?.addEventListener('change', e => {
-      vBtn.disabled = !e.target.checked;
+    const viinaharavaBtn = document.createElement('button');
+    viinaharavaBtn.id = 'viinaharavaBtn';
+    viinaharavaBtn.className = 'btn';
+    viinaharavaBtn.textContent = 'Viinaharava';
+    viinaharavaBtn.disabled = !testFeaturesEnabled;
+    resetBtn.parentNode.insertBefore(viinaharavaBtn, resetBtn.nextSibling);
+    if (testFeaturesToggleEl) {
+      testFeaturesToggleEl.addEventListener('change', function() {
+        viinaharavaBtn.disabled = !this.checked;
+      });
+    }
+    viinaharavaBtn.addEventListener('click', () => {
+      startLosersGame({ name: "Joukkue 1", players: ["Pelaaja 1", "Pelaaja 2"] });
     });
   }
 
@@ -1690,11 +1748,13 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('closeLosersGameBtn')?.addEventListener('click', finishLosersGame);
 });
 
-/* Export some for console debugging if desired */
-window.startLosersGame = startLosersGame;
-window.finishLosersGame = finishLosersGame;
-</script>
+/* ===================== EXPORT SOME HOOKS ===================== */
+window.forceShowLosersGame = () => {
+  document.getElementById('losersGameModal').style.display = 'flex';
+};
 
+/* ===================== END ===================== */
+</script>
 <script src="https://static.app/js/static.js" type="text/javascript"></script>
 </body>
 </html>
