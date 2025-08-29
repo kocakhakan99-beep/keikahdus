@@ -1243,7 +1243,7 @@ function renderCupSet(teamIdx, match) {
     cupIndices.forEach(cupIdx => {
       let hit = cupStates[cupKey]?.[cupIdx];
       row += `<button class="cup-btn${hit?' hit':''}" id="cup_${cupKey}_${cupIdx}" onclick="toggleCup('${cupKey}',${cupIdx})">
-        <img src="redcup.png" alt="Red Cup">
+        <img src="assets/redcup.png" alt="Red Cup">
       </button>`;
     });
     row += '</div>';
@@ -1412,7 +1412,7 @@ window.showActiveMatch = function(matchId) {
       <span style="color:#ff00c8;text-shadow:0 0 8px #ff00c8;">${t2}</span>
     </h2>
     <div class="cups-area">
-      <img src="table.png" class="table-img" alt="Table">
+      <img src="assets/table.png" class="table-img" alt="Table">
       ${leftCupSet}
       ${rightCupSet}
     </div>
