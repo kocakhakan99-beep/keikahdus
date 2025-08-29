@@ -672,6 +672,37 @@
       <span class="team bottom" id="introTeamBottom"></span>
     </div>
   </div>
+<!-- Viinaharava -->
+<div id="losersGameModal" class="fullscreen-modal" style="display:none;">
+  <div class="modal-content">
+    <h2>Viinaharava</h2>
+    <div style="margin-bottom: 15px; font-size: 1.2em; text-align: center;">
+      <span id="loserTeamName" class="team-left"></span> | 
+      <span id="currentThrower" class="team-right"></span> heittää
+    </div>
+    
+    <!-- Use the same cups-area styling as the match screen -->
+    <div class="cups-area" style="height: 420px; min-height: 420px;">
+      <img src="table.png" class="table-img">
+      <div class="cup-set center" style="transform: rotate(-90deg); display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 10px; width: 280px; height: 280px;">
+        <!-- Cups will be generated here by JavaScript -->
+      </div>
+    </div>
+    
+    <div id="throwResult" style="display:none; margin: 20px auto; max-width: 400px; text-align: center; padding: 15px; background: #18003a; border-radius: 12px; border: 2px solid #00ffd0;">
+      <h3 id="resultTitle">Osuma!</h3>
+      <div id="resultContent" class="result-content">
+        <div class="result-drink">Baileys</div>
+        <button class="btn" id="nextThrowBtn">Seuraava heittäjä</button>
+      </div>
+    </div>
+    
+    <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+      <button class="btn" id="finishLosersGameBtn">Sulje peli</button>
+    </div>
+  </div>
+  <button class="close-btn" id="closeLosersGameBtn">&times;</button>
+</div>
 </div>
 <script>
 let teams = [];
