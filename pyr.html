@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+  <title>Shot Wheel</title>
+  <style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+
+  .navbar {
+    background-color: #333;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .navbar a {
+    float: left;
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+  }
+
+  .navbar a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+
+  .navbar .icon {
+    display: none;
+  }
+
+  @media screen and (max-width: 600px) {
+    .navbar a {display: none;}
+    .navbar a.icon {
+      float: right;
+      display: block;
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .navbar.responsive {position: relative;}
+    .navbar.responsive a.icon {
+      position: absolute;
+      right: 0;
+      top: 0;
+    }
+    .navbar.responsive a {
+      float: none;
+      display: block;
+      text-align: left;
+    }
+  }
+</style>
+  <style>
+    :root{
+      --bg:#0b0f13; --panel:#131a22; --accent:#ff3a5e; --accent2:#ffd166; --text:#e9eef3; --muted:#8ea0b2;
+      --good:#3ddc97; --warn:#ff9f1c; --bad:#ef476f;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+      background: radial-gradient(1200px 800px at 70% -200px, #1c2430, var(--bg));
+      color:var(--text);
+      min-height:100svh; display:flex; flex-direction:column;
+    }
+    header{
+      padding:12px 16px; display:flex; align-items:center; gap:12px; justify-content:space-between;
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0));
+      border-bottom:1px solid #1f2732;
+      position:sticky; top:0; z-index:2;
+    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:700}
+    .chip{padding:4px 10px; border-radius:999px; font-size:12px; background:#1f2732; color:var(--muted)}
+    main{flex:1; display:grid; place-items:center; padding:12px}
+    .app{
+      width:min(960px, 100%); display:grid; gap:12px; grid-template-columns:1fr; align-items:center;
+    }
+    @media (min-width:900px){
+      .app{grid-template-columns:1.2fr .8fr}
+    }
+    .card{
+      background:linear-gradient(180deg,#151c25,#10171f);
+      border:1px solid #1f2732; border-radius:16px; padding:12px;
+      box-shadow:0 10px 40px rgba(0,0,0,0.35);
+    }
+    .wheel-wrap{position:relative; aspect-ratio:1; width:100%; max-width:560px; margin-inline:auto;}
+    canvas{width:100%; height:100%; display:block}
+    .pointer{
+      position:absolute; top:-10px; left:50%; transform:translate(-50%, 0);
+      width:0; height:0; border-left:16px solid transparent; border-right:16px solid transparent;
+      border-bottom:30px solid var(--accent2); filter:drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+    }
+    .controls{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
+    button, .toggle, select{
+      background:#1f2732; color:var(--text); border:1px solid #2a3544; border-radius:12px;
+      padding:12px 14px; font-weight:600; cursor:pointer;
+    }
+    button.primary{background:linear-gradient(180deg,var(--accent),#e92e55); border-color:#ff4c72; color:white}
+    button:disabled{opacity:.6; cursor:not-allowed}
+    .toggle{display:flex; align-items:center; gap:8px}
+    .toggle input{accent-color:var(--accent)}
+    select{appearance:none; padding-right:36px; background-image:linear-gradient(45deg,transparent 50%,#9fb0c4 50%),linear-gradient(135deg,#9fb0c4 50%,transparent 50%); background-position:calc(100% - 18px) 55%, calc(100% - 12px) 55%; background-size:6px 6px; background-repeat:no-repeat}
+    .pill{padding:4px 10px; border-radius:999px; background:#1f2732; color:#9fb0c4; font-size:12px}
+    .stack{display:flex; flex-direction:column; gap:8px}
+    .row{display:flex; justify-content:space-between; align-items:center; gap:8px}
+    .list{display:flex; flex-direction:column; gap:6px; max-height:240px; overflow:auto}
+    .item{display:flex; align-items:center; gap:8px; font-size:14px; color:#c7d6e6}
+    .emoji{font-size:18px}
+    .result{
+      font-size:22px; font-weight:800; letter-spacing:.2px; margin-top:6px;
+      background:linear-gradient(90deg,#fff,#cfe6ff); -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    }
+    .modal-backdrop{
+      position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:5;
+    }
+    .modal{width:min(440px, 92vw); background:#0f1620; border:1px solid #2a3544; border-radius:14px; padding:16px}
+    .grid{display:grid; gap:8px; grid-template-columns:1fr 1fr}
+    .notice{font-size:12px; color:#9fb0c4}
+    footer{
+      text-align:center; padding:10px; color:#7f90a5; font-size:12px; border-top:1px solid #1f2732
+    }
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="navbar" id="myNavbar">
+  <a href="joukkuearvonta.html">Joukkuearvonta</a>
+  <a href="pyr.html">Shot Wheel</a>
+  <a href="javascript:void(0);" class="icon" onclick="toggleNavbar()">
+    ☰
+  </a>
+</div>
+
+<script>
+function toggleNavbar() {
+  var x = document.getElementById("myNavbar");
+  if (x.className === "navbar") {
+    x.className += " responsive";
+  } else {
+    x.className = "navbar";
+  }
+}
+</script>
+
+
+<header>
+  <div class="brand">
+    <span style="font-size:22px">🎯</span> Shottipyörä
+    <span class="chip">Mobile</span>
+  </div>
+  <div class="row">
+    <label class="toggle">
+      <input id="doomToggle" type="checkbox"/>
+      <span>☠️ Doom Spin</span>
+    </label>
+    <label class="toggle">
+      <input id="muteToggle" type="checkbox"/>
+      <span>🔇 Mute</span>
+    </label>
+  </div>
+</header>
+
+<main>
+  <div class="app">
+    <!-- WHEEL -->
+    <section class="card">
+      <div class="wheel-wrap">
+        <div class="pointer"></div>
+        <canvas id="wheel" width="800" height="800" aria-label="Shot Wheel"></canvas>
+      </div>
+      <div class="controls">
+        <button id="spinBtn" class="primary">🎲 Spin</button>
+        <button id="rollBtn">🎲 Roll Mixer</button>
+        <button id="resetBtn">↺ Reset</button>
+
+        <!-- Spin Length selector (all profiles are 6+ full rotations) -->
+        <select id="spinLength" title="Spin Length">
+          <option value="quick">⚡ Quick</option>
+          <option value="normal">🎯 Normal</option>
+          <option value="long">🕰️ Long</option>
+          <option value="epic" selected>🏁 Epic</option>
+        </select>
+
+        <span id="modeLabel" class="pill">Mode: Normal</span>
+      </div>
+      <div class="stack">
+        <div class="row">
+          <div>
+            <div class="muted">Wheel Result</div>
+            <div id="result" class="result">—</div>
+          </div>
+          <div>
+            <div class="muted">Mixer</div>
+            <div id="mixer" class="result">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS / HISTORY -->
+    <section class="card">
+      <div class="stack">
+        <div class="row">
+          <strong>Odds</strong>
+          <span id="oddsLabel" class="pill">Normal</span>
+        </div>
+        <div id="oddsList" class="list"></div>
+
+        <div class="row" style="margin-top:6px">
+          <strong>History</strong>
+          <button id="clearHistoryBtn">Clear</button>
+        </div>
+        <div id="history" class="list"></div> 
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Wild choose modal -->
+<div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal">
+    <h3>🃏 Wild — valitse vapaasti.</h3>
+    <div id="wildGrid" class="grid" style="margin:8px 0 10px"></div>
+    <div class="row">
+      <span class="muted">Valitse juoma.</span>
+      <button id="wildCancel">Peru</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  
+</footer>
+
+<script>
+(function(){
+  // ---------- Data ----------
+  const EMOJI = {
+    Vodka: "🥃", Jaloviina: "🧉", "Jägermeister": "🦌", Gin:"🍸", Salmiakki:"🧪",
+    Respin:"🔁", Wild:"🃏"
+  };
+  const MIXERS = {
+    1:"Orange juice",2:"Vichy",3:"Coke",4:"Cranberry juice",5:"Tonic",6:"None"
+  };
+
+  const NORMAL = [
+    {label:"Vodka", weight:40, color:"#e63946"},
+    {label:"Jaloviina", weight:5, color:"#118ab2"},
+    {label:"Jägermeister", weight:5, color:"#06d6a0"},
+    {label:"Gin", weight:20, color:"#ffd166"},
+    {label:"Salmiakki", weight:10, color:"#8338ec"},
+    {label:"Respin", weight:5, color:"#adb5bd"},
+    {label:"Wild", weight:5, color:"#f3722c"},
+  ];
+  const DOOM = [
+    {label:"Vodka", weight:10, color:"#e63946"},
+    {label:"Jaloviina", weight:20, color:"#118ab2"},
+    {label:"Jägermeister", weight:20, color:"#06d6a0"},
+    {label:"Gin", weight:10, color:"#ffd166"},
+    {label:"Salmiakki", weight:30, color:"#8338ec"},
+    {label:"Respin", weight:5, color:"#adb5bd"},
+    {label:"Wild", weight:5, color:"#f3722c"},
+  ];
+
+  // Spin profiles — all are guaranteed >= 6 full rotations
+  const SPIN_PROFILES = {
+    quick:  { minSpins: 6,  maxSpins: 8,  minMs: 7000,  maxMs: 9000,  tickDivs: 24 },
+    normal: { minSpins: 7,  maxSpins: 10, minMs: 9000,  maxMs: 12000, tickDivs: 20 },
+    long:   { minSpins: 9,  maxSpins: 12, minMs: 11000, maxMs: 14000, tickDivs: 16 },
+    epic:   { minSpins: 12, maxSpins: 16, minMs: 14000, maxMs: 18000, tickDivs: 12 },
+  };
+
+  // ---------- State ----------
+  let doom = false;
+  let isSpinning = false;
+  let angle = 0; // absolute radians; can grow very large
+  let wheelSegments = buildSegments(NORMAL);
+  let history = [];
+  let muted = false;
+
+  // tick cadence (more divisions = more ticks)
+  let tickDivs = SPIN_PROFILES.epic.tickDivs; // Epic default
+  let lastTickAngle = 0;
+
+  // ---------- Elements ----------
+  const canvas = document.getElementById('wheel');
+  const ctx = canvas.getContext('2d');
+  const spinBtn = document.getElementById('spinBtn');
+  const rollBtn = document.getElementById('rollBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const doomToggle = document.getElementById('doomToggle');
+  const muteToggle = document.getElementById('muteToggle');
+  const resultEl = document.getElementById('result');
+  const mixerEl = document.getElementById('mixer');
+  const oddsList = document.getElementById('oddsList');
+  const oddsLabel = document.getElementById('oddsLabel');
+  const modeLabel = document.getElementById('modeLabel');
+  const historyEl = document.getElementById('history');
+  const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+  const spinLengthSel = document.getElementById('spinLength');
+
+  const modalBackdrop = document.getElementById('modalBackdrop');
+  const wildGrid = document.getElementById('wildGrid');
+  const wildCancel = document.getElementById('wildCancel');
+
+  // ---------- Audio (plug your own files) ----------
+  const sounds = {
+    spin: new Audio('spin.mp3'),
+    tick: new Audio('tick.mp3'),
+    cheer: new Audio('cheer.mp3'),
+    boo: new Audio('boo.mp3')
+  };
+  sounds.spin.loop = true;
+  sounds.tick.volume = 1.00;
+  sounds.cheer.volume = 1;
+  sounds.boo.volume = 1;
+	sounds.spin.volume = 0.5;
+  
+  const play = (a) => { if(muted) return; a.currentTime = 0; a.play().catch(()=>{}); };
+  const loopStart = (a) => { if(muted) return; a.currentTime = 0; a.play().catch(()=>{}); };
+  const loopStop = (a) => { try{ a.pause(); a.currentTime = 0; }catch{} };
+
+  // ---------- Utility ----------
+  function buildSegments(def){
+    const total = def.reduce((s,d)=>s+d.weight,0);
+    let start = 0;
+    return def.map(d=>{
+      const frac = d.weight/total;
+      const seg = {
+        ...d,
+        startAngle: start,
+        endAngle: start + frac * Math.PI*2
+      };
+      start = seg.endAngle;
+      return seg;
+    });
+  }
+
+  function weightedPick(def){
+    const total = def.reduce((s,d)=>s+d.weight,0);
+    let r = Math.random()*total;
+    for(const d of def){
+      if(r < d.weight) return d;
+      r -= d.weight;
+    }
+    return def[def.length-1];
+  }
+
+  function drawWheel(){
+    const dpr = window.devicePixelRatio || 1;
+    const W = canvas.width, H = canvas.height;
+    const cx = W/2, cy = H/2; const R = Math.min(W,H)/2 - 20;
+    ctx.save();
+    ctx.clearRect(0,0,W,H);
+    ctx.translate(cx,cy);
+
+    // The pointer is always at the top (angle 0), so rotate the wheel to current angle
+    ctx.rotate(angle % (Math.PI * 2));
+
+    // segments
+    wheelSegments.forEach((seg,i)=>{
+      ctx.beginPath();
+      ctx.moveTo(0,0);
+      ctx.arc(0,0,R, seg.startAngle, seg.endAngle);
+      ctx.closePath();
+      ctx.fillStyle = seg.color;
+      ctx.fill();
+
+      // border
+      ctx.strokeStyle = "#0b0f13";
+      ctx.lineWidth = 3*dpr;
+      ctx.stroke();
+
+      // label
+      const mid = (seg.startAngle + seg.endAngle)/2;
+      const labelR = R*0.68;
+      ctx.save();
+      ctx.rotate(mid);
+      ctx.translate(labelR,0);
+      ctx.rotate(Math.PI/2);
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#0b0f13";
+      ctx.font = `${24*dpr}px system-ui, sans-serif`;
+      const label = seg.label;
+      ctx.fillText(label, 0, 0);
+      ctx.restore();
+
+      // emoji near edge
+      ctx.save();
+      ctx.rotate(mid);
+      ctx.translate(R*0.88,0);
+      ctx.rotate(Math.PI/2);
+      ctx.font = `${26*dpr}px serif`;
+      ctx.fillText(EMOJI[seg.label] || "🎯", -12, 8);
+      ctx.restore();
+    });
+
+    // center hub
+    ctx.beginPath();
+    ctx.arc(0,0, R*0.14, 0, Math.PI*2);
+    ctx.fillStyle = "#0f1620";
+    ctx.fill();
+    ctx.lineWidth = 4*dpr;
+    ctx.strokeStyle = "#2a3544";
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  function setOddsUI(def){
+    oddsList.innerHTML = '';
+    def.forEach(d=>{
+      const div = document.createElement('div');
+      div.className = 'item';
+      const pct = d.weight;
+      div.innerHTML = `<span class="emoji">${EMOJI[d.label]||"🎯"}</span><strong>${d.label}</strong><span class="muted">· ${pct}%</span>`;
+      oddsList.appendChild(div);
+    });
+  }
+
+  function pushHistory(entry){
+    history.unshift(entry);
+    history = history.slice(0,100);
+    renderHistory();
+  }
+
+  function renderHistory(){
+    historyEl.innerHTML = '';
+    history.forEach(h=>{
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `<span class="emoji">${h.emoji}</span><span>${h.text}</span><span class="muted">· ${new Date(h.ts).toLocaleTimeString()}</span>`;
+      historyEl.appendChild(div);
+    });
+  }
+
+  // ---------- Tick cadence ----------
+  function setTickDivisions(profileKey){
+    tickDivs = SPIN_PROFILES[profileKey]?.tickDivs ?? 24;
+  }
+
+  function shouldTick(a){
+    // play a tick when crossing increments of step angle, using absolute angle
+    const step = (Math.PI*2)/tickDivs;
+    const crossed = Math.floor(a/step) > Math.floor(lastTickAngle/step);
+    if(crossed) lastTickAngle = a;
+    return crossed;
+  }
+
+  // ---------- Spin Logic ----------
+  // This guarantees the visual matches the result!
+  async function spin(){
+    isSpinning = true;
+    const def = doom ? DOOM : NORMAL;
+    wheelSegments = buildSegments(def);
+    drawWheel();
+
+    const key = spinLengthSel?.value || 'epic';
+    const prof = SPIN_PROFILES[key] || SPIN_PROFILES.epic;
+
+    // Pick result FIRST
+    const chosen = weightedPick(def);
+    const seg = wheelSegments.find(s => s.label === chosen.label);
+
+    // Segment center
+    const TAU = Math.PI * 2;
+    const segMid = (seg.startAngle + seg.endAngle) / 2;
+    const spins = prof.minSpins + Math.floor(Math.random() * (prof.maxSpins - prof.minSpins + 1));
+    const finalAngle = (TAU - segMid) - Math.PI / 2 + spins * TAU;
+    const startAngle = angle % TAU;
+    const delta = finalAngle - startAngle;
+    const duration = prof.minMs + Math.random() * (prof.maxMs - prof.minMs);
+
+    let start = performance.now();
+    lastTickAngle = angle;
+    loopStart(sounds.spin);
+
+    return new Promise(resolve => {
+      function step(now) {
+        const t = now - start;
+        const prog = Math.min(t / duration, 1);
+        const eased = easeOutCubic(prog);
+
+        angle = (angle - (angle % TAU)) + (startAngle + delta * eased); // eased = easeOutCubic(prog)
+        drawWheel();
+        if (shouldTick(angle)) play(sounds.tick);
+
+        if (prog < 1) {
+          requestAnimationFrame(step);
+        } else {
+          angle = (angle - (angle % TAU)) + (startAngle + delta * eased);
+          drawWheel();
+          loopStop(sounds.spin);
+
+          // Respin logic
+          if (chosen.label === "Respin") {
+            play(sounds.boo);
+            pushHistory({emoji:"🔁", text:"Respin!", ts:Date.now()});
+            resultEl.textContent = "🔁 Respin!";
+            isSpinning = false;
+            setTimeout(async ()=>{
+              spinBtn.disabled = true;
+              const r = await spin();
+              resultEl.textContent = r ? `${EMOJI[r]||"🎯"} ${r}` : "—";
+              spinBtn.disabled = false;
+              resolve(r);
+            }, 700);
+            return;
+          }
+
+          // Wild logic
+          if (chosen.label === "Wild") {
+            isSpinning = false;
+            openWildModal(def.map(d=>d.label).filter(x=>x!=="Respin" && x!=="Wild"))
+              .then(sel=>{
+                const finalChoice = sel || "Vodka";
+                resultEl.textContent = `${EMOJI[finalChoice]||"🃏"} ${finalChoice}`;
+                play(sounds.cheer);
+                pushHistory({emoji: EMOJI[finalChoice]||"🃏", text:`Wild → ${finalChoice}`, ts:Date.now()});
+                resolve(finalChoice);
+              });
+            return;
+          }
+
+          resultEl.textContent = `${EMOJI[chosen.label]||"🎯"} ${chosen.label}`;
+          play(sounds.cheer);
+          pushHistory({emoji: EMOJI[chosen.label]||"🎯", text: `${chosen.label}`, ts:Date.now()});
+          isSpinning = false;
+          resolve(chosen.label);
+        }
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  // Easings
+  function easeOutQuad(x){ return 1 - (1 - x) * (1 - x); }
+  function easeOutQuint(x){ return 1 - Math.pow(1 - x, 5); }
+  function easeInSine(x) { return 1 - Math.cos((x * Math.PI) / 2); }
+  function easeOutSine(x) { return Math.sin((x * Math.PI) / 2); }
+  function easeOutCubic(x) { return 1 - Math.pow(1 - x, 3); }
+
+  // ---------- Dice ----------
+async function rollMixer(){
+    rollBtn.disabled = true;
+    const start = performance.now();
+    let val = 1;
+    const spinSfx = new Audio('assets/dice.mp3'); spinSfx.volume = muted?0:0.6; spinSfx.play().catch(()=>{});
+    return new Promise(resolve=>{
+      const frame = (now)=>{
+        const t = now - start;
+        // flicker faster at start, slower at end
+        if (t < 900){
+          if (Math.random() < 0.4 + 0.6*(1-t/900)){
+            val = 1 + Math.floor(Math.random()*6);
+            mixerEl.textContent = `${val} – ${MIXERS[val]}`;
+          }
+          requestAnimationFrame(frame);
+        } else {
+          const final = 1 + Math.floor(Math.random()*6);
+          mixerEl.textContent = `${final} – ${MIXERS[final]}`;
+          pushHistory({emoji:"🥤", text:`Mixer: ${MIXERS[final]}`, ts:Date.now()});
+          rollBtn.disabled = false;
+          resolve(final);
+        }
+      };
+      requestAnimationFrame(frame);
+    });
+  }
+    
+  // ---------- Wild modal ----------
+  function openWildModal(options){
+    return new Promise(resolve=>{
+      modalBackdrop.style.display = 'flex';
+      wildGrid.innerHTML = '';
+      options.forEach(opt=>{
+        const btn = document.createElement('button');
+        btn.textContent = `${EMOJI[opt]||"🃏"} ${opt}`;
+        btn.onclick = ()=>{
+          modalBackdrop.style.display = 'none';
+          resolve(opt);
+        };
+        wildGrid.appendChild(btn);
+      });
+      wildCancel.onclick = ()=>{
+        modalBackdrop.style.display = 'none';
+        resolve(null);
+      };
+    });
+  }
+
+  // ---------- Events ----------
+   spinBtn.addEventListener('click', async ()=>{
+    if(isSpinning) return;
+    spinBtn.disabled = true;
+    const result = await spin();
+    // Always show something in resultEl if result is empty
+    if (!result) {
+      resultEl.textContent = "—";
+    }
+    spinBtn.disabled = false;
+  });
+  doomToggle.addEventListener('change', ()=>{
+    doom = doomToggle.checked;
+    wheelSegments = buildSegments(doom ? DOOM : NORMAL);
+    drawWheel();
+    oddsLabel.textContent = doom ? 'Doom' : 'Normal';
+    modeLabel.textContent = `Mode: ${doom ? 'Doom' : 'Normal'}`;
+    pushHistory({emoji: doom ? "☠️":"🎉", text:`Mode → ${doom ? 'Doom Spin' : 'Normal'}`, ts:Date.now()});
+    setOddsUI(doom ? DOOM : NORMAL);
+  });
+  muteToggle.addEventListener('change', ()=>{ muted = muteToggle.checked; if(muted) loopStop(sounds.spin); });
+
+  spinLengthSel.addEventListener('change', ()=>{
+    const v = spinLengthSel.value;
+    setTickDivisions(v);
+    pushHistory({emoji:"⏱️", text:`Spin length → ${v}`, ts:Date.now()});
+  });
+
+  clearHistoryBtn.addEventListener('click', ()=>{ history = []; renderHistory(); });
+
+  resetBtn.addEventListener('click', () => {
+    angle = 0; // Always reset to segment 0 at pointer
+    drawWheel();
+    resultEl.textContent = "—";
+    mixerEl.textContent = "—";
+    pushHistory({emoji: "🔄", text: "Wheel reset", ts:Date.now()});
+  });
+	
+  rollBtn.addEventListener('click', rollMixer);
+  resetBtn.addEventListener('click', ()=>{
+    angle = 0; drawWheel();
+    resultEl.textContent = '—'; mixerEl.textContent = '—';
+  });
+  // ---------- Init ----------
+  setOddsUI(NORMAL);
+  setTickDivisions(spinLengthSel.value || 'epic');
+  drawWheel();
+  window.addEventListener('resize', ()=>{ drawWheel(); });
+
+})();
+</script>
+
+<script src="https://static.app/js/static.js" type="text/javascript"></script>
+</body>
+</html>
