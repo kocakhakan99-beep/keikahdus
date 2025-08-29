@@ -6,7 +6,7 @@
   <link href="https://fonts.googleapis.com/css?family=Press+Start+2P|Orbitron:700,900" rel="stylesheet">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
-    /* (Existing styles unchanged above this line in prior version) */
+    /* === BASE / GLOBAL STYLES === */
     body {
       font-family: 'Press Start 2P', 'Orbitron', Arial, sans-serif;
       margin: 0;
@@ -17,21 +17,8 @@
     h1, h2 {
       color: #ff00c8;
       text-shadow: 0 0 8px #ff00c8, 0 0 2px #fff;
-      font-family: 'Press Start 2P', 'Orbitron', Arial, sans-serif;
       letter-spacing: 2.5px;
-    }
-    .navbar { background-color: #333; overflow: hidden; position: relative; }
-    .navbar a { float: left; display: block; color: white; text-align: center; padding: 14px 16px; text-decoration: none; }
-    .navbar a:hover { background-color: #ddd; color: black; }
-    .navbar .icon { display: none; }
-    @media screen and (max-width: 600px) {
-      .navbar a {display: none;}
-      .navbar a.icon { float: right; display: block; }
-    }
-    @media screen and (max-width: 600px) {
-      .navbar.responsive {position: relative;}
-      .navbar.responsive a.icon { position: absolute; right: 0; top: 0; }
-      .navbar.responsive a { float: none; display: block; text-align: left; }
+      font-family: 'Press Start 2P', 'Orbitron', Arial, sans-serif;
     }
     .section {
       margin-bottom: 2em;
@@ -54,8 +41,8 @@
       transition: filter 0.2s, transform 0.1s;
     }
     .btn:active { filter: brightness(1.3) saturate(2); transform: scale(0.96); }
-    .btn:disabled { background: #444; color: #aaa; box-shadow: none; cursor: not-allowed; }
-    input[type="number"], input[type="text"] {
+    .btn:disabled { background:#444; color:#aaa; box-shadow:none; cursor:not-allowed; }
+    input[type="number"], input[type="text"], input[type="range"] {
       padding: 7px;
       border-radius: 6px;
       border: 2px solid #ff00c8;
@@ -71,9 +58,9 @@
       padding: 8px;
       border-radius: 8px;
       color: #fff;
-      font-family: 'Orbitron', Arial, sans-serif;
       text-shadow: 0 0 2px #00ffd0;
       box-shadow: 0 0 8px #00ffd099;
+      font-family: 'Orbitron', Arial, sans-serif;
     }
     .fixture-card {
       background: #18003a;
@@ -85,7 +72,24 @@
       flex-direction: column;
       gap: 0.7em;
       border: 2px solid #00ffd0;
+      font-family: 'Orbitron', Arial, sans-serif;
     }
+    .game-title {
+      font-weight: bold;
+      color: #ff00c8;
+      font-size: 1.08em;
+      margin-bottom: 2px;
+      text-shadow: 0 0 6px #ff00c8;
+    }
+    .game-result {
+      color: #00ffd0;
+      font-weight: bold;
+      font-size: 1.11em;
+      margin-top: 2px;
+      text-shadow: 0 0 6px #00ffd0;
+    }
+
+    /* Cups area (shared) */
     .cups-area {
       position: relative;
       width: 420px;
@@ -97,6 +101,7 @@
       background: #400299;
       border-radius: 20px;
       box-shadow: 0 0 32px #00ffd099;
+      overflow: hidden;
     }
     .table-img {
       position: absolute;
@@ -107,108 +112,203 @@
       z-index: 0;
       opacity: 0.8;
     }
-    .cup-set { margin: 0 18px; position: relative; z-index: 1; flex: 1 1 50%; display: flex; flex-direction: column; align-items: center; }
-    .cup-set.left { transform: rotate(-90deg); }
-    .cup-set.right { transform: rotate(90deg); }
-    .cup-set.center {
-      margin: 0 auto;
-      transform: rotate(-90deg);
-      justify-content: center;
+    .cup-set {
+      margin: 0 18px;
+      position: relative;
+      z-index: 1;
+      flex: 1 1 50%;
+      display: flex;
+      flex-direction: column;
       align-items: center;
     }
-    .loser-cup-btn, .cup-btn {
-      width: 45px; height: 45px; background: transparent; border: none; padding: 0; margin: 2px;
-      cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-      box-shadow: none; outline: none; transition: transform 0.2s, filter 0.2s;
+    .cup-set.left { transform: rotate(-90deg); }
+    .cup-set.right { transform: rotate(90deg); }
+    .cup-label {
+      text-align: center;
+      color: #00ffd0;
+      font-size: 1.1em;
+      margin-bottom: 3px;
+      text-shadow: 0 0 6px #00ffd0;
+      font-family: 'Orbitron', Arial, sans-serif;
     }
-    .loser-cup-btn img, .cup-btn img {
+    .cup-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 5px; }
+    .cup-row.reverse { flex-direction: row-reverse; }
+    .cup-btn {
       width: 45px; height: 45px;
-      border-radius: 50%; display: block; pointer-events: none; user-select: none;
-      border: 2px solid #ff00c8; box-shadow: 0 0 12px #ff00c8; background:#222;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 2px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+      transition: filter 0.2s;
     }
-    .loser-cup-btn.hit img,
+    .cup-btn img {
+      width: 45px; height: 45px;
+      border-radius: 50%;
+      pointer-events: none;
+      user-select: none;
+      border: 2px solid #ff00c8;
+      box-shadow: 0 0 12px #ff00c8;
+      background: #222;
+    }
     .cup-btn.hit img {
       filter: grayscale(100%) brightness(0.4) drop-shadow(0 0 8px #00ffd0);
       opacity: 0.3;
       border: 2px solid #00ffd0;
       box-shadow: 0 0 18px #00ffd0;
     }
-    .result-drink {
-      font-size: 2em; font-weight: bold; color: #00ffd0; text-shadow: 0 0 5px #00ffd0;
-      font-family: 'Press Start 2P', 'Orbitron', sans-serif; padding: 10px 20px; background: #2b0057;
-      border-radius: 8px; border: 2px solid #ff00c8; box-shadow: 0 0 15px #ff00c8; margin: 10px 0;
-    }
-    .result-content { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-    .cup-label {
-      text-align: center; color: #00ffd0; font-size: 1.15em; margin-bottom: 3px;
-      text-shadow: 0 0 6px #00ffd0; font-family: 'Orbitron', Arial, sans-serif;
-    }
-    .cup-row { display: flex; gap: 10px; justify-content: center; margin-bottom: 5px; }
-    .cup-row.reverse { flex-direction: row-reverse; }
+
+    /* Fullscreen modals */
     .fullscreen-modal {
-      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(25,10,40,0.97); z-index: 9999; display: flex; justify-content: center; align-items: center;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(25,10,40,0.97);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       animation: modalShow 0.25s ease;
     }
-    @keyframes modalShow { 0% {opacity:0; filter:blur(10px);} 100%{opacity:1; filter:blur(0);} }
     .modal-content {
-      background: #18003a; border-radius: 16px; padding: 2em; min-width: 320px; max-width: 99vw;
-      color: #fff; box-shadow: 0 0 24px #ff00c8dd; border: 2px solid #00ffd0;
+      background: #18003a;
+      border-radius: 16px;
+      padding: 2em;
+      min-width: 320px;
+      max-width: 99vw;
+      color: #fff;
+      box-shadow: 0 0 24px #ff00c8dd;
+      border: 2px solid #00ffd0;
+      position: relative;
     }
-    .team-left { color: #00ffd0; text-shadow: 0 0 8px #00ffd0; }
-    .team-right { color: #ff00c8; text-shadow: 0 0 8px #ff00c8; }
+    @keyframes modalShow { 0% {opacity:0; filter:blur(10px);} 100% {opacity:1; filter:blur(0);} }
     .close-btn {
-      position: absolute; top: 20px; right: 30px; font-size: 2.5em; background: none; border: none;
-      color: #ff00c8; text-shadow: 0 0 12px #ff00c8; cursor: pointer; transition: color 0.2s;
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2.5em;
+      background: none;
+      border: none;
+      color: #ff00c8;
+      text-shadow: 0 0 12px #ff00c8;
+      cursor: pointer;
+      transition: color 0.2s;
     }
-    .close-btn:hover { color:#00ffd0; }
+    .close-btn:hover { color: #00ffd0; }
+
+    /* Timer & state badges */
     .timer {
-      font-weight: bold; color: #00ffd0; font-size: 1.25em;
-      text-shadow: 0 0 10px #00ffd0; font-family: 'Press Start 2P','Orbitron',Arial,sans-serif;
+      font-weight: bold;
+      color: #00ffd0;
+      font-size: 1.25em;
+      text-shadow: 0 0 10px #00ffd0;
+      font-family: 'Press Start 2P', 'Orbitron', Arial, sans-serif;
     }
-    table.standings { width:100%; border-collapse:collapse; margin-top:1em; background:#2b0057; color:#fff;
-      font-family:'Orbitron',Arial,sans-serif; font-size:0.95em; border-radius:10px; overflow:hidden; }
-    table.standings th, table.standings td { padding:9px 8px; border:1px solid #ff00c8; text-align:center; }
-    table.standings th { background:#18003a; color:#00ffd0; text-shadow:0 0 4px #00ffd0; }
-    .game-title { font-weight:bold; color:#ff00c8; font-size:1.08em; margin-bottom:2px; text-shadow:0 0 6px #ff00c8; font-family:'Orbitron',Arial,sans-serif; }
-    .game-result { color:#00ffd0; font-weight:bold; font-size:1.11em; margin-top:2px; text-shadow:0 0 6px #00ffd0; }
-    #resetBtn { background: linear-gradient(90deg,#ffb700 0%, #ff00c8 100%); color:#222; box-shadow:0 0 8px #ffb700; }
+
+    /* Standings table */
+    table.standings {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+      background: #2b0057;
+      color: #fff;
+      font-family: 'Orbitron', Arial, sans-serif;
+      font-size: 0.95em;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    table.standings th, table.standings td {
+      padding: 9px 8px;
+      border: 1px solid #ff00c8;
+      text-align: center;
+    }
+    table.standings th {
+      background: #18003a;
+      color: #00ffd0;
+      text-shadow: 0 0 4px #00ffd0;
+    }
+
+    /* Sidebar standings overlay */
     .sidebar-overlay {
-      position: fixed; top:0; right:0; width:230px; height:100vh; background:#18003aee; z-index:10001;
-      padding:1em 0.6em; box-shadow:-3px 0 28px #ff00c888; color:#00ffd0; font-size:1.08em;
-      overflow-y:auto; display:flex; flex-direction:column; gap:0.7em;
-      border-left:3px solid #00ffd0; font-family:'Orbitron',Arial,sans-serif;
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 230px;
+      height: 100vh;
+      background: #18003aee;
+      z-index: 10001;
+      padding: 1em 0.6em;
+      box-shadow: -3px 0 28px #ff00c888;
+      color: #00ffd0;
+      font-size: 1.08em;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7em;
+      border-left: 3px solid #00ffd0;
+      font-family: 'Orbitron', Arial, sans-serif;
     }
     .sidebar-overlay table { width:100%; border-collapse:collapse; font-size:0.98em; }
-    .sidebar-overlay th, .sidebar-overlay td { padding:6px 3px; border:1px solid #00ffd0; text-align:center; }
+    .sidebar-overlay th, .sidebar-overlay td {
+      padding: 6px 3px; border: 1px solid #00ffd0; text-align: center;
+    }
     .sidebar-overlay th { background:#2b0057; color:#ff00c8; text-shadow:0 0 4px #ff00c8; }
     .sidebar-overlay tr.active-team { background:#ffb700; color:#222; font-weight:bold; }
     .sidebar-overlay tr.active-team td { border:2px solid #00ffd0cc; }
+
+    /* Match intro animation */
     .match-intro-overlay {
-      position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:10001; display:none;
-      align-items:center; justify-content:center; background:transparent;
+      position: fixed;
+      inset: 0;
+      z-index: 10001;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
     }
-    .match-intro-bars { position:relative; width:100vw; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-    .bar { position:absolute; left:0; width:100vw; height:0; background:linear-gradient(90deg,#ff00c8 0%,#00ffd0 100%); opacity:.97;
-      transition:height .7s cubic-bezier(.5,1.8,.5,1), top .7s, bottom .7s; box-shadow:0 0 24px #ff00c8; z-index:1; }
+    .match-intro-bars { position: relative; width: 100vw; height: 100vh; display:flex; align-items:center; justify-content:center; }
+    .bar {
+      position:absolute; left:0; width:100vw; height:0;
+      background: linear-gradient(90deg, #ff00c8 0%, #00ffd0 100%);
+      opacity:0.97;
+      transition: height 0.7s cubic-bezier(.5,1.8,.5,1), top 0.7s, bottom 0.7s;
+      box-shadow:0 0 24px #ff00c8; z-index:1;
+    }
     .bar.top { top:0; }
     .bar.bottom { bottom:0; }
     .match-intro-names {
-      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:100vw;
-      display:flex; flex-direction:column; align-items:center; justify-content:center; opacity:0;
-      z-index:2; transition:opacity .4s .7s; font-size:2.5em; font-weight:bold; letter-spacing:3px;
-      font-family:'Press Start 2P','Orbitron',Arial,sans-serif; text-shadow:0 0 16px #ff00c8,0 0 6px #00ffd0;
+      position: absolute;
+      left:50%; top:50%; transform:translate(-50%, -50%);
+      width:100vw;
+      display:flex; flex-direction:column; align-items:center;
+      opacity:0;
+      z-index:2;
+      transition: opacity 0.4s 0.7s;
+      font-size:2.5em; font-weight:bold; letter-spacing:3px;
+      font-family:'Press Start 2P','Orbitron',Arial,sans-serif;
+      text-shadow:0 0 16px #ff00c8, 0 0 6px #00ffd0;
     }
     .match-intro-names .team { min-width:330px; text-align:center; opacity:0; position:relative; }
     .match-intro-names .team.top {
-      left:-400px; color:#00ffd0; transition:left .7s cubic-bezier(.5,1.8,.5,1), opacity .4s .7s; margin-bottom:12px;
-    }
-    .match-intro-names .vs {
-      color:#ffb700; font-size:1.2em; font-weight:bold; opacity:0; margin:0 0 14px 0;
-      text-shadow:0 0 12px #ffb700; transition:opacity .3s 1s;
+      left:-400px; color:#00ffd0;
+      transition:left 0.7s cubic-bezier(.5,1.8,.5,1), opacity 0.4s 0.7s;
+      margin-bottom:12px;
     }
     .match-intro-names .team.bottom {
-      right:-400px; color:#ff00c8; transition:right .7s cubic-bezier(.5,1.8,.5,1), opacity .4s .7s; margin-top:14px;
+      right:-400px; color:#ff00c8;
+      transition:right 0.7s cubic-bezier(.5,1.8,.5,1), opacity 0.4s 0.7s;
+      margin-top:14px;
+    }
+    .match-intro-names .vs {
+      color:#ffb700; font-size:1.2em; font-weight:bold;
+      opacity:0; margin:0 0 14px 0;
+      text-shadow:0 0 12px #ffb700;
+      transition:opacity 0.3s 1s;
     }
     .match-intro-overlay.animate .bar.top,
     .match-intro-overlay.animate .bar.bottom { height:35vh; }
@@ -216,126 +316,215 @@
     .match-intro-overlay.animate .team.top,
     .match-intro-overlay.animate .team.bottom,
     .match-intro-overlay.animate .vs { opacity:1; }
+    .match-intro-overlay.animate .team.top { left:0; }
+    .match-intro-overlay.animate .team.bottom { right:0; }
+
     .flex { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 
-    .toggle-switch { position:relative; display:inline-block; width:60px; height:28px; margin:0 8px; }
+    /* Toggles */
+    .toggle-switch { position:relative; display:inline-block; width:60px; height:28px; }
     .toggle-switch input { opacity:0; width:0; height:0; }
     .toggle-slider {
-      position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#18003a;
+      position:absolute; cursor:pointer; inset:0; background:#18003a;
       border:2px solid #ff00c8; transition:.4s; border-radius:34px; box-shadow:0 0 10px #ff00c8;
     }
     .toggle-slider:before {
       position:absolute; content:""; height:20px; width:20px; left:4px; bottom:4px;
       background:#00ffd0; transition:.4s; border-radius:50%; box-shadow:0 0 8px #00ffd0;
     }
-    input:checked + .toggle-slider { background:#2b0057; border-color:#00ffd0; box-shadow:0 0 10px #00ffd0; }
-    input:checked + .toggle-slider:before { transform:translateX(30px); background:#ff00c8; box-shadow:0 0 8px #ff00c8; }
-    .toggle-container { display:flex; align-items:center; margin:10px 0; font-family:'Orbitron',Arial,sans-serif; }
-    .toggle-label { color:#00ffd0; text-shadow:0 0 4px #00ffd0; }
-
-    .top-right-controls {
-      position:fixed; top:12px; right:12px; z-index:11000; display:flex; gap:10px; align-items:center;
-      background:rgba(24,0,58,0.75); padding:8px 12px; border-radius:10px; border:2px solid #00ffd0;
-      box-shadow:0 6px 20px #0008,0 0 18px #00ffd022; backdrop-filter:blur(6px); font-family:'Orbitron',Arial,sans-serif;
+    input:checked + .toggle-slider {
+      background:#2b0057; border-color:#00ffd0; box-shadow:0 0 10px #00ffd0;
     }
-    .top-right-controls .toggle-container { margin:0; gap:8px; }
-    .top-right-controls .toggle-label { color:#ffb700; font-size:0.82em; margin-right:6px; text-shadow:0 0 6px #ffb70044; }
+    input:checked + .toggle-slider:before {
+      transform:translateX(30px); background:#ff00c8; box-shadow:0 0 8px #ff00c8;
+    }
+    .toggle-container { display:flex; align-items:center; gap:6px; }
+    .toggle-label { color:#ffb700; font-size:0.78em; text-shadow:0 0 6px #ffb70055; }
 
+    /* Top right control panel */
+    .top-right-controls {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 11000;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      background: rgba(24,0,58,0.75);
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 2px solid #00ffd0;
+      box-shadow: 0 6px 20px #0008, 0 0 18px #00ffd022;
+      backdrop-filter: blur(6px);
+      font-family: 'Orbitron', Arial, sans-serif;
+    }
+
+    /* Big alert modal */
     #bigAlertModal {
-      position:fixed; inset:0; display:none; z-index:12000;
-      background:linear-gradient(180deg,rgba(8,4,20,0.96),rgba(12,6,32,0.98));
-      align-items:center; justify-content:center; padding:20px;
+      position: fixed;
+      inset: 0;
+      display: none;
+      z-index: 12000;
+      background: linear-gradient(180deg, rgba(8,4,20,0.96), rgba(12,6,32,0.98));
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
     #bigAlertInner {
-      max-width:920px; width:96%; background:linear-gradient(180deg,#1a0036,#10001f);
-      border:2px solid #00ffd0; box-shadow:0 10px 60px rgba(0,0,0,0.6),0 0 28px #00ffd099;
-      border-radius:14px; padding:22px; color:#fff; text-align:left; font-family:'Orbitron',Arial,sans-serif;
+      max-width: 920px;
+      width: 96%;
+      background: linear-gradient(180deg, #1a0036, #10001f);
+      border: 2px solid #00ffd0;
+      box-shadow: 0 10px 60px rgba(0,0,0,0.6), 0 0 28px #00ffd099;
+      border-radius: 14px;
+      padding: 22px;
+      color: #fff;
+      font-family: 'Orbitron', Arial, sans-serif;
     }
-    #bigAlertInner h2 { margin:0 0 10px 0; color:#ffb700; text-shadow:0 0 12px #ffb70066; font-size:1.15em; }
-    #bigAlertInner p { margin:6px 0 10px 0; color:#00ffd0; white-space:pre-wrap; }
+    #bigAlertInner h2 {
+      margin: 0 0 10px 0;
+      color: #ffb700;
+      text-shadow: 0 0 12px #ffb70066;
+      font-size: 1.15em;
+    }
+    #bigAlertInner p { margin: 6px 0 10px 0; color: #00ffd0; white-space: pre-wrap; }
     #bigAlertInner .big-alert-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:12px; }
-    #bigAlertInner .big-close { background:linear-gradient(90deg,#ff00c8,#00ffd0); border:none; padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:bold; }
-
-    @media (max-width:600px){
-      .container { padding:0.3em; }
-      .modal-content { padding:0.8em; }
-      .cups-area { width:98vw; min-width:0; }
-      .table-img { width:100vw; height:auto; }
-      .cup-set { margin:0 4px; }
-      .cup-btn, .cup-btn img { width:28px; height:28px; }
-      .match-intro-bars .match-intro-names { font-size:1.3em; }
-      .match-intro-names .team { min-width:140px; }
-      .sidebar-overlay {
-        width:98vw; left:0; top:auto; bottom:0; height:180px; flex-direction:row; font-size:0.88em;
-        border-radius:0; border-left:none; border-top:3px solid #00ffd0; box-shadow:0 -3px 28px #ff00c888;
-      }
-      .sidebar-overlay table { font-size:0.88em; }
-      .top-right-controls { right:8px; top:8px; padding:6px; gap:6px; }
-      #bigAlertInner { padding:12px; border-radius:10px; }
+    #bigAlertInner .big-close {
+      background: linear-gradient(90deg,#ff00c8,#00ffd0);
+      border: none; padding: 8px 12px;
+      border-radius: 8px; cursor: pointer; font-weight: bold;
     }
 
-    #losersGameModal { z-index:20050 !important; }
-
-    /* === VIINAHARAVA (LOSERS GAME) CUSTOM LAYOUT OVERRIDES === */
+    /* === VIINAHARAVA (LOSERS GAME) ENHANCED LAYOUT === */
+    :root {
+      --vh-grid-size: 210px;  /* overall width/height of 4x4 grid */
+      --cup-size: 38px;       /* single cup size */
+      --table-scale: 0.9;     /* scale factor for rotated table image */
+      --grid-offset-y: 0px;   /* vertical nudge of cup grid */
+    }
+    #losersGameModal { z-index: 20050 !important; }
+    #losersGameModal .modal-content {
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
     #losersGameModal .cups-area {
-      width: 340px;
-      height: 360px;           /* Taller for vertical orientation */
-      min-height: 360px;
-      border-radius: 28px;
+      width: 400px;
+      height: 640px;
+      min-height: 640px;
+      border-radius: 30px;
+      background: #2a0064;
+      overflow: hidden;
+      box-shadow: 0 0 40px #00ffd055, inset 0 0 20px #000;
+    }
+    #losersGameModal .cups-area .table-wrapper {
+      position: absolute;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0;
+      pointer-events: none;
     }
-    /* Rotate only the table image vertically (90deg) */
-    #losersGameModal .table-img {
-      transform: rotate(90deg);
-      object-fit: contain;
-      filter: brightness(0.95);
-    }
-    /* Center smaller grid (no rotation) */
-    #losersGameModal .cup-set.center {
-      transform: none !important;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
+    #losersGameModal .cups-area .table-wrapper img.table-img {
+      width: auto;
       height: 100%;
-      pointer-events: none; /* let cups inside handle events */
+      max-height: 100%;
+      transform: rotate(90deg) scale(var(--table-scale));
+      transform-origin: center center;
+      opacity: 0.9;
+      filter: drop-shadow(0 0 16px #000);
     }
-    #losersGameModal .cup-set.center .losers-grid {
+    #losersGameModal #losersGrid {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, calc(-50% + var(--grid-offset-y)));
+      width: var(--vh-grid-size);
+      height: var(--vh-grid-size);
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       grid-template-rows: repeat(4, 1fr);
-      gap: 8px;
-      width: 60px;
-      height: 60px;
+      gap: 14px;
+      z-index: 5;
       pointer-events: auto;
-      position: relative;
     }
-    #losersGameModal .cup-set.center .losers-grid .cup-btn img {
-      width: 36px;
-      height: 36px;
+    #losersGameModal #losersGrid .cup-btn {
+      width: var(--cup-size);
+      height: var(--cup-size);
+      margin: 0;
+    }
+    #losersGameModal #losersGrid .cup-btn img {
+      width: var(--cup-size);
+      height: var(--cup-size);
       box-shadow: 0 0 10px #ff00c8;
     }
-    #losersGameModal .cup-set.center .losers-grid .cup-btn.hit img {
+    #losersGameModal #losersGrid .cup-btn.hit img {
       box-shadow: 0 0 16px #00ffd0;
     }
-    /* === END VIINAHARAVA CUSTOM OVERRIDES === */
+    #losersGameModal.losers-ended #losersGrid {
+      opacity: 0.55;
+      filter: grayscale(60%);
+      pointer-events: none;
+    }
+    #throwResult .result-drink {
+      font-size: 1.55em;
+      padding: 8px 18px;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 600px) {
+      .container { padding: 0.3em; }
+      .cups-area { width: 98vw; min-width: 0; }
+      .table-img { width: 100vw; height: auto; }
+      .cup-set { margin: 0 4px; }
+      .cup-btn, .cup-btn img { width: 28px; height: 28px; }
+      .match-intro-names { font-size: 1.3em; }
+      .match-intro-names .team { min-width: 140px; }
+      .sidebar-overlay {
+        width: 98vw;
+        left: 0;
+        top: auto;
+        bottom: 0;
+        height: 180px;
+        flex-direction: row;
+        font-size: 0.88em;
+        border-radius: 0;
+        border-left: none;
+        border-top: 3px solid #00ffd0;
+        box-shadow: 0 -3px 28px #ff00c888;
+      }
+      .sidebar-overlay table { font-size: 0.88em; }
+      .top-right-controls { right: 8px; top: 8px; padding: 6px; gap: 8px; }
+      #bigAlertInner { padding: 12px; border-radius: 10px; }
+      #losersGameModal .cups-area {
+        width: 310px;
+        height: 520px;
+        min-height: 520px;
+      }
+      :root {
+        --vh-grid-size: 185px;
+        --cup-size: 32px;
+        --table-scale: 0.82;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="top-right-controls" aria-hidden="false">
+  <!-- TOP-RIGHT CONTROLS -->
+  <div class="top-right-controls">
     <div class="toggle-container">
       <span class="toggle-label">Äänet</span>
       <label class="toggle-switch" title="Äänet On/Off">
-        <input type="checkbox" id="soundToggle"><span class="toggle-slider"></span>
+        <input type="checkbox" id="soundToggle">
+        <span class="toggle-slider"></span>
       </label>
     </div>
     <div class="toggle-container">
       <span class="toggle-label">Testitoiminnot</span>
       <label class="toggle-switch" title="Testitoiminnot On/Off">
-        <input type="checkbox" id="testFeaturesToggle"><span class="toggle-slider"></span>
+        <input type="checkbox" id="testFeaturesToggle">
+        <span class="toggle-slider"></span>
       </label>
     </div>
   </div>
@@ -349,8 +538,14 @@
           <input type="range" min="1" max="4" value="2" id="teamSizeSlider" style="width:100px;">
           <span id="teamSizeVal">2</span>
         </label>
-        <label><input type="checkbox" id="goldenGoalCheckbox" style="margin-right:6px;"> Golden goal?</label>
-        <label>Peliaika: <input type="number" id="timerInput" min="1" max="60" value="10" style="width:60px;"> min</label>
+        <label>
+          <input type="checkbox" id="goldenGoalCheckbox" style="margin-right:6px;">
+          Golden goal?
+        </label>
+        <label>
+          Peliaika:
+          <input type="number" id="timerInput" min="1" max="60" value="10" style="width:60px;"> min
+        </label>
         <button class="btn" id="addTeamBtn">Lisää</button>
         <label for="csvInput" class="custom-file-label">Tuo .CSV</label>
         <input type="file" accept=".csv" id="csvInput" style="margin-left:1em;">
@@ -358,7 +553,7 @@
         <button class="btn" id="resetBtn">Nollaa</button>
       </div>
       <div class="team-list" id="teamList"></div>
-      <button id="startTournamentBtn" class="btn" onclick="beginTournament()" style="display:none;">Käynnistä turnaus</button>
+      <button id="startTournamentBtn" class="btn" style="display:none;" onclick="beginTournament()">Käynnistä turnaus</button>
     </div>
     <div class="section" id="fixturesSection" style="display:none;">
       <h2>Ottelukaavio</h2>
@@ -370,20 +565,25 @@
     </div>
   </div>
 
+  <!-- Match modal -->
   <div class="fullscreen-modal" id="fullscreenModal" style="display:none;">
     <div class="modal-content" id="modalContent"></div>
     <div id="sidebarOverlay" class="sidebar-overlay" style="display:none;"></div>
-    <button class="close-btn" id="closeModalBtn">&times;</button>
+    <button class="close-btn" id="closeModalBtn" type="button">&times;</button>
   </div>
 
+  <!-- Big alert -->
   <div id="bigAlertModal" role="dialog" aria-modal="true" aria-hidden="true">
     <div id="bigAlertInner" role="document">
       <h2 id="bigAlertTitle">Alert</h2>
       <p id="bigAlertMessage">Message</p>
-      <div class="big-alert-actions"><button class="big-close" id="bigAlertCloseBtn">Sulje</button></div>
+      <div class="big-alert-actions">
+        <button class="big-close btn" id="bigAlertCloseBtn">Sulje</button>
+      </div>
     </div>
   </div>
 
+  <!-- Intro animation -->
   <div class="match-intro-overlay" id="matchIntroOverlay" style="display:none;">
     <div class="match-intro-bars">
       <div class="bar top"></div>
@@ -396,928 +596,1164 @@
     </div>
   </div>
 
-  <!-- Updated Viinaharava modal (grid & orientation) -->
+  <!-- Viinaharava modal -->
   <div id="losersGameModal" class="fullscreen-modal" style="display:none;">
     <div class="modal-content">
       <h2>Viinaharava</h2>
-      <div style="margin-bottom: 15px; font-size: 1.1em; text-align: center;">
-        <span id="loserTeamName" class="team-left"></span> |
-        <span id="currentThrower" class="team-right"></span> heittää
+      <div style="margin-bottom: 15px; font-size: 1.05em; text-align: center;">
+        <span id="loserTeamName" style="color:#00ffd0;text-shadow:0 0 8px #00ffd0;"></span> |
+        <span id="currentThrower" style="color:#ff00c8;text-shadow:0 0 8px #ff00c8;"></span> heittää
       </div>
       <div class="cups-area">
-        <img src="assets/table.png" class="table-img" alt="Table">
-        <div class="cup-set center">
-          <div class="losers-grid" id="losersGrid"></div>
+        <div class="table-wrapper">
+          <img src="assets/table.png" class="table-img" alt="Table">
         </div>
+        <div id="losersGrid"></div>
       </div>
       <div id="throwResult"
-           style="display:none; margin: 20px auto; max-width: 400px; text-align: center;
-                  padding: 15px; background: #18003a; border-radius: 12px; border: 2px solid #00ffd0;">
+           style="display:none; margin:20px auto; max-width:420px; text-align:center; padding:15px;
+                  background:#18003a; border-radius:12px; border:2px solid #00ffd0;">
         <h3 id="resultTitle">Osuma!</h3>
         <div id="resultContent" class="result-content"></div>
       </div>
       <div style="display:flex; justify-content:center; gap:15px; margin-top:20px;">
-        <button class="btn" id="finishLosersGameBtn">Sulje peli</button>
+        <button class="btn" id="finishLosersGameBtn" type="button">Sulje peli</button>
       </div>
     </div>
-    <button class="close-btn" id="closeLosersGameBtn">&times;</button>
+    <button class="close-btn" id="closeLosersGameBtn" type="button">&times;</button>
   </div>
 
-  <script>
-  /* (JavaScript below largely same as previous cleaned version; only losers game logic & styles updated) */
+<script>
+/* ===================== STATE ===================== */
+let teams = [];
+let teamInputs = [];
+let teamSize = 2;
+let tournamentStarted = false;
+let fixtures = [];
+let matchResults = {};
+let phase = "league";
+let leagueCups = 6;
+let knockoutCups = 10;
+let goldenGoalEnabled = false;
+let leagueTimer = 10 * 60;
+let knockoutFixtures = [];
+let cupStates = {};
+let ongoingMatchId = null;
+let timerInterval = null;
 
-  let teams = [];
-  let teamInputs = [];
-  let teamSize = 2;
-  let tournamentStarted = false;
-  let fixtures = [];
-  let matchResults = {};
-  let phase = "league";
-  let leagueCups = 6;
-  let knockoutCups = 10;
-  let goldenGoalEnabled = false;
-  let leagueTimer = 10 * 60;
-  let knockoutFixtures = [];
-  let cupStates = {};
-  let ongoingMatchId = null;
-  let timerInterval = null;
+/* Viinaharava state */
+let losersGameActive = false;
+let losersGameEnded = false;
+let losersTeam = null;
+let losersPlayers = [];
+let currentLoserIndex = 0;
+let losersCupResults = [];
 
-  // Viinaharava
-  let losersGameActive = false;
-  let losersTeam = null;
-  let losersPlayers = [];
-  let currentLoserIndex = 0;
-  let losersCupResults = [];
+/* Feature toggles */
+let soundEnabled = false;
+let testFeaturesEnabled = false;
 
-  let soundEnabled = false;
-  let testFeaturesEnabled = false;
+const soundToggleEl = document.getElementById('soundToggle');
+const testFeaturesToggleEl = document.getElementById('testFeaturesToggle');
+const testModeBtn = document.getElementById('testModeBtn');
+if (testModeBtn) testModeBtn.disabled = !testFeaturesEnabled;
 
-  const soundToggleEl = document.getElementById('soundToggle');
-  const testFeaturesToggleEl = document.getElementById('testFeaturesToggle');
-  const testModeBtn = document.getElementById('testModeBtn');
-
-  if (soundToggleEl) soundToggleEl.checked = soundEnabled;
-  if (testFeaturesToggleEl) testFeaturesToggleEl.checked = testFeaturesEnabled;
-  if (testModeBtn) testModeBtn.disabled = !testFeaturesEnabled;
-
-  if (soundToggleEl) soundToggleEl.addEventListener('change', function() {
-    soundEnabled = this.checked;
+/* ===================== TOGGLE LISTENERS ===================== */
+if (soundToggleEl) {
+  soundToggleEl.addEventListener('change', e => {
+    soundEnabled = e.target.checked;
   });
-  if (testFeaturesToggleEl) testFeaturesToggleEl.addEventListener('change', function() {
-    testFeaturesEnabled = this.checked;
+}
+if (testFeaturesToggleEl) {
+  testFeaturesToggleEl.addEventListener('change', e => {
+    testFeaturesEnabled = e.target.checked;
     if (testModeBtn) testModeBtn.disabled = !testFeaturesEnabled;
     renderFixtures();
   });
+}
 
-  const losersCupTypes = [
-    { type: 'BAILEYS', count: 4, color: '#A67B5B' },
-    { type: 'SALMARI', count: 4, color: '#000000' },
-    { type: 'JÄGERMEISTER', count: 1, color: '#72A331' },
-    { type: 'RETHROW', count: 2, color: '#3B88C3' },
-    { type: 'WILD', count: 2, color: '#FFB700' },
-    { type: 'MINTTU', count: 3, color: '#00ffd0' }
-  ];
+/* ===================== VIINAHARAVA CONFIG ===================== */
+const losersCupTypes = [
+  { type: 'BAILEYS', count: 4, color: '#A67B5B' },
+  { type: 'SALMARI', count: 4, color: '#000000' },
+  { type: 'JÄGERMEISTER', count: 1, color: '#72A331' },
+  { type: 'RETHROW', count: 2, color: '#3B88C3' },
+  { type: 'WILD', count: 2, color: '#FFB700' },
+  { type: 'MINTTU', count: 3, color: '#00ffd0' }
+];
 
-  function startLosersGame(losingTeam, onComplete) {
-    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    if (!losingTeam || !losingTeam.players?.length) {
-      if (onComplete) onComplete();
-      return;
-    }
-    document.getElementById('matchIntroOverlay').style.display = 'none';
-    document.getElementById('fullscreenModal').style.display = 'none';
-    hideSidebar();
+/* ===================== HELPER: ALERT MODAL ===================== */
+const bigAlertModal = document.getElementById('bigAlertModal');
+const bigAlertTitleEl = document.getElementById('bigAlertTitle');
+const bigAlertMessageEl = document.getElementById('bigAlertMessage');
+const bigAlertCloseBtn = document.getElementById('bigAlertCloseBtn');
 
-    losersGameActive = true;
-    losersTeam = losingTeam;
-    losersPlayers = [...losingTeam.players];
-    currentLoserIndex = 0;
-    window.losersGameCompleteCallback = onComplete || null;
+function showBigAlert(title, message, opts = {}) {
+  bigAlertTitleEl.textContent = title || 'Info';
+  bigAlertMessageEl.textContent = typeof message === 'string' ? message : JSON.stringify(message, null, 2);
+  bigAlertModal.style.display = 'flex';
+  bigAlertModal.setAttribute('aria-hidden', 'false');
+  if (bigAlertModal._timer) {
+    clearTimeout(bigAlertModal._timer);
+    bigAlertModal._timer = null;
+  }
+  if (opts.autoCloseMs) {
+    bigAlertModal._timer = setTimeout(() => {
+      hideBigAlert();
+      if (typeof opts.onClose === 'function') opts.onClose();
+    }, opts.autoCloseMs);
+  }
+}
+function hideBigAlert() {
+  bigAlertModal.style.display = 'none';
+  bigAlertModal.setAttribute('aria-hidden', 'true');
+  if (bigAlertModal._timer) {
+    clearTimeout(bigAlertModal._timer);
+    bigAlertModal._timer = null;
+  }
+}
+if (bigAlertCloseBtn) bigAlertCloseBtn.addEventListener('click', hideBigAlert);
 
-    // Build distribution
-    const allResults = [];
-    losersCupTypes.forEach(t => { for (let i=0;i<t.count;i++) allResults.push({...t}); });
-    for (let i = allResults.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [allResults[i], allResults[j]] = [allResults[j], allResults[i]];
-    }
-    losersCupResults = allResults;
+/* ===================== VIINAHARAVA FUNCTIONS ===================== */
+function startLosersGame(losingTeam, onComplete) {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  if (!losingTeam || !losingTeam.players?.length) {
+    if (onComplete) onComplete();
+    return;
+  }
+  document.getElementById('matchIntroOverlay').style.display = 'none';
+  document.getElementById('fullscreenModal').style.display = 'none';
+  hideSidebar();
 
-    document.getElementById('loserTeamName').textContent = losingTeam.name;
-    document.getElementById('currentThrower').textContent = losersPlayers[currentLoserIndex] || 'Unknown';
+  losersGameActive = true;
+  losersGameEnded = false;
+  losersTeam = losingTeam;
+  // Only first two players matter for the early end rule
+  losersPlayers = losingTeam.players.slice(0, 2);
+  currentLoserIndex = 0;
+  window.losersGameCompleteCallback = onComplete || null;
+
+  // Distribution
+  const allResults = [];
+  losersCupTypes.forEach(t => {
+    for (let i = 0; i < t.count; i++) allResults.push({...t});
+  });
+  for (let i = allResults.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allResults[i], allResults[j]] = [allResults[j], allResults[i]];
+  }
+  losersCupResults = allResults;
+
+  document.getElementById('loserTeamName').textContent = losingTeam.name;
+  document.getElementById('currentThrower').textContent = losersPlayers[currentLoserIndex] || 'Unknown';
+  document.getElementById('throwResult').style.display = 'none';
+
+  renderLosersCups();
+  const modal = document.getElementById('losersGameModal');
+  modal.classList.remove('losers-ended');
+  modal.style.display = 'flex';
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function renderLosersCups() {
+  const grid = document.getElementById('losersGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  for (let i = 0; i < 16; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'cup-btn losers-cup';
+    btn.dataset.index = i;
+    const img = document.createElement('img');
+    img.src = 'assets/redcup.png';
+    img.onerror = function() { this.src = 'redcup.png'; };
+    img.alt = 'Cup';
+    btn.appendChild(img);
+    btn.addEventListener('click', () => handleLosersCupClick(btn, i));
+    grid.appendChild(btn);
+  }
+}
+
+function handleLosersCupClick(btn, idx) {
+  if (!losersGameActive || losersGameEnded) return;
+  if (btn.classList.contains('hit')) return;
+  btn.classList.add('hit');
+
+  const result = losersCupResults[idx];
+
+  document.getElementById('resultTitle').textContent = 'OSUMA!';
+  const resultContent = document.getElementById('resultContent');
+  resultContent.innerHTML = `
+    <div class="result-drink"
+         style="background-color:${result.color}20;color:${result.color};border-color:${result.color}">
+      ${result.type}
+    </div>
+    <button class="btn" id="nextThrowBtn">
+      ${result.type === 'RETHROW'
+        ? (currentLoserIndex === 1 ? 'UUDELLEENHEITTO (2. Pelaaja)' : 'UUDELLEENHEITTO')
+        : (currentLoserIndex === 0 ? 'SEURAAVA HEITTÄJÄ' : 'LOPETA')}
+    </button>
+  `;
+  document.getElementById('throwResult').style.display = 'block';
+
+  document.getElementById('nextThrowBtn').addEventListener('click', () => {
     document.getElementById('throwResult').style.display = 'none';
 
-    renderLosersCups();
+    // Rethrow: same player
+    if (result.type === 'RETHROW') return;
 
-    const modal = document.getElementById('losersGameModal');
-    modal.style.display = 'flex';
-    modal.setAttribute('aria-hidden','false');
-  }
+    // Move to next player
+    currentLoserIndex++;
 
-  function renderLosersCups() {
-    const grid = document.getElementById('losersGrid');
-    if (!grid) return;
-    grid.innerHTML = '';
-    for (let i=0;i<16;i++) {
-      const btn = document.createElement('button');
-      btn.className = 'cup-btn losers-cup';
-      btn.dataset.losersIndex = i;
-      const img = document.createElement('img');
-      img.src = 'assets/redcup.png';
-      img.onerror = function(){ this.src = 'redcup.png'; };
-      img.alt = 'Cup';
-      btn.appendChild(img);
-      btn.addEventListener('click', ()=>handleLosersCupClick(btn,i));
-      grid.appendChild(btn);
+    // End if second player has thrown a non-rethrow (or no second player exists)
+    if (currentLoserIndex >= 2 || currentLoserIndex >= losersPlayers.length) {
+      endLosersGame();
+    } else {
+      document.getElementById('currentThrower').textContent =
+        losersPlayers[currentLoserIndex] || 'Unknown';
     }
+  }, { once: true });
+}
+
+function endLosersGame() {
+  if (losersGameEnded) return;
+  losersGameActive = false;
+  losersGameEnded = true;
+  disableLosersCups();
+  document.getElementById('losersGameModal').classList.add('losers-ended');
+  showBigAlert('Peli valmis', 'Häviäjien peli on päättynyt!', { autoCloseMs: 2200 });
+  setTimeout(() => finishLosersGame(), 2400);
+}
+
+function disableLosersCups() {
+  const grid = document.getElementById('losersGrid');
+  if (!grid) return;
+  [...grid.querySelectorAll('.cup-btn')].forEach(b => {
+    b.style.pointerEvents = 'none';
+  });
+}
+
+function finishLosersGame() {
+  const modal = document.getElementById('losersGameModal');
+  modal.style.display = 'none';
+  modal.setAttribute('aria-hidden', 'true');
+  losersGameActive = false;
+  losersGameEnded = true;
+  if (window.losersGameCompleteCallback) {
+    window.losersGameCompleteCallback();
+    window.losersGameCompleteCallback = null;
   }
+}
 
-  function handleLosersCupClick(cupBtn, index) {
-    if (!losersGameActive || cupBtn.classList.contains('hit')) return;
-    cupBtn.classList.add('hit');
+/* Expose some test helpers */
+window.testLosersGame = function() {
+  startLosersGame({ name: "Joukkue 1", players: ["Pelaaja 1", "Pelaaja 2"] });
+};
 
-    const result = losersCupResults[index];
-    document.getElementById('resultTitle').textContent = 'OSUMA!';
-    const resultContent = document.getElementById('resultContent');
-    resultContent.innerHTML = `
-      <div class="result-drink" style="background-color:${result.color}20;color:${result.color};border-color:${result.color}">
-        ${result.type}
-      </div>
-      <button class="btn" id="nextThrowBtn">${result.type === 'RETHROW' ? 'UUDELLEENHEITTO' : 'SEURAAVA / LOPETA'}</button>
-    `;
-    document.getElementById('throwResult').style.display = 'block';
+/* ===================== TEAM SETUP & CSV ===================== */
+document.getElementById('teamSizeSlider').oninput = function() {
+  teamSize = Number(this.value);
+  document.getElementById('teamSizeVal').textContent = teamSize;
+};
 
-    document.getElementById('nextThrowBtn').addEventListener('click', () => {
-      document.getElementById('throwResult').style.display = 'none';
+document.getElementById('addTeamBtn').onclick = () => {
+  if (tournamentStarted) return;
+  teamInputs.push({ name: "", players: Array(teamSize).fill("") });
+  renderTeamList();
+  updateStartButton();
+};
 
-      if (result.type === 'RETHROW') {
-        // Same player rethrows; do nothing else.
-        return;
-      }
+document.getElementById('csvInput').onchange = handleCSVUpload;
 
-      // Advance to next player
-      currentLoserIndex++;
-
-      // EARLY END RULE:
-      // End game after the second player's (index 1) non-RETHROW result
-      // OR if we ran out of players anyway
-      const secondPlayerDone = (currentLoserIndex > 1);
-      const noMorePlayers = currentLoserIndex >= losersPlayers.length;
-
-      if (secondPlayerDone || noMorePlayers) {
-        losersGameActive = false;
-        showBigAlert('Peli valmis', 'Häviäjien peli on päättynyt!', { autoCloseMs: 2500 });
-        setTimeout(()=>finishLosersGame(), 2700);
+function handleCSVUpload(e) {
+  let file = e.target.files[0];
+  if (!file) return;
+  let reader = new FileReader();
+  reader.onload = function(evt) {
+    let text;
+    try {
+      if (evt.target.result instanceof ArrayBuffer) {
+        text = new TextDecoder("utf-8").decode(evt.target.result);
       } else {
-        // Show next player (which should be index 1)
-        document.getElementById('currentThrower').textContent = losersPlayers[currentLoserIndex] || 'Unknown';
+        text = evt.target.result;
       }
-    });
-  }
-
-  function finishLosersGame() {
-    const modal = document.getElementById('losersGameModal');
-    modal.style.display = 'none';
-    modal.setAttribute('aria-hidden','true');
-    losersGameActive = false;
-    if (window.losersGameCompleteCallback) {
-      window.losersGameCompleteCallback();
-      window.losersGameCompleteCallback = null;
+    } catch {
+      text = evt.target.result;
     }
-  }
-
-  // Big Alert helpers
-  const bigAlertModal = document.getElementById('bigAlertModal');
-  const bigAlertTitleEl = document.getElementById('bigAlertTitle');
-  const bigAlertMessageEl = document.getElementById('bigAlertMessage');
-  const bigAlertCloseBtn = document.getElementById('bigAlertCloseBtn');
-
-  function showBigAlert(title, message, opts = {}) {
-    if (!bigAlertModal) { alert(message); return; }
-    bigAlertTitleEl.textContent = title || 'Info';
-    bigAlertMessageEl.textContent = typeof message === 'string' ? message : JSON.stringify(message,null,2);
-    bigAlertModal.style.display='flex';
-    bigAlertModal.setAttribute('aria-hidden','false');
-    if (bigAlertModal._autoCloseTimer) clearTimeout(bigAlertModal._autoCloseTimer);
-    if (opts.autoCloseMs) {
-      bigAlertModal._autoCloseTimer = setTimeout(()=>{
-        hideBigAlert();
-        if (typeof opts.onClose === 'function') opts.onClose();
-      }, opts.autoCloseMs);
+    let delimiter = text.includes(";") ? ";" : ",";
+    let rows = text.trim().split('\n');
+    if (rows[0].toLowerCase().includes("joukkue") || rows[0].toLowerCase().includes("team")) {
+      rows = rows.slice(1);
     }
-  }
-  function hideBigAlert() {
-    bigAlertModal.style.display='none';
-    bigAlertModal.setAttribute('aria-hidden','true');
-    if (bigAlertModal._autoCloseTimer) {
-      clearTimeout(bigAlertModal._autoCloseTimer);
-      bigAlertModal._autoCloseTimer = null;
+    let map = {};
+    for (let r=0; r<rows.length; r++) {
+      let row = rows[r].split(delimiter);
+      if (row.length < 2) continue;
+      let team = row[0].trim();
+      let player = row[1].trim();
+      if (!map[team]) map[team] = [];
+      map[team].push(player);
     }
-  }
-  if (bigAlertCloseBtn) bigAlertCloseBtn.addEventListener('click', hideBigAlert);
-
-  // Test utilities
-  function randomLoserScore() {
-    const r = Math.random();
-    if (r < 0.03) return 1;
-    if (r < 0.10) return 2;
-    if (r < 0.45) return 3;
-    if (r < 0.80) return 4;
-    return 5;
-  }
-
-  function applyTestResultToMatch(match, winnerIdx, winnerScore, loserScore) {
-    if (!match?.teams?.length) return;
-    match.winner = match.teams[winnerIdx].name;
-    match.score = winnerIdx===0 ? [winnerScore, loserScore] : [loserScore, winnerScore];
-    match.awaitingConfirm = false;
-    match.time = undefined;
-    const losingTeam = match.teams[winnerIdx===0?1:0];
-    startLosersGame(losingTeam, () => {
-      ongoingMatchId = null;
-      renderFixtures(); renderStandings(); checkLeagueCompletion();
-      if (phase==="knockout") checkKnockoutProgression();
-    });
-  }
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const finishBtn = document.getElementById('finishLosersGameBtn');
-    if (finishBtn) finishBtn.addEventListener('click', finishLosersGame);
-    const closeLosersBtn = document.getElementById('closeLosersGameBtn');
-    if (closeLosersBtn) closeLosersBtn.addEventListener('click', finishLosersGame);
-
-    const resetBtn = document.getElementById('resetBtn');
-    if (resetBtn) {
-      const vhBtn = document.createElement('button');
-      vhBtn.id='viinaharavaBtn';
-      vhBtn.className=resetBtn.className;
-      vhBtn.textContent='Viinaharava';
-      resetBtn.parentNode.insertBefore(vhBtn, resetBtn.nextSibling);
-      vhBtn.disabled = !testFeaturesEnabled;
-      if (testFeaturesToggleEl) {
-        testFeaturesToggleEl.addEventListener('change', function(){ vhBtn.disabled = !this.checked; });
-      }
-      vhBtn.addEventListener('click', () => {
-        const hardcodedTeam = { name:"Joukkue 1", players:["Pelaaja 1","Pelaaja 2"] };
-        ongoingMatchId = null;
-        if (timerInterval) { clearInterval(timerInterval); timerInterval=null; }
-        startLosersGame(hardcodedTeam);
-      });
+    teamInputs = [];
+    teams = [];
+    for (let t in map) {
+      teamInputs.push({ name: t, players: map[t].slice() });
+      teams.push({ name: t, players: map[t].slice() });
     }
+    renderTeamList();
+    updateStartButton();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ===================== TEST MODE FILL ===================== */
+if (testModeBtn) {
+  testModeBtn.onclick = testMode;
+}
+
+function testMode() {
+  let teamNames = ["Red Devils","Beer Bros","Cup Kings","Pong Stars","Sudden Death","Last Call"];
+  let playerNames = ["Alex","Sam","Jamie","Taylor","Jordan","Morgan","Riley","Casey","Reese","Charlie","Drew","Skyler"];
+  let nTeams = 6;
+  let tSize = Number(teamSize) || 2;
+
+  teams = [];
+  teamInputs = [];
+
+  let usedPlayers = [];
+  for (let i=0; i<nTeams; i++) {
+    let tn = teamNames[i % teamNames.length];
+    let ps = [];
+    for (let j=0; j<tSize; j++) {
+      let p;
+      let attempts = 0;
+      do {
+        p = playerNames[Math.floor(Math.random()*playerNames.length)];
+        attempts++;
+      } while (usedPlayers.includes(p) && attempts < 20);
+      usedPlayers.push(p);
+      ps.push(p);
+    }
+    teams.push({ name: tn, players: ps });
+    teamInputs.push({ name: tn, players: ps.slice() });
+  }
+
+  tournamentStarted = true;
+  renderTeamList();
+  generateFixtures();
+  document.getElementById('fixturesSection').style.display = '';
+  document.getElementById('standingsSection').style.display = '';
+  renderFixtures();
+  renderStandings();
+}
+
+/* ===================== RESET ===================== */
+document.getElementById('resetBtn').onclick = function() {
+  teams = [];
+  teamInputs = [];
+  tournamentStarted = false;
+  fixtures = [];
+  knockoutFixtures = [];
+  cupStates = {};
+  phase = "league";
+  teamSize = 2;
+  ongoingMatchId = null;
+  teamSizeSlider.value = 2;
+  teamSizeVal.textContent = 2;
+  document.getElementById('teamList').innerHTML = '';
+  document.getElementById('fixtureList').innerHTML = '';
+  document.getElementById('standingsTable').innerHTML = '';
+  document.getElementById('fixturesSection').style.display = 'none';
+  document.getElementById('standingsSection').style.display = 'none';
+  document.getElementById('fullscreenModal').style.display = 'none';
+  document.getElementById('sidebarOverlay').style.display = 'none';
+  document.getElementById('matchIntroOverlay').style.display = 'none';
+  document.getElementById('startTournamentBtn').style.display = 'none';
+  if (timerInterval) clearInterval(timerInterval);
+
+  soundEnabled = false;
+  testFeaturesEnabled = false;
+  if (soundToggleEl) soundToggleEl.checked = soundEnabled;
+  if (testFeaturesToggleEl) testFeaturesToggleEl.checked = testFeaturesEnabled;
+  if (testModeBtn) testModeBtn.disabled = !testFeaturesEnabled;
+  hideBigAlert();
+  renderFixtures();
+};
+
+document.getElementById('goldenGoalCheckbox').onchange = function() {
+  goldenGoalEnabled = this.checked;
+};
+document.getElementById('timerInput').oninput = function() {
+  leagueTimer = Number(this.value) * 60;
+};
+
+/* ===================== TEAM LIST RENDER ===================== */
+function renderTeamList() {
+  const el = document.getElementById('teamList');
+  el.innerHTML = '';
+  let source = tournamentStarted ? teams : teamInputs;
+
+  source.forEach((team, idx) => {
+    let div = document.createElement('div');
+    div.className = 'team';
+    if (!tournamentStarted) {
+      div.innerHTML = `
+        <input type="text" placeholder="Joukkueen nimi" value="${team.name}"
+          oninput="updateTeamInput(${idx}, 'name', this.value)" style="margin-right:12px;">
+        ${team.players.map((p, pi) =>
+          `<input type="text" placeholder="Pelaaja ${pi+1}" value="${p}"
+            oninput="updateTeamInput(${idx}, 'player', this.value, ${pi})"
+            style="margin-right:10px;">`
+        ).join('')}
+        <button class="btn" style="float:right;" onclick="removeTeam(${idx})">Poista</button>
+      `;
+    } else {
+      div.innerHTML = `<b>${team.name}</b> (${team.players.length}): ${team.players.join(', ')}`;
+    }
+    el.appendChild(div);
   });
 
-  window.forceShowLosersGame = ()=>{ document.getElementById('losersGameModal').style.display='flex'; };
-  window.testLosersGame = ()=> startLosersGame({name:"Joukkue 1", players:["Pelaaja 1","Pelaaja 2"]});
+  updateStartButton();
+}
 
-  window.generateAllResults = function() {
-    if (!testFeaturesEnabled) return;
-    const allMatches = [...fixtures, ...knockoutFixtures];
-    allMatches.forEach(m=>{
-      if (!m || m.winner) return;
-      const winnerIdx = Math.random()<0.5?0:1;
-      const loserScore = randomLoserScore();
-      const winnerScore = 6;
-      applyTestResultToMatch(m, winnerIdx, winnerScore, loserScore);
-    });
-    showBigAlert('Testitulokset','Testitulokset generoitu.',{autoCloseMs:2500});
-  };
+window.updateTeamInput = function(idx, field, value, pi) {
+  if (!teamInputs[idx]) return;
+  if (field === 'name') teamInputs[idx].name = value;
+  else if (field === 'player') teamInputs[idx].players[pi] = value;
+  updateStartButton();
+};
 
-  window.promptAndApplyResult = function(matchId) {
-    if (!testFeaturesEnabled) return;
-    const match = getMatchById(matchId);
-    if (!match) return;
-    const input = prompt('Syötä tulos muodossa "6-0" (vasen-oikea)', '6-0');
-    if (!input) return;
-    const parts = input.trim().split('-');
-    if (parts.length!==2) { showBigAlert('Virhe','Virheellinen muoto.'); return; }
-    const left = parseInt(parts[0],10); const right = parseInt(parts[1],10);
-    if (Number.isNaN(left) || Number.isNaN(right)) { showBigAlert('Virhe','Ei numeroita.'); return; }
-    if (left===right) { showBigAlert('Virhe','Tasapeli ei sallittu.'); return; }
-    const winnerIdx = left>right?0:1;
-    match.winner = match.teams[winnerIdx].name;
-    match.score = [left,right];
-    match.awaitingConfirm=false;
-    ongoingMatchId=null;
-    match.time=undefined;
-    renderFixtures(); renderStandings(); checkLeagueCompletion();
-    if (phase==="knockout") checkKnockoutProgression();
-    showBigAlert('Tulos tallennettu', `${match.teams[0].name} ${left} - ${right} ${match.teams[1].name}`, {autoCloseMs:2000});
-  };
+window.removeTeam = function(idx) {
+  teamInputs.splice(idx,1);
+  renderTeamList();
+  updateStartButton();
+};
 
-  // Team & tournament logic (unchanged)
-  document.getElementById('teamSizeSlider').oninput = function() {
-    teamSize = Number(this.value);
-    document.getElementById('teamSizeVal').textContent = teamSize;
-  };
-  document.getElementById('addTeamBtn').onclick = () => {
-    if (tournamentStarted) return;
-    teamInputs.push({name:"", players:Array(teamSize).fill("")});
-    renderTeamList(); updateStartButton();
-  };
-  document.getElementById('csvInput').onchange = handleCSVUpload;
-  if (testModeBtn) testModeBtn.onclick = testMode;
-  document.getElementById('resetBtn').onclick = function() {
-    teams=[]; teamInputs=[]; tournamentStarted=false; fixtures=[]; knockoutFixtures=[];
-    cupStates={}; phase="league"; teamSize=2; ongoingMatchId=null; teamSizeSlider.value=2; teamSizeVal.textContent=2;
-    ['teamList','fixtureList','standingsTable'].forEach(id=>document.getElementById(id).innerHTML='');
-    document.getElementById('fixturesSection').style.display='none';
-    document.getElementById('standingsSection').style.display='none';
-    document.getElementById('fullscreenModal').style.display='none';
-    document.getElementById('sidebarOverlay').style.display='none';
-    document.getElementById('matchIntroOverlay').style.display='none';
-    document.getElementById('startTournamentBtn').style.display='none';
-    if (timerInterval) clearInterval(timerInterval);
-    soundEnabled=false; testFeaturesEnabled=false;
-    if (soundToggleEl) soundToggleEl.checked=false;
-    if (testFeaturesToggleEl) testFeaturesToggleEl.checked=false;
-    if (testModeBtn) testModeBtn.disabled=true;
-    renderFixtures(); hideBigAlert();
-  };
-  document.getElementById('goldenGoalCheckbox').onchange = function(){ goldenGoalEnabled = this.checked; };
-  document.getElementById('timerInput').oninput = function(){ leagueTimer = Number(this.value)*60; };
+function updateStartButton() {
+  const btnEl = document.getElementById('startTournamentBtn');
+  if (!tournamentStarted &&
+      teamInputs.length >= 2 &&
+      teamInputs.every(t => t.name && t.name.trim() && t.players.every(p => p && p.trim()))) {
+    btnEl.style.display = '';
+  } else {
+    btnEl.style.display = 'none';
+  }
+}
 
-  function abbreviateTeamName(name) {
-    let words = name.split(/\s+/).filter(Boolean);
-    if (words.length===1) return words[0].substring(0,3).toUpperCase();
-    return words.slice(0,3).map(w=>w[0].toUpperCase()).join('');
+/* ===================== TOURNAMENT SETUP ===================== */
+function beginTournament() {
+  tournamentStarted = true;
+  teams = teamInputs.map(t => ({
+    name: t.name,
+    players: t.players.slice()
+  }));
+  renderTeamList();
+  generateFixtures();
+  document.getElementById('fixturesSection').style.display = '';
+  document.getElementById('standingsSection').style.display = '';
+  renderFixtures();
+  renderStandings();
+}
+window.beginTournament = beginTournament;
+
+function generateFixtures() {
+  fixtures = [];
+  matchResults = {};
+  let n = teams.length;
+  let rounds = n % 2 === 0 ? n - 1 : n;
+  let leagueMatchCounter = 1;
+  let teamList = teams.slice();
+
+  if (n % 2 === 1) {
+    teamList.push({name: "BYE", players: []});
+    n++;
   }
 
-  function renderSidebarStandings() {
-    let arr = fixtures.concat(knockoutFixtures);
-    let stats = {};
-    teams.forEach(t=>stats[t.name]={pts:0,S:0,SC:0,SD:0,played:0,W:0,L:0});
-    arr.forEach(m=>{
-      if(!m.winner||!m.score) return;
-      let t1=m.teams[0].name, t2=m.teams[1].name;
-      let [s1,s2]=m.score;
-      stats[t1].played++; stats[t2].played++;
-      if(m.winner===t1){ stats[t1].pts+=2; stats[t1].W++; stats[t2].L++; }
-      else { stats[t2].pts+=2; stats[t2].W++; stats[t1].L++; }
-      stats[t1].S+=s1; stats[t1].SC+=s2;
-      stats[t2].S+=s2; stats[t2].SC+=s1;
-    });
-    Object.keys(stats).forEach(n=>stats[n].SD=stats[n].S-stats[n].SC);
-    let sorted = Object.entries(stats).sort((a,b)=>{
-      if(b[1].pts!==a[1].pts) return b[1].pts-a[1].pts;
-      if(b[1].SD!==a[1].SD) return b[1].SD-a[1].SD;
-      if(b[1].S!==a[1].S) return b[1].S-a[1].S;
-      return b[1].SC-a[1].SC;
-    });
-    let activeTeams=[];
-    if (ongoingMatchId) {
-      let m=getMatchById(ongoingMatchId);
-      if (m) activeTeams=[m.teams[0].name,m.teams[1].name];
-    }
-    let table = `<table>
-      <tr><th>Joukkue</th><th>P</th><th>W</th><th>L</th><th>Pisteet</th><th>SD</th></tr>`;
-    sorted.forEach(([name,s])=>{
-      table += `<tr${activeTeams.includes(name)?' class="active-team"':''}>
-        <td>${abbreviateTeamName(name)}</td>
-        <td>${s.played}</td><td>${s.W}</td><td>${s.L}</td><td>${s.pts}</td><td>${s.SD}</td>
-      </tr>`;
-    });
-    table += '</table>';
-    return table;
-  }
-  function showSidebar() {
-    let sidebar=document.getElementById('sidebarOverlay');
-    sidebar.innerHTML=`<h3>Sarjataulukko</h3>${renderSidebarStandings()}`;
-    sidebar.style.display='flex';
-  }
-  function hideSidebar(){ document.getElementById('sidebarOverlay').style.display='none'; }
+  let maxGames = 10;
+  let gameCount = 0;
 
-  function handleCSVUpload(e) {
-    let file = e.target.files[0];
-    if(!file) return;
-    let reader=new FileReader();
-    reader.onload=function(evt){
-      let text;
-      try {
-        text = evt.target.result instanceof ArrayBuffer
-          ? new TextDecoder("utf-8").decode(evt.target.result)
-          : evt.target.result;
-      } catch { text = evt.target.result; }
-      let delimiter = text.includes(";")?";":",";
-      let rows = text.trim().split('\n');
-      if (rows[0].toLowerCase().includes("joukkue")||rows[0].toLowerCase().includes("team")) rows=rows.slice(1);
-      let map = {};
-      rows.forEach(r=>{
-        let cols=r.split(delimiter);
-        if(cols.length<2) return;
-        let team=cols[0].trim(), player=cols[1].trim();
-        if(!map[team]) map[team]=[];
-        map[team].push(player);
-      });
-      teamInputs=[]; teams=[];
-      for (let t in map){
-        teamInputs.push({name:t, players:map[t].slice()});
-        teams.push({name:t, players:map[t].slice()});
-      }
-      renderTeamList(); updateStartButton();
-    };
-    reader.readAsArrayBuffer(file);
-  }
-
-  function testMode() {
-    let teamNames=["Red Devils","Beer Bros","Cup Kings","Pong Stars","Sudden Death","Last Call"];
-    let playerNames=["Alex","Sam","Jamie","Taylor","Jordan","Morgan","Riley","Casey","Reese","Charlie","Drew","Skyler"];
-    let nTeams=6, tSize=Number(teamSize)||2;
-    teams=[]; teamInputs=[];
-    let usedPlayers=[];
-    for(let i=0;i<nTeams;i++){
-      let tn=teamNames[i%teamNames.length];
-      let ps=[];
-      for(let j=0;j<tSize;j++){
-        let p; let attempts=0;
-        do { p=playerNames[Math.floor(Math.random()*playerNames.length)]; attempts++; }
-        while(usedPlayers.includes(p)&&attempts<20);
-        usedPlayers.push(p); ps.push(p);
-      }
-      teams.push({name:tn, players:ps});
-      teamInputs.push({name:tn, players:ps.slice()});
-    }
-    tournamentStarted=true;
-    renderTeamList(); generateFixtures();
-    document.getElementById('fixturesSection').style.display='';
-    document.getElementById('standingsSection').style.display='';
-    renderFixtures(); renderStandings();
-  }
-
-  function updateStartButton() {
-    const btnEl=document.getElementById('startTournamentBtn');
-    if (!tournamentStarted &&
-        teamInputs.length>=2 &&
-        teamInputs.every(t=>t.name && t.name.trim() && t.players.every(p=>p && p.trim()))) {
-      btnEl.style.display='';
-    } else btnEl.style.display='none';
-  }
-
-  function renderTeamList() {
-    const el=document.getElementById('teamList');
-    el.innerHTML='';
-    let source=tournamentStarted?teams:teamInputs;
-    source.forEach((team,idx)=>{
-      let div=document.createElement('div');
-      div.className='team';
-      if(!tournamentStarted){
-        div.innerHTML=`
-          <input type="text" placeholder="Joukkueen nimi" value="${team.name}"
-            oninput="updateTeamInput(${idx},'name',this.value)" style="margin-right:12px;">
-          ${team.players.map((p,pi)=>`
-            <input type="text" placeholder="Pelaaja ${pi+1}" value="${p}"
-              oninput="updateTeamInput(${idx},'player',this.value,${pi})"
-              style="margin-right:10px;">`).join('')}
-          <button class="btn" style="float:right;" onclick="removeTeam(${idx})">Poista</button>`;
-      } else {
-        div.innerHTML = `<b>${team.name}</b> (${team.players.length}): ${team.players.join(', ')}`;
-      }
-      el.appendChild(div);
-    });
-    updateStartButton();
-  }
-  window.updateTeamInput=function(idx,field,value,pi){
-    if(!teamInputs[idx]) return;
-    if(field==='name') teamInputs[idx].name=value;
-    else if(field==='player') teamInputs[idx].players[pi]=value;
-    updateStartButton();
-  };
-  window.removeTeam=function(idx){
-    teamInputs.splice(idx,1);
-    renderTeamList(); updateStartButton();
-  };
-
-  function beginTournament() {
-    tournamentStarted=true;
-    teams=teamInputs.map(t=>({name:t.name, players:t.players.slice()}));
-    renderTeamList(); generateFixtures();
-    document.getElementById('fixturesSection').style.display='';
-    document.getElementById('standingsSection').style.display='';
-    renderFixtures(); renderStandings();
-  }
-  window.beginTournament=beginTournament;
-
-  function generateFixtures() {
-    fixtures=[]; matchResults={};
-    let n=teams.length;
-    let rounds = n%2===0 ? n-1 : n;
-    let leagueMatchCounter=1;
-    let teamList=teams.slice();
-    if(n%2===1){ teamList.push({name:"BYE",players:[]}); n++; }
-    let maxGames=10, gameCount=0;
-    outer: for(let round=0;round<rounds;round++){
-      for(let i=0;i<n/2;i++){
-        let t1=teamList[i], t2=teamList[n-1-i];
-        if(t1.name!=="BYE" && t2.name!=="BYE"){
-          fixtures.push({
-            id:`R${round+1}_${i}`, teams:[t1,t2], phase:"league", cups:leagueCups,
-            winner:null, score:null, suddenDeath:false, time:null, cupsHit:[0,0],
-            number:leagueMatchCounter++, awaitingConfirm:false
-          });
-          gameCount++;
-          if(gameCount>=maxGames) break outer;
-        }
-      }
-      teamList.splice(1,0,teamList.pop());
-    }
-    phase="league"; knockoutFixtures=[]; ongoingMatchId=null;
-  }
-
-  function getMatchTitle(match, idx, koLen=0){
-    if(match.phase==="league") return `Sarjaottelu ${match.number || (idx+1)}`;
-    if(match.id==="SF1") return "Semifinaali 1";
-    if(match.id==="SF2") return "Semifinaali 2";
-    if(match.id==="Final") return "Finaali";
-    if(match.id==="Bronze") return "Pronssiottelu";
-    return `Karsintaottelu ${idx - koLen + 1}`;
-  }
-  function getMatchResultText(match){
-    if(!match.winner||!match.score) return "";
-    let t1=match.teams[0].name, t2=match.teams[1].name;
-    let [s1,s2]=match.score;
-    return `${t1} ${s1} - ${s2} ${t2} (${match.winner} on voittaja)`;
-  }
-
-  function renderFixtures() {
-    let list=document.getElementById('fixtureList');
-    list.innerHTML='';
-    let arr = phase==="knockout" ? knockoutFixtures : fixtures;
-    if (testFeaturesEnabled) {
-      const headerDiv=document.createElement('div');
-      headerDiv.style.display='flex';
-      headerDiv.style.justifyContent='flex-end';
-      headerDiv.style.marginBottom='8px';
-      headerDiv.innerHTML=`<button class="btn" onclick="generateAllResults()">Generoi kaikki tulokset</button>`;
-      list.appendChild(headerDiv);
-    }
-    arr.forEach((match,idx)=>{
-      if(!match?.teams?.[0] || !match.teams[1]) return;
-      let div=document.createElement('div');
-      div.className='fixture-card';
-      let t1=match.teams[0].name, t2=match.teams[1].name;
-      let title=getMatchTitle(match,idx,knockoutFixtures.length);
-      let winner = match.winner ? `<b>Voittaja:</b> ${match.winner}` : '';
-      let result = getMatchResultText(match);
-      let matchBtnHtml="";
-      if(!ongoingMatchId) matchBtnHtml=`<button class="btn" onclick="startMatch('${match.id}')">Käynnistä ottelu</button>`;
-      else if(ongoingMatchId===match.id) matchBtnHtml=`<button class="btn" onclick="spectateMatch('${match.id}')">Katsele</button>`;
-      else matchBtnHtml=`<button class="btn" disabled>Aloita ottelu</button>`;
-      if(match.winner) matchBtnHtml="";
-      let enterResultBtn='';
-      if(testFeaturesEnabled && !match.winner) enterResultBtn=`<button class="btn" onclick="promptAndApplyResult('${match.id}')">Syötä tulos</button>`;
-      div.innerHTML=`
-        <div class="game-title">${title}</div>
-        <div><b>${t1}</b> vs <b>${t2}</b></div>
-        ${winner}
-        ${result ? `<div class="game-result">${result}</div>` : ""}
-        <div class="flex">${matchBtnHtml}${enterResultBtn}</div>
-        <div><small>${match.cups} mukia${match.phase==='league'?`, ${Math.round(leagueTimer/60)} min varsinainen peliaika`:', Knockout'}</small></div>
-        ${match.suddenDeath?`<div class="timer">Golden goal käynnissä!</div>`:''}
-      `;
-      list.appendChild(div);
-    });
-  }
-
-  function getMatchById(id){ return [...fixtures,...knockoutFixtures].find(m=>m && m.id===id)||null; }
-
-  function renderCupSet(teamIdx, match) {
-    if(!match?.teams?.[teamIdx]) return '';
-    let nCups = match.cups;
-    let layout = nCups===6 ? [3,2,1] : [4,3,2,1];
-    let teamLabel = match.teams[teamIdx].name;
-    const labelColor = teamIdx===0 ? 'color:#00ffd0;text-shadow:0 0 8px #00ffd0;' : 'color:#ff00c8;text-shadow:0 0 8px #ff00c8;';
-    let rows = [];
-    let cupKey = `${match.id}_${teamIdx}`;
-    let sideClass = teamIdx===0 ? 'left':'right';
-    layout.forEach((n,r)=>{
-      let rowClass = teamIdx===0 ? '' : 'reverse';
-      let row = `<div class="cup-row ${rowClass}">`;
-      let cupIndices=[];
-      for(let i=0;i<n;i++){
-        let cupIdx = layout.slice(0,r).reduce((a,b)=>a+b,0)+i;
-        cupIndices.push(cupIdx);
-      }
-      if(teamIdx===1) cupIndices = cupIndices.reverse();
-      cupIndices.forEach(cupIdx=>{
-        let hit = cupStates[cupKey]?.[cupIdx];
-        row += `<button class="cup-btn${hit?' hit':''}" id="cup_${cupKey}_${cupIdx}" onclick="toggleCup('${cupKey}',${cupIdx})">
-          <img src="assets/redcup.png" alt="Red Cup">
-        </button>`;
-      });
-      row+='</div>';
-      rows.push(row);
-    });
-    return `<div class="cup-set ${sideClass}">
-      <div class="cup-label" style="${labelColor}">${teamLabel}</div>
-      ${rows.join('')}
-    </div>`;
-  }
-
-  window.toggleCup = function(cupKey, cupIdx){
-    if(!cupStates[cupKey]) cupStates[cupKey]=Array(15).fill(false);
-    cupStates[cupKey][cupIdx] = !cupStates[cupKey][cupIdx];
-    let btn=document.getElementById(`cup_${cupKey}_${cupIdx}`);
-    if(btn) btn.classList.toggle('hit', cupStates[cupKey][cupIdx]);
-    if(ongoingMatchId){
-      let match=getMatchById(ongoingMatchId);
-      if(!match) return;
-      let leftKey=`${match.id}_0`, rightKey=`${match.id}_1`;
-      let leftDown = cupStates[leftKey]?.filter(Boolean).length||0;
-      let rightDown = cupStates[rightKey]?.filter(Boolean).length||0;
-      if((leftDown>=match.cups || rightDown>=match.cups) && !match.awaitingConfirm){
-        match.awaitingConfirm=true;
-        setTimeout(()=>showEndMatchModal(match,leftDown,rightDown),400);
+  outer: for (let round = 0; round < rounds; round++) {
+    for (let i = 0; i < n / 2; i++) {
+      let t1 = teamList[i];
+      let t2 = teamList[n - 1 - i];
+      if (t1.name !== "BYE" && t2.name !== "BYE") {
+        fixtures.push({
+          id: `R${round+1}_${i}`,
+            teams: [t1, t2],
+            phase: "league",
+            cups: leagueCups,
+            winner: null,
+            score: null,
+            suddenDeath: false,
+            time: null,
+            cupsHit: [0,0],
+            number: leagueMatchCounter++,
+            awaitingConfirm: false
+        });
+        gameCount++;
+        if (gameCount >= maxGames) break outer;
       }
     }
-  };
+    teamList.splice(1, 0, teamList.pop());
+  }
+  phase = "league";
+  knockoutFixtures = [];
+  ongoingMatchId = null;
+}
 
-  function showEndMatchModal(match,leftDown,rightDown){
-    let cupsTotal=match.cups;
-    let winnerIdx=null;
-    let winnerScore=cupsTotal, loserScore=0;
-    if(leftDown>=cupsTotal){ winnerIdx=1; loserScore=rightDown; }
-    else if(rightDown>=cupsTotal){ winnerIdx=0; loserScore=leftDown; }
-    let winnerName=match.teams[winnerIdx].name;
-    let team1=match.teams[0].name, team2=match.teams[1].name;
-    let modal=document.getElementById('fullscreenModal');
-    let content=document.getElementById('modalContent');
-    content.innerHTML=`
-      <h2>Voittaja: ${winnerName}</h2>
-      <div style="font-size:1em; margin-bottom:10px;">
-        ${team1} upotetut mukit: ${rightDown}<br>
-        ${team2} upotetut mukit: ${leftDown}
-      </div>
-      <div class="flex">
-        <button class="btn" onclick="confirmAutoScore('${match.id}',${winnerIdx},${winnerScore},${loserScore})">Vahvista tulos</button>
-        <button class="btn" onclick="returnToMatch('${match.id}')">Peruuta</button>
-      </div>
-    `;
-    modal.style.display='flex';
+/* ===================== RENDER FIXTURES ===================== */
+function getMatchTitle(match, idx, knockoutArrLength=0) {
+  if(match.phase === "league") return `Sarjaottelu ${match.number || (idx+1)}`;
+  if (match.id === "SF1") return "Semifinaali 1";
+  if (match.id === "SF2") return "Semifinaali 2";
+  if (match.id === "Final") return "Finaali";
+  if (match.id === "Bronze") return "Pronssiottelu";
+  return `Karsintaottelu ${idx - knockoutArrLength + 1}`;
+}
+
+function getMatchResultText(match) {
+  if(!match.winner || !match.score) return "";
+  let t1 = match.teams[0].name, t2 = match.teams[1].name;
+  let [s1,s2] = match.score;
+  return `${t1} ${s1} - ${s2} ${t2} (${match.winner} on voittaja)`;
+}
+
+function renderFixtures() {
+  let list = document.getElementById('fixtureList');
+  list.innerHTML = '';
+  let showKnockout = phase === "knockout";
+  let arr = showKnockout ? knockoutFixtures : fixtures;
+
+  // Test feature button
+  if (testFeaturesEnabled) {
+    const headerDiv = document.createElement('div');
+    headerDiv.style.display = 'flex';
+    headerDiv.style.justifyContent = 'flex-end';
+    headerDiv.style.marginBottom = '8px';
+    headerDiv.innerHTML = `<button class="btn" onclick="generateAllResults()">Generoi kaikki tulokset</button>`;
+    list.appendChild(headerDiv);
   }
 
-  window.confirmAutoScore = function(matchId,winnerIdx,winnerScore,loserScore){
-    let match=getMatchById(matchId);
-    if(!match) return;
-    match.winner=match.teams[winnerIdx].name;
-    match.score = winnerIdx===0 ? [winnerScore,loserScore] : [loserScore,winnerScore];
-    match.awaitingConfirm=false; match.time=undefined; ongoingMatchId=null;
-    if(timerInterval){ clearInterval(timerInterval); timerInterval=null; }
-    document.getElementById('fullscreenModal').style.display='none';
-    hideSidebar();
-    const losingTeam=match.teams[winnerIdx===0?1:0];
-    setTimeout(()=>{
-      startLosersGame(losingTeam, ()=>{
-        renderFixtures(); renderStandings(); checkLeagueCompletion();
-        if(phase==="knockout") checkKnockoutProgression();
-      });
-    },200);
-  };
+  arr.forEach((match, idx) => {
+    if (!match?.teams?.[0] || !match.teams[1]) return;
+    let div = document.createElement('div');
+    div.className = 'fixture-card';
 
-  window.returnToMatch=function(matchId){
-    let match=getMatchById(matchId);
-    if(!match) return;
-    match.awaitingConfirm=false;
-    document.getElementById('fullscreenModal').style.display='none';
-    showActiveMatch(matchId);
-  };
+    let t1 = match.teams[0].name, t2 = match.teams[1].name;
+    let title = getMatchTitle(match, idx, knockoutFixtures.length);
+    let winner = match.winner ? `<b>Voittaja:</b> ${match.winner}` : '';
+    let result = getMatchResultText(match);
 
-  window.startMatch=function(matchId){
-    ongoingMatchId=matchId;
-    renderFixtures();
-    playIntroAnimation(matchId, ()=>showActiveMatch(matchId));
-  };
-  window.spectateMatch=function(matchId){ showActiveMatch(matchId); };
-
-  function playIntroAnimation(matchId,onDone){
-    let match=getMatchById(matchId);
-    if(!match) return;
-    document.getElementById('introTeamTop').textContent=match.teams[0].name;
-    document.getElementById('introTeamBottom').textContent=match.teams[1].name;
-    let overlay=document.getElementById('matchIntroOverlay');
-    overlay.style.display='flex';
-    setTimeout(()=>overlay.classList.add('animate'),10);
-    setTimeout(()=>{
-      overlay.classList.remove('animate');
-      overlay.style.display='none';
-      if(onDone) onDone();
-    },2500);
-  }
-
-  window.showActiveMatch=function(matchId){
-    let match=getMatchById(matchId);
-    if(!match) return;
-    let leftCupSet=renderCupSet(0,match);
-    let rightCupSet=renderCupSet(1,match);
-    let title=getMatchTitle(match,(phase==="knockout"?knockoutFixtures.indexOf(match):fixtures.indexOf(match)),knockoutFixtures.length);
-    let result=getMatchResultText(match);
-    let timerHtml = match.phase==='league'
-      ? `<div class="timer" id="modalTimer">${formatTime(typeof match.time==='number'?match.time:leagueTimer)}</div>` : '';
-    let confirmButtonsHtml='';
-    if(match.awaitingConfirm){
-      let leftKey=`${match.id}_0`, rightKey=`${match.id}_1`;
-      let leftDown=cupStates[leftKey]?.filter(Boolean).length||0;
-      let rightDown=cupStates[rightKey]?.filter(Boolean).length||0;
-      let winnerIdx = leftDown>=match.cups ? 1 : 0;
-      let winnerScore=match.cups;
-      let loserScore=winnerIdx===0?leftDown:rightDown;
-      confirmButtonsHtml=`
-        <div style="background:#ff00c8; padding:10px; border-radius:8px; margin:10px 0;">
-          <h3>Ottelu päättynyt!</h3>
-          <div class="flex">
-            <button class="btn" onclick="confirmAutoScore('${match.id}',${winnerIdx},${winnerScore},${loserScore})">Vahvista tulos</button>
-            <button class="btn" onclick="returnToMatch('${match.id}')">Peruuta</button>
-          </div>
-        </div>`;
+    let matchBtnHtml = "";
+    if (!ongoingMatchId) {
+      matchBtnHtml = `<button class="btn" onclick="startMatch('${match.id}')">Käynnistä ottelu</button>`;
+    } else if (ongoingMatchId === match.id) {
+      matchBtnHtml = `<button class="btn" onclick="spectateMatch('${match.id}')">Katsele</button>`;
+    } else {
+      matchBtnHtml = `<button class="btn" disabled>Aloita ottelu</button>`;
     }
-    let modal=document.getElementById('fullscreenModal');
-    let content=document.getElementById('modalContent');
-    content.innerHTML=`
+    if (match.winner) matchBtnHtml = "";
+
+    let enterResultBtn = '';
+    if (testFeaturesEnabled && !match.winner) {
+      enterResultBtn = `<button class="btn" onclick="promptAndApplyResult('${match.id}')">Syötä tulos</button>`;
+    }
+
+    div.innerHTML = `
       <div class="game-title">${title}</div>
-      <h2>
-        <span style="color:#00ffd0;text-shadow:0 0 8px #00ffd0;">${match.teams[0].name}</span>
-        <span style="color:#ffb700;text-shadow:0 0 8px #ffb700; margin:0 10px;">VS</span>
-        <span style="color:#ff00c8;text-shadow:0 0 8px #ff00c8;">${match.teams[1].name}</span>
-      </h2>
-      <div class="cups-area">
-        <img src="assets/table.png" class="table-img" alt="Table">
-        ${leftCupSet}${rightCupSet}
-      </div>
-      ${result?`<div class="game-result">${result}</div>`:''}
-      ${timerHtml}
-      ${confirmButtonsHtml}
-      ${match.suddenDeath?`<div class="timer">Golden goal käynnissä!</div>`:''}
-      <div><small>${match.cups} mukia${match.phase==='league'?`, ${Math.round(leagueTimer/60)} min varsinainen peliaika`:', Knockout'}</small></div>
-      <div class="flex" style="margin-top:1em;">
-        <button class="btn" onclick="closeMatchView()">Pienennä</button>
+      <div><b>${t1}</b> vs <b>${t2}</b></div>
+      ${winner}
+      ${result ? `<div class="game-result">${result}</div>` : ""}
+      <div class="flex">${matchBtnHtml}${enterResultBtn}</div>
+      <div><small>${match.cups} mukia${match.phase === 'league' ? `, ${Math.round(leagueTimer/60)} min` : ', Knockout'}</small></div>
+      ${match.suddenDeath ? `<div class="timer">Golden goal käynnissä!</div>` : ''}
+    `;
+    list.appendChild(div);
+  });
+}
+
+/* ===================== MATCH CONTROL ===================== */
+function getMatchById(id) {
+  return [...fixtures, ...knockoutFixtures].find(m => m && m.id === id) || null;
+}
+
+function renderCupSet(teamIdx, match) {
+  if (!match?.teams?.[teamIdx]) return '';
+  let nCups = match.cups;
+  let layout = nCups === 6 ? [3,2,1] : [4,3,2,1];
+  let teamLabel = match.teams[teamIdx].name;
+  const labelColor = teamIdx === 0
+    ? 'color:#00ffd0;text-shadow:0 0 8px #00ffd0;'
+    : 'color:#ff00c8;text-shadow:0 0 8px #ff00c8;';
+  let rows = [];
+  let cupKey = `${match.id}_${teamIdx}`;
+  let sideClass = teamIdx === 0 ? "left" : "right";
+
+  layout.forEach((n, r) => {
+    let rowClass = teamIdx === 0 ? "" : "reverse";
+    let row = `<div class="cup-row ${rowClass}">`;
+    let cupIndices = [];
+    for (let i=0; i<n; i++) {
+      let cupIdx = layout.slice(0,r).reduce((a,b)=>a+b, 0)+i;
+      cupIndices.push(cupIdx);
+    }
+    if (teamIdx === 1) cupIndices = cupIndices.reverse();
+    cupIndices.forEach(cupIdx => {
+      let hit = cupStates[cupKey]?.[cupIdx];
+      row += `<button class="cup-btn${hit ? ' hit' : ''}" id="cup_${cupKey}_${cupIdx}" onclick="toggleCup('${cupKey}',${cupIdx})">
+        <img src="assets/redcup.png" alt="Red Cup">
+      </button>`;
+    });
+    row += '</div>';
+    rows.push(row);
+  });
+
+  return `<div class="cup-set ${sideClass}">
+    <div class="cup-label" style="${labelColor}">${teamLabel}</div>
+    ${rows.join('')}
+  </div>`;
+}
+
+window.toggleCup = function(cupKey, cupIdx) {
+  if(!cupStates[cupKey]) cupStates[cupKey] = Array(15).fill(false);
+  cupStates[cupKey][cupIdx] = !cupStates[cupKey][cupIdx];
+  let btn = document.getElementById(`cup_${cupKey}_${cupIdx}`);
+  if (btn) btn.classList.toggle('hit', cupStates[cupKey][cupIdx]);
+
+  if (ongoingMatchId) {
+    let match = getMatchById(ongoingMatchId);
+    if (!match) return;
+    let leftKey = `${match.id}_0`;
+    let rightKey = `${match.id}_1`;
+    let leftDown = cupStates[leftKey]?.filter(Boolean).length || 0;
+    let rightDown = cupStates[rightKey]?.filter(Boolean).length || 0;
+
+    if ((leftDown >= match.cups || rightDown >= match.cups) && !match.awaitingConfirm) {
+      match.awaitingConfirm = true;
+      setTimeout(() => showEndMatchModal(match, leftDown, rightDown), 400);
+    }
+  }
+};
+
+function showEndMatchModal(match, leftDown, rightDown) {
+  if (!match) return;
+  let cupsTotal = match.cups;
+  let winnerIdx = null;
+  let winnerScore = cupsTotal, loserScore = 0;
+  if (leftDown >= cupsTotal) { winnerIdx = 1; loserScore = rightDown; }
+  else if (rightDown >= cupsTotal) { winnerIdx = 0; loserScore = leftDown; }
+  let winnerName = match.teams[winnerIdx].name;
+  let team1 = match.teams[0].name, team2 = match.teams[1].name;
+
+  let modal = document.getElementById('fullscreenModal');
+  let content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <h2>Voittaja: ${winnerName}</h2>
+    <div style="font-size:1em; margin-bottom:10px;">
+      ${team1} upotetut mukit: ${rightDown}<br>
+      ${team2} upotetut mukit: ${leftDown}
+    </div>
+    <div class="flex">
+      <button class="btn" onclick="confirmAutoScore('${match.id}',${winnerIdx},${winnerScore},${loserScore})">Vahvista tulos</button>
+      <button class="btn" onclick="returnToMatch('${match.id}')">Peruuta</button>
+    </div>
+  `;
+  modal.style.display = 'flex';
+}
+
+window.confirmAutoScore = function(matchId, winnerIdx, winnerScore, loserScore) {
+  let match = getMatchById(matchId);
+  if (!match) return;
+  match.winner = match.teams[winnerIdx].name;
+  match.score = winnerIdx === 0 ? [winnerScore, loserScore] : [loserScore, winnerScore];
+  match.awaitingConfirm = false;
+  match.time = undefined;
+  ongoingMatchId = null;
+
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  document.getElementById('fullscreenModal').style.display = 'none';
+  hideSidebar();
+
+  const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
+  setTimeout(() => {
+    startLosersGame(losingTeam, () => {
+      renderFixtures();
+      renderStandings();
+      checkLeagueCompletion();
+      if (phase === "knockout") checkKnockoutProgression();
+    });
+  }, 250);
+};
+
+window.returnToMatch = function(matchId) {
+  let match = getMatchById(matchId);
+  if (!match) return;
+  match.awaitingConfirm = false;
+  document.getElementById('fullscreenModal').style.display = 'none';
+  showActiveMatch(matchId);
+};
+
+window.startMatch = function(matchId) {
+  ongoingMatchId = matchId;
+  renderFixtures();
+  playIntroAnimation(matchId, () => showActiveMatch(matchId));
+};
+window.spectateMatch = function(matchId) {
+  showActiveMatch(matchId);
+};
+
+function playIntroAnimation(matchId, onDone) {
+  let match = getMatchById(matchId);
+  if (!match) return;
+  document.getElementById('introTeamTop').textContent = match.teams[0].name;
+  document.getElementById('introTeamBottom').textContent = match.teams[1].name;
+  let overlay = document.getElementById('matchIntroOverlay');
+  overlay.style.display = 'flex';
+  setTimeout(()=>overlay.classList.add('animate'), 10);
+  setTimeout(() => {
+    overlay.classList.remove('animate');
+    overlay.style.display = 'none';
+    if (onDone) onDone();
+  }, 2500);
+}
+
+window.showActiveMatch = function(matchId) {
+  let match = getMatchById(matchId);
+  if (!match) return;
+
+  let leftCupSet = renderCupSet(0, match);
+  let rightCupSet = renderCupSet(1, match);
+  let title = getMatchTitle(match, (phase === "knockout" ? knockoutFixtures.indexOf(match) : fixtures.indexOf(match)), knockoutFixtures.length);
+  let result = getMatchResultText(match);
+  let timerHtml = match.phase === 'league'
+    ? `<div class="timer" id="modalTimer">${formatTime(typeof match.time === 'number' ? match.time : leagueTimer)}</div>` : '';
+
+  let confirmButtonsHtml = '';
+  if (match.awaitingConfirm) {
+    let leftKey = `${match.id}_0`;
+    let rightKey = `${match.id}_1`;
+    let leftDown = cupStates[leftKey]?.filter(Boolean).length || 0;
+    let rightDown = cupStates[rightKey]?.filter(Boolean).length || 0;
+    let winnerIdx = leftDown >= match.cups ? 1 : 0;
+    let winnerScore = match.cups;
+    let loserScore = winnerIdx === 0 ? leftDown : rightDown;
+    confirmButtonsHtml = `
+      <div style="background:#ff00c8; padding:10px; border-radius:8px; margin:10px 0;">
+        <h3>Ottelu päättynyt!</h3>
+        <div class="flex">
+          <button class="btn" onclick="confirmAutoScore('${match.id}',${winnerIdx},${winnerScore},${loserScore})">Vahvista tulos</button>
+          <button class="btn" onclick="returnToMatch('${match.id}')">Peruuta</button>
+        </div>
       </div>
     `;
-    modal.style.display='flex';
-    showSidebar();
-
-    if(match.phase==='league' && !match.winner && ongoingMatchId===match.id){
-      let timerEl=document.getElementById('modalTimer');
-      if(timerEl){
-        let secs=typeof match.time==='number'?match.time:leagueTimer;
-        if(timerInterval) clearInterval(timerInterval);
-        timerInterval=setInterval(()=>{
-          if(document.getElementById('fullscreenModal').style.display==='none' || match.winner){
-            clearInterval(timerInterval); match.time=secs; return;
-          }
-            if(secs>0){
-              secs--; timerEl.textContent=formatTime(secs); match.time=secs;
-            } else if(goldenGoalEnabled && !match.suddenDeath){
-              match.suddenDeath=true;
-              timerEl.textContent="Golden Goal!";
-              clearInterval(timerInterval);
-              renderFixtures();
-            }
-        },1000);
-      }
-    }
-  };
-
-  window.closeMatchView=function(){
-    document.getElementById('fullscreenModal').style.display='none';
-    hideSidebar();
-    let match=ongoingMatchId?getMatchById(ongoingMatchId):null;
-    if(match && match.phase==="league" && !match.winner){
-      let timerEl=document.getElementById('modalTimer');
-      if(timerEl && timerEl.textContent.includes(':')){
-        let [m,s]=timerEl.textContent.split(':').map(x=>parseInt(x,10));
-        match.time=m*60+s;
-      }
-    }
-    if(timerInterval) clearInterval(timerInterval);
-  };
-
-  document.getElementById('closeModalBtn').onclick=()=>{
-    document.getElementById('fullscreenModal').style.display='none';
-    hideSidebar();
-    if(timerInterval) clearInterval(timerInterval);
-  };
-
-  function formatTime(s){
-    let m=Math.floor(s/60), ss=s%60;
-    return `${m}:${ss<10?'0':''}${ss}`;
   }
 
-  window.manualScore=function(matchId,winnerIdx){
-    let match=getMatchById(matchId);
-    if(!match) return;
-    let nCups=match.cups;
-    let leftKey=`${match.id}_0`, rightKey=`${match.id}_1`;
-    let leftTeamScore = cupStates[rightKey]?.filter(Boolean).length||0;
-    let rightTeamScore = cupStates[leftKey]?.filter(Boolean).length||0;
-    let winnerScore=nCups;
-    let loserScore = winnerIdx===0 ? leftTeamScore : rightTeamScore;
-    match.winner=match.teams[winnerIdx].name;
-    match.score = winnerIdx===0 ? [winnerScore,loserScore] : [loserScore,winnerScore];
-    match.awaitingConfirm=false; ongoingMatchId=null; match.time=undefined;
-    if(timerInterval) clearInterval(timerInterval);
-    document.getElementById('fullscreenModal').style.display='none';
-    const losingTeam=match.teams[winnerIdx===0?1:0];
-    startLosersGame(losingTeam, ()=>{
-      renderFixtures(); renderStandings(); checkLeagueCompletion();
-      if(phase==="knockout") checkKnockoutProgression();
-    });
-  };
+  let modal = document.getElementById('fullscreenModal');
+  let content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="game-title">${title}</div>
+    <h2>
+      <span style="color:#00ffd0;text-shadow:0 0 8px #00ffd0;">${match.teams[0].name}</span>
+      <span style="color:#ffb700;text-shadow:0 0 8px #ffb700; margin:0 10px;">VS</span>
+      <span style="color:#ff00c8;text-shadow:0 0 8px #ff00c8;">${match.teams[1].name}</span>
+    </h2>
+    <div class="cups-area">
+      <img src="assets/table.png" class="table-img" alt="Table">
+      ${leftCupSet}
+      ${rightCupSet}
+    </div>
+    ${result ? `<div class="game-result">${result}</div>` : ""}
+    ${timerHtml}
+    ${confirmButtonsHtml}
+    ${match.suddenDeath ? `<div class="timer">Golden goal käynnissä!</div>` : ''}
+    <div><small>${match.cups} mukia${match.phase === 'league'
+      ? `, ${Math.round(leagueTimer/60)} min varsinainen peliaika`
+      : ', Knockout'}</small></div>
+    <div class="flex" style="margin-top:1em;">
+      <button class="btn" onclick="closeMatchView()">Pienennä</button>
+    </div>
+  `;
+  modal.style.display = 'flex';
+  showSidebar();
 
-  function renderStandings(){
-    let arr=fixtures.concat(knockoutFixtures);
-    let stats={};
-    teams.forEach(t=>stats[t.name]={pts:0,S:0,SC:0,SD:0,played:0,W:0,L:0});
-    arr.forEach(m=>{
-      if(!m.winner||!m.score) return;
-      let t1=m.teams[0].name, t2=m.teams[1].name;
-      let [s1,s2]=m.score;
-      stats[t1].played++; stats[t2].played++;
-      if(m.winner===t1){ stats[t1].pts+=2; stats[t1].W++; stats[t2].L++; }
-      else { stats[t2].pts+=2; stats[t2].W++; stats[t1].L++; }
-      stats[t1].S+=s1; stats[t1].SC+=s2;
-      stats[t2].S+=s2; stats[t2].SC+=s1;
-    });
-    Object.keys(stats).forEach(n=>stats[n].SD=stats[n].S-stats[n].SC);
-    let sorted=Object.entries(stats).sort((a,b)=>{
-      if(b[1].pts!==a[1].pts) return b[1].pts-a[1].pts;
-      if(b[1].SD!==a[1].SD) return b[1].SD-a[1].SD;
-      if(b[1].S!==a[1].S) return b[1].S-a[1].S;
-      return b[1].SC-a[1].SC;
-    });
-    let table=`<table class="standings"><tr>
-      <th>Team</th><th>Played</th><th>W</th><th>L</th><th>Pts</th><th>S</th><th>SC</th><th>SD</th>
+  if (match.phase === 'league' && !match.winner && ongoingMatchId === match.id) {
+    let timerEl = document.getElementById('modalTimer');
+    if (timerEl) {
+      let secs = typeof match.time === 'number' ? match.time : leagueTimer;
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(()=>{
+        if (document.getElementById('fullscreenModal').style.display === 'none' || match.winner) {
+          clearInterval(timerInterval);
+          match.time = secs;
+          return;
+        }
+        if (secs > 0) {
+          secs--;
+          timerEl.textContent = formatTime(secs);
+          match.time = secs;
+        } else if (goldenGoalEnabled && !match.suddenDeath) {
+          match.suddenDeath = true;
+          timerEl.textContent = "Golden Goal!";
+          clearInterval(timerInterval);
+          renderFixtures();
+        }
+      }, 1000);
+    }
+  }
+};
+
+window.closeMatchView = function() {
+  document.getElementById('fullscreenModal').style.display = 'none';
+  hideSidebar();
+  let match = ongoingMatchId ? getMatchById(ongoingMatchId) : null;
+  if (match && match.phase === "league" && !match.winner) {
+    let timerEl = document.getElementById('modalTimer');
+    if (timerEl && timerEl.textContent.includes(':')) {
+      let [m,s] = timerEl.textContent.split(':').map(x=>parseInt(x,10));
+      match.time = m*60 + s;
+    }
+  }
+  if (timerInterval) clearInterval(timerInterval);
+};
+
+document.getElementById('closeModalBtn').onclick = () => {
+  document.getElementById('fullscreenModal').style.display = 'none';
+  hideSidebar();
+  if (timerInterval) clearInterval(timerInterval);
+};
+
+function formatTime(s) {
+  let m = Math.floor(s/60), ss = s%60;
+  return `${m}:${ss<10?'0':''}${ss}`;
+}
+
+window.manualScore = function(matchId, winnerIdx) {
+  let match = getMatchById(matchId);
+  if (!match) return;
+  let nCups = match.cups;
+  let leftKey = `${match.id}_0`;
+  let rightKey = `${match.id}_1`;
+  let leftTeamScore = cupStates[rightKey]?.filter(Boolean).length || 0;
+  let rightTeamScore = cupStates[leftKey]?.filter(Boolean).length || 0;
+  let winnerScore = nCups;
+  let loserScore = winnerIdx === 0 ? leftTeamScore : rightTeamScore;
+
+  match.winner = match.teams[winnerIdx].name;
+  match.score = winnerIdx === 0 ? [winnerScore, loserScore] : [loserScore, winnerScore];
+  match.awaitingConfirm = false;
+  ongoingMatchId = null;
+  match.time = undefined;
+
+  if (timerInterval) clearInterval(timerInterval);
+
+  document.getElementById('fullscreenModal').style.display = 'none';
+
+  const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
+  startLosersGame(losingTeam, () => {
+    renderFixtures();
+    renderStandings();
+    checkLeagueCompletion();
+    if (phase === "knockout") checkKnockoutProgression();
+  });
+};
+
+/* ===================== STANDINGS ===================== */
+function abbreviateTeamName(name) {
+  let words = name.split(/\s+/).filter(Boolean);
+  if (words.length === 1) return words[0].substring(0,3).toUpperCase();
+  return words.slice(0,3).map(w=>w[0].toUpperCase()).join('');
+}
+
+function renderSidebarStandings() {
+  let arr = fixtures.concat(knockoutFixtures);
+  let stats = {};
+  teams.forEach(t=>stats[t.name]={pts:0,S:0,SC:0,SD:0,played:0,W:0,L:0});
+  arr.forEach(m=>{
+    if(!m.winner || !m.score) return;
+    let t1 = m.teams[0].name, t2 = m.teams[1].name;
+    let [s1,s2] = m.score;
+    stats[t1].played++; stats[t2].played++;
+    if (m.winner === t1) {
+      stats[t1].pts+=2; stats[t1].W++; stats[t2].L++;
+    } else {
+      stats[t2].pts+=2; stats[t2].W++; stats[t1].L++;
+    }
+    stats[t1].S += s1; stats[t1].SC += s2;
+    stats[t2].S += s2; stats[t2].SC += s1;
+  });
+  Object.keys(stats).forEach(n => stats[n].SD = stats[n].S - stats[n].SC);
+  let sorted = Object.entries(stats).sort((a, b) => {
+    if (b[1].pts !== a[1].pts) return b[1].pts - a[1].pts;
+    if (b[1].SD !== a[1].SD) return b[1].SD - a[1].SD;
+    if (b[1].S !== a[1].S) return b[1].S - a[1].S;
+    return b[1].SC - a[1].SC;
+  });
+
+  let activeTeams = [];
+  if (ongoingMatchId) {
+    let match = getMatchById(ongoingMatchId);
+    if (match && match.teams.length === 2) {
+      activeTeams = [match.teams[0].name, match.teams[1].name];
+    }
+  }
+
+  let table = `<table>
+    <tr><th>Joukkue</th><th>P</th><th>W</th><th>L</th><th>Pisteet</th><th>SD</th></tr>`;
+  sorted.forEach(([name,s])=>{
+    let abbr = abbreviateTeamName(name);
+    let isActive = activeTeams.includes(name);
+    table += `<tr${isActive?' class="active-team"':''}>
+      <td>${abbr}</td>
+      <td>${s.played}</td>
+      <td>${s.W}</td>
+      <td>${s.L}</td>
+      <td>${s.pts}</td>
+      <td>${s.SD}</td>
     </tr>`;
-    sorted.forEach(([n,s])=>{
-      table+=`<tr><td>${n}</td><td>${s.played}</td><td>${s.W}</td><td>${s.L}</td><td>${s.pts}</td><td>${s.S}</td><td>${s.SC}</td><td>${s.SD}</td></tr>`;
-    });
-    table+='</table>';
-    document.getElementById('standingsTable').innerHTML=table;
-  }
+  });
+  table += '</table>';
+  return table;
+}
 
-  function checkLeagueCompletion(){
-    if(phase!=="league") return;
-    let finished=fixtures.every(m=>m.winner);
-    if(finished){
-      phase="knockout";
-      generateKnockoutFixtures();
-      renderFixtures(); renderStandings();
-      showBigAlert('Liigavaihe ohi','Liigavaihe ohi! Karsintapelit luotu.',{autoCloseMs:3000});
-    }
-  }
+function renderStandings() {
+  let arr = fixtures.concat(knockoutFixtures);
+  let stats = {};
+  teams.forEach(t=>stats[t.name]={pts:0,S:0,SC:0,SD:0,played:0,W:0,L:0});
 
-  function generateKnockoutFixtures(){
-    let stats={};
-    teams.forEach(t=>stats[t.name]={pts:0,S:0,SC:0});
-    fixtures.forEach(m=>{
-      if(!m.winner||!m.score) return;
-      let t1=m.teams[0].name, t2=m.teams[1].name;
-      let [s1,s2]=m.score;
-      if(m.winner===t1) stats[t1].pts+=2; else stats[t2].pts+=2;
-      stats[t1].S+=s1; stats[t1].SC+=s2;
-      stats[t2].S+=s2; stats[t2].SC+=s1;
-    });
-    let sorted=Object.entries(stats).sort((a,b)=>{
-      if(b[1].pts!==a[1].pts) return b[1].pts-a[1].pts;
-      if(b[1].S!==a[1].S) return b[1].S-a[1].S;
-      return b[1].SC-a[1].SC;
-    }).map(([n])=>n);
-    let t1=sorted[0], t2=sorted[1], t3=sorted[2], t4=sorted[3];
-    knockoutFixtures=[
-      {id:'SF1', teams:[getTeamByName(t1), getTeamByName(t4)], phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false},
-      {id:'SF2', teams:[getTeamByName(t2), getTeamByName(t3)], phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false},
+  arr.forEach(m=>{
+    if(!m.winner || !m.score) return;
+    let t1 = m.teams[0].name, t2 = m.teams[1].name;
+    let [s1, s2] = m.score;
+    stats[t1].played++; stats[t2].played++;
+    if(m.winner === t1) { stats[t1].pts+=2; stats[t1].W++; stats[t2].L++; }
+    else { stats[t2].pts+=2; stats[t2].W++; stats[t1].L++; }
+    stats[t1].S += s1; stats[t1].SC += s2;
+    stats[t2].S += s2; stats[t2].SC += s1;
+  });
+  Object.keys(stats).forEach(n=>stats[n].SD= stats[n].S - stats[n].SC);
+  let sorted = Object.entries(stats).sort((a,b)=>{
+    if (b[1].pts !== a[1].pts) return b[1].pts - a[1].pts;
+    if (b[1].SD !== a[1].SD) return b[1].SD - a[1].SD;
+    if (b[1].S !== a[1].S) return b[1].S - a[1].S;
+    return b[1].SC - a[1].SC;
+  });
+  let table = `<table class="standings"><tr>
+    <th>Team</th><th>Played</th><th>W</th><th>L</th><th>Pts</th><th>S</th><th>SC</th><th>SD</th>
+  </tr>`;
+  sorted.forEach(([name,s])=>{
+    table += `<tr>
+      <td>${name}</td>
+      <td>${s.played}</td>
+      <td>${s.W}</td>
+      <td>${s.L}</td>
+      <td>${s.pts}</td>
+      <td>${s.S}</td>
+      <td>${s.SC}</td>
+      <td>${s.SD}</td>
+    </tr>`;
+  });
+  table += '</table>';
+  document.getElementById('standingsTable').innerHTML = table;
+}
+
+function showSidebar() {
+  let sidebar = document.getElementById('sidebarOverlay');
+  sidebar.innerHTML = `<h3>Sarjataulukko</h3>${renderSidebarStandings()}`;
+  sidebar.style.display = 'flex';
+}
+function hideSidebar() {
+  document.getElementById('sidebarOverlay').style.display = 'none';
+}
+
+/* ===================== PROGRESSION ===================== */
+function checkLeagueCompletion() {
+  if (phase !== "league") return;
+  let finished = fixtures.every(m=>m.winner);
+  if(finished) {
+    phase = "knockout";
+    generateKnockoutFixtures();
+    renderFixtures();
+    renderStandings();
+    showBigAlert('Liigavaihe ohi', 'Liigavaihe ohi! Karsintapelit luotu.', { autoCloseMs: 3500 });
+  }
+}
+
+function generateKnockoutFixtures() {
+  let stats = {};
+  teams.forEach(t=>stats[t.name]={pts:0,S:0,SC:0});
+  fixtures.forEach(m=>{
+    if(!m.winner || !m.score) return;
+    let t1 = m.teams[0].name, t2 = m.teams[1].name;
+    let [s1,s2] = m.score;
+    if(m.winner === t1) stats[t1].pts+=2;
+    else stats[t2].pts+=2;
+    stats[t1].S+=s1; stats[t1].SC+=s2;
+    stats[t2].S+=s2; stats[t2].SC+=s1;
+  });
+  let sorted = Object.entries(stats).sort((a,b)=>{
+    if(b[1].pts!==a[1].pts) return b[1].pts - a[1].pts;
+    if(b[1].S!==a[1].S) return b[1].S - a[1].S;
+    return b[1].SC - a[1].SC;
+  }).map(([n])=>n);
+  let t1=sorted[0], t2=sorted[1], t3=sorted[2], t4=sorted[3];
+  knockoutFixtures = [
+    {id: 'SF1', teams:[getTeamByName(t1), getTeamByName(t4)], phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false},
+    {id: 'SF2', teams:[getTeamByName(t2), getTeamByName(t3)], phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false},
+  ];
+}
+
+function getTeamByName(name) {
+  return teams.find(t=>t.name===name) || null;
+}
+
+function checkKnockoutProgression() {
+  if (knockoutFixtures.length === 2 && knockoutFixtures.every(m=>m.winner)) {
+    let sf1 = knockoutFixtures[0], sf2 = knockoutFixtures[1];
+    let finalists = [sf1.winner, sf2.winner];
+    let bronzeTeams = [
+      sf1.teams.find(t=>t.name!==sf1.winner).name,
+      sf2.teams.find(t=>t.name!==sf2.winner).name
     ];
+    knockoutFixtures.push({
+      id: 'Final',
+      teams: [getTeamByName(finalists[0]), getTeamByName(finalists[1])],
+      phase: "knockout", cups: knockoutCups, winner:null, score:null, awaitingConfirm:false
+    });
+    knockoutFixtures.push({
+      id: 'Bronze',
+      teams: [getTeamByName(bronzeTeams[0]), getTeamByName(bronzeTeams[1])],
+      phase: "knockout", cups: knockoutCups, winner:null, score:null, awaitingConfirm:false
+    });
+    renderFixtures();
+    renderStandings();
+    showBigAlert('Semifinaalit pelattu', 'Semifinaalit pelattu! Finaali ja pronssiottelu luotu.', { autoCloseMs: 3500 });
   }
-
-  function getTeamByName(name){ return teams.find(t=>t.name===name)||null; }
-
-  function checkKnockoutProgression(){
-    if(knockoutFixtures.length===2 && knockoutFixtures.every(m=>m.winner)){
-      let sf1=knockoutFixtures[0], sf2=knockoutFixtures[1];
-      let finalists=[sf1.winner, sf2.winner];
-      let bronzeTeams=[
-        sf1.teams.find(t=>t.name!==sf1.winner).name,
-        sf2.teams.find(t=>t.name!==sf2.winner).name
-      ];
-      knockoutFixtures.push({
-        id:'Final', teams:[getTeamByName(finalists[0]), getTeamByName(finalists[1])],
-        phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false
-      });
-      knockoutFixtures.push({
-        id:'Bronze', teams:[getTeamByName(bronzeTeams[0]), getTeamByName(bronzeTeams[1])],
-        phase:"knockout", cups:knockoutCups, winner:null, score:null, awaitingConfirm:false
-      });
-      renderFixtures(); renderStandings();
-      showBigAlert('Semifinaalit pelattu','Finaali ja pronssiottelu luotu.',{autoCloseMs:3000});
-    }
-    if(knockoutFixtures.length===4 && knockoutFixtures.slice(2).every(m=>m.winner)){
-      let final=knockoutFixtures.find(m=>m.id==='Final');
-      let bronze=knockoutFixtures.find(m=>m.id==='Bronze');
-      if(final && bronze){
-        const msg=`Mestari: ${final.winner}\nHopea: ${final.teams.find(t=>t.name!==final.winner).name}\nPronssi: ${bronze.winner}`;
-        showBigAlert('Turnaus valmis', msg);
-      }
+  if (knockoutFixtures.length === 4 && knockoutFixtures.slice(2).every(m=>m.winner)) {
+    let final = knockoutFixtures.find(m=>m.id==='Final');
+    let bronze = knockoutFixtures.find(m=>m.id==='Bronze');
+    if (final && bronze) {
+      const msg = `Mestari: ${final.winner}\nHopea: ${final.teams.find(t=>t.name!==final.winner).name}\nPronssi: ${bronze.winner}`;
+      showBigAlert('Turnaus valmis', msg);
     }
   }
-  </script>
+}
 
-  <script src="https://static.app/js/static.js" type="text/javascript"></script>
+/* ===================== TEST UTILITIES ===================== */
+function randomLoserScore() {
+  const r = Math.random();
+  if (r < 0.03) return 1;
+  if (r < 0.10) return 2;
+  if (r < 0.45) return 3;
+  if (r < 0.80) return 4;
+  return 5;
+}
+
+function applyTestResultToMatch(match, winnerIdx, winnerScore, loserScore) {
+  if (!match?.teams?.length) return;
+  match.winner = match.teams[winnerIdx].name;
+  match.score = winnerIdx === 0 ? [winnerScore, loserScore] : [loserScore, winnerScore];
+  match.awaitingConfirm = false;
+  match.time = undefined;
+  const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
+  startLosersGame(losingTeam, () => {
+    ongoingMatchId = null;
+    renderFixtures();
+    renderStandings();
+    checkLeagueCompletion();
+    if (phase === "knockout") checkKnockoutProgression();
+  });
+}
+
+window.generateAllResults = function() {
+  if (!testFeaturesEnabled) return;
+  const allMatches = [...fixtures, ...knockoutFixtures];
+  allMatches.forEach(m => {
+    if (!m || m.winner) return;
+    const winnerIdx = Math.random() < 0.5 ? 0 : 1;
+    const loserScore = randomLoserScore();
+    const winnerScore = 6;
+    applyTestResultToMatch(m, winnerIdx, winnerScore, loserScore);
+  });
+  showBigAlert('Testitulokset', 'Testitulokset generoitu.', { autoCloseMs: 3000 });
+};
+
+window.promptAndApplyResult = function(matchId) {
+  if (!testFeaturesEnabled) return;
+  const match = getMatchById(matchId);
+  if (!match) return;
+  const input = prompt('Syötä tulos muodossa "6-0" (vasen-oikea)', '6-0');
+  if (!input) return;
+  const parts = input.trim().split('-');
+  if (parts.length !== 2) {
+    showBigAlert('Virhe', 'Virheellinen muoto. Käytä esim. "6-0".');
+    return;
+  }
+  const left = parseInt(parts[0], 10);
+  const right = parseInt(parts[1], 10);
+  if (Number.isNaN(left) || Number.isNaN(right)) {
+    showBigAlert('Virhe', 'Arvot eivät ole numeroita.');
+    return;
+  }
+  if (left === right) {
+    showBigAlert('Virhe', 'Tasapeli ei ole sallittu.');
+    return;
+  }
+  const winnerIdx = left > right ? 0 : 1;
+  match.winner = match.teams[winnerIdx].name;
+  match.score = [left, right];
+  match.awaitingConfirm = false;
+  ongoingMatchId = null;
+  match.time = undefined;
+  renderFixtures();
+  renderStandings();
+  checkLeagueCompletion();
+  if (phase === "knockout") checkKnockoutProgression();
+  showBigAlert('Tulos tallennettu', `${match.teams[0].name} ${left} - ${right} ${match.teams[1].name}`, { autoCloseMs: 2500 });
+};
+
+/* ===================== SIDEBAR ===================== */
+function showSidebar() {
+  let sidebar = document.getElementById('sidebarOverlay');
+  sidebar.innerHTML = `<h3>Sarjataulukko</h3>${renderSidebarStandings()}`;
+  sidebar.style.display = 'flex';
+}
+function hideSidebar() {
+  document.getElementById('sidebarOverlay').style.display = 'none';
+}
+
+/* ===================== EXTRA BUTTON INJECTION (VIINAHARAVA TEST) ===================== */
+document.addEventListener('DOMContentLoaded', () => {
+  const resetBtn = document.getElementById('resetBtn');
+  if (resetBtn) {
+    const viinaharavaBtn = document.createElement('button');
+    viinaharavaBtn.id = 'viinaharavaBtn';
+    viinaharavaBtn.className = 'btn';
+    viinaharavaBtn.textContent = 'Viinaharava';
+    viinaharavaBtn.disabled = !testFeaturesEnabled;
+    resetBtn.parentNode.insertBefore(viinaharavaBtn, resetBtn.nextSibling);
+    if (testFeaturesToggleEl) {
+      testFeaturesToggleEl.addEventListener('change', function() {
+        viinaharavaBtn.disabled = !this.checked;
+      });
+    }
+    viinaharavaBtn.addEventListener('click', () => {
+      startLosersGame({ name: "Joukkue 1", players: ["Pelaaja 1", "Pelaaja 2"] });
+    });
+  }
+
+  document.getElementById('finishLosersGameBtn')?.addEventListener('click', finishLosersGame);
+  document.getElementById('closeLosersGameBtn')?.addEventListener('click', finishLosersGame);
+});
+
+/* ===================== EXPORT SOME HOOKS ===================== */
+window.forceShowLosersGame = () => {
+  document.getElementById('losersGameModal').style.display = 'flex';
+};
+
+/* ===================== END ===================== */
+</script>
 </body>
 </html>
