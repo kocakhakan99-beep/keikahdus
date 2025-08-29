@@ -823,11 +823,12 @@ const losersCupTypes = [
   { type: 'MINTTU', count: 3, color: '#00ffd0' }
 ];
 // Start losers game after a match ends
-function startLosersGame(losingTeam) {
+function startLosersGame(losingTeam, onComplete) {
   console.log("Starting losers game for team:", losingTeam ? losingTeam.name : "unknown");
   
   if (!losingTeam || !losingTeam.players || losingTeam.players.length === 0) {
     console.error('Invalid losing team provided to losers game');
+    if (onComplete) onComplete();
     return;
   }
   
@@ -860,8 +861,11 @@ function startLosersGame(losingTeam) {
   document.getElementById('currentThrower').textContent = losersPlayers[currentLoserIndex] || 'Unknown';
   document.getElementById('throwResult').style.display = 'none';
   
-  // Generate cups using the existing pattern but for losers game
+  // Generate cups
   renderLosersCups();
+  
+  // Store the callback to call when losers game completes
+  window.losersGameCompleteCallback = onComplete;
   
   // Show the modal
   document.getElementById('losersGameModal').style.display = 'flex';
@@ -897,7 +901,7 @@ function renderLosersCups() {
   }
 }
 
-// Handle cup clicks for the losers game
+// Also update the handleLosersCupClick function to call the callback when all players have completed
 function handleLosersCupClick(cupBtn, index) {
   if (!losersGameActive || cupBtn.classList.contains('hit')) return;
   
@@ -931,11 +935,19 @@ function handleLosersCupClick(cupBtn, index) {
       if (currentLoserIndex >= losersPlayers.length) {
         // All players have thrown, end losers game
         losersGameActive = false;
+        
         // Show completion message
         showBigAlert('Peli valmis', 'Häviäjien peli on päättynyt!', { autoCloseMs: 3000 });
+        
         // Hide the modal after the alert closes
         setTimeout(() => {
           document.getElementById('losersGameModal').style.display = 'none';
+          
+          // Call the completion callback if it exists
+          if (window.losersGameCompleteCallback) {
+            window.losersGameCompleteCallback();
+            window.losersGameCompleteCallback = null;
+          }
         }, 3500);
       } else {
         // Update to show next player
@@ -945,6 +957,7 @@ function handleLosersCupClick(cupBtn, index) {
     }
   });
 }
+
 // --- Big alert modal helper functions ---
 const bigAlertModal = document.getElementById('bigAlertModal');
 const bigAlertTitleEl = document.getElementById('bigAlertTitle');
@@ -1005,6 +1018,8 @@ function randomLoserScore() {
 
 function applyTestResultToMatch(match, winnerIdx, winnerScore, loserScore) {
   if (!match || !match.teams || match.teams.length < 2) return;
+  
+  // Update match data
   match.winner = match.teams[winnerIdx].name;
   if (winnerIdx === 0) {
     match.score = [winnerScore, loserScore];
@@ -1012,26 +1027,41 @@ function applyTestResultToMatch(match, winnerIdx, winnerScore, loserScore) {
     match.score = [loserScore, winnerScore];
   }
   match.awaitingConfirm = false;
-  ongoingMatchId = null;
   match.time = undefined;
+  
+  // Update cup states
   cupStates[`${match.id}_0`] = cupStates[`${match.id}_0`] || [];
   cupStates[`${match.id}_1`] = cupStates[`${match.id}_1`] || [];
-  renderFixtures();
-  renderStandings();
-  checkLeagueCompletion();
-  if (phase === "knockout") checkKnockoutProgression();
   
-  console.log("Match completed, initiating losers game...");
+  // IMPORTANT: Don't reset ongoingMatchId yet to prevent rerenders
+  // We'll reset it after the losers game completes
+  
+  // Start losers game immediately without rendering fixtures first
   const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
-  startLosersGame(losingTeam);
+  startLosersGame(losingTeam, () => {
+    // This is a callback that will run when losers game completes
+    console.log("Losers game completed, returning to tournament view");
+    ongoingMatchId = null;
+    renderFixtures();
+    renderStandings();
+    checkLeagueCompletion();
+    if (phase === "knockout") checkKnockoutProgression();
+  });
 }
   
+// Modify the finish button handler to use the callback
 document.addEventListener('DOMContentLoaded', function() {
   const finishBtn = document.getElementById('finishLosersGameBtn');
   if (finishBtn) {
     finishBtn.addEventListener('click', () => {
       document.getElementById('losersGameModal').style.display = 'none';
       losersGameActive = false;
+      
+      // Call the completion callback if it exists
+      if (window.losersGameCompleteCallback) {
+        window.losersGameCompleteCallback();
+        window.losersGameCompleteCallback = null;
+      }
     });
   }
 
@@ -1040,6 +1070,12 @@ document.addEventListener('DOMContentLoaded', function() {
     closeBtn.addEventListener('click', () => {
       document.getElementById('losersGameModal').style.display = 'none';
       losersGameActive = false;
+      
+      // Call the completion callback if it exists
+      if (window.losersGameCompleteCallback) {
+        window.losersGameCompleteCallback();
+        window.losersGameCompleteCallback = null;
+      }
     });
   }
 });
