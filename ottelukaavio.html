@@ -510,110 +510,7 @@
       margin-right: 6px;
       text-shadow: 0 0 6px #ffb70044;
     }
-    /* Add these styles to your existing <style> section */
-    .losers-cups-container {
-      position: relative;
-      width: 100%;
-      height: 400px;
-      margin: 20px auto;
-      background: linear-gradient(135deg, #18003a 0%, #2b0057 100%);
-      border-radius: 16px;
-      border: 2px solid #00ffd0;
-      box-shadow: 0 0 24px #ff00c899;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-    
-    .losers-cups-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      grid-template-rows: repeat(4, 1fr);
-      gap: 15px;
-      width: 360px;
-      height: 360px;
-    }
-    
-    .loser-cup {
-      position: relative;
-      width: 75px;
-      height: 75px;
-      background: linear-gradient(180deg, #00ffd0 0%, #00ffd033 100%);
-      border-radius: 0 0 35px 35px;
-      box-shadow: 0 0 15px #00ffd099;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-    
-    .loser-cup:before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 20%;
-      background: #00ffd0;
-      border-radius: 50% / 10px;
-    }
-    
-    .loser-cup:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 20px #00ffd0, 0 0 40px #ff00c855;
-    }
-    
-    .loser-cup.hit {
-      background: linear-gradient(180deg, #ff00c8 0%, #ff00c833 100%);
-      box-shadow: 0 0 15px #ff00c899;
-      transform: scale(0.95);
-      opacity: 0.7;
-      pointer-events: none;
-    }
-    
-    .loser-cup.hit:before {
-      background: #ff00c8;
-    }
 
-    .result-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
-    }
-    
-    .result-drink {
-      font-size: 2em;
-      font-weight: bold;
-      color: #00ffd0;
-      text-shadow: 0 0 5px #00ffd0;
-      font-family: 'Press Start 2P', 'Orbitron', sans-serif;
-      padding: 10px 20px;
-      background: #2b0057;
-      border-radius: 8px;
-      border: 2px solid #ff00c8;
-      box-shadow: 0 0 15px #ff00c8;
-    }
-    
-    @media (max-width: 600px) {
-      .losers-cups-grid {
-        width: 280px;
-        height: 280px;
-        gap: 10px;
-      }
-      
-      .loser-cup {
-        width: 60px;
-        height: 60px;
-      }
-      
-      .result-drink {
-        font-size: 1.5em;
-      }
-    }
     /* Big alert modal styles */
     #bigAlertModal {
       position: fixed;
@@ -691,15 +588,6 @@
   </style>
 </head>
 <body>
-<!-- Navigation -->
-<div class="navbar" id="myNavbar">
-  <a href="index">Joukkuearvonta</a>
-  <a href="ottelukaavio">Ottelukaavio</a>
-  <a href="pyr">Shottipyörö</a>
-  <a href="javascript:void(0);" class="icon" onclick="toggleNavbar()">
-    <span style="font-size: 1.2em;">☰</span>
-  </a>
-</div>
   <!-- TOP-RIGHT CONTROLS -->
   <div class="top-right-controls" aria-hidden="false">
     <div class="toggle-container">
@@ -763,33 +651,6 @@
   <button class="close-btn" id="closeModalBtn">&times;</button>
 </div>
 
-<!-- Viinaharava -->
-<div id="losersGameModal" class="fullscreen-modal" style="display:none;">
-  <div class="modal-content">
-    <h2>Viinaharava</h2>
-    <div id="currentLoserInfo" style="margin-bottom: 15px; font-size: 1.2em;">
-      <span id="loserTeamName" class="team-left"></span> | 
-      <span id="currentThrower" class="team-right"></span> heittää
-    </div>
-    
-    <div class="losers-cups-container">
-      <div class="losers-cups-grid" id="losersGrid"></div>
-    </div>
-    
-    <div id="throwResult" style="display:none; margin: 20px 0; padding: 15px; background: #18003a; border-radius: 12px; border: 2px solid #00ffd0;">
-      <h3 id="resultTitle">Osuma!</h3>
-      <div id="resultContent" class="result-content">
-        <div class="result-drink">Baileys</div>
-        <button class="btn" id="nextThrowBtn">Seuraava heittäjä</button>
-      </div>
-    </div>
-    
-    <div class="losers-controls" style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
-      <button class="btn" id="finishLosersGameBtn">Sulje peli</button>
-    </div>
-  </div>
-  <button class="close-btn" id="closeLosersGameBtn">&times;</button>
-</div>
 <!-- Big alert modal (new) -->
 <div id="bigAlertModal" role="dialog" aria-modal="true" aria-hidden="true">
   <div id="bigAlertInner" role="document">
@@ -828,12 +689,6 @@ let knockoutFixtures = [];
 let cupStates = {};
 let ongoingMatchId = null;
 let timerInterval = null;
-let losersGameActive = false;
-let losersTeam = null;
-let losersPlayers = [];
-let currentLoserIndex = 0;
-let losersCupResults = [];
-let losersCupsHit = [];
 
 // --- Test and sound toggles state and wiring ---
 let soundEnabled = false;
@@ -913,70 +768,7 @@ if (bigAlertCloseBtn) {
     hideBigAlert();
   });
 }
-  
-<!-- Add this JavaScript at the end of your existing script tag -->
-function toggleNavbar() {
-  var navbar = document.getElementById("myNavbar");
-  if (navbar.className === "navbar") {
-    navbar.className += " responsive";
-  } else {
-    navbar.className = "navbar";
-  }
-}
-// Cup result distributions
-const losersCupTypes = [
-  { type: 'BAILEYS', count: 4, color: '#A67B5B' },
-  { type: 'SALMARI', count: 4, color: '#000000' },
-  { type: 'JÄGERMEISTER', count: 1, color: '#72A331' },
-  { type: 'RETHROW', count: 2, color: '#3B88C3' },
-  { type: 'WILD', count: 2, color: '#FFB700' },
-  { type: 'MINTTU', count: 3, color: '#00ffd0' }
-];
 
-// Start losers game after a match ends
-function startLosersGame(losingTeam) {
-  if (!losingTeam || !losingTeam.players || losingTeam.players.length === 0) {
-    console.error('Invalid losing team provided to losers game');
-    return;
-  }
-  
-  losersTeam = losingTeam;
-  losersPlayers = [...losingTeam.players];
-  currentLoserIndex = 0;
-  losersCupsHit = [];
-  losersGameActive = true;
-  
-  // Initialize cup results (randomly assign the drinks to positions)
-  losersCupResults = [];
-  const allResults = [];
-  
-  // Create the distribution according to counts
-  losersCupTypes.forEach(result => {
-    for (let i = 0; i < result.count; i++) {
-      allResults.push({...result});
-    }
-  });
-  
-  // Shuffle the results
-  for (let i = allResults.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [allResults[i], allResults[j]] = [allResults[j], allResults[i]];
-  }
-  
-  losersCupResults = allResults;
-  
-  // Update UI
-  document.getElementById('loserTeamName').textContent = losingTeam.name;
-  document.getElementById('currentThrower').textContent = losersPlayers[currentLoserIndex] || 'Unknown';
-  document.getElementById('throwResult').style.display = 'none';
-  
-  // Generate cups
-  renderLosersCupsGrid();
-  
-  // Show the modal
-  document.getElementById('losersGameModal').style.display = 'flex';
-}
-  
 // --- Test feature helpers ---
 function randomLoserScore() {
   const r = Math.random();
@@ -1004,85 +796,8 @@ function applyTestResultToMatch(match, winnerIdx, winnerScore, loserScore) {
   renderStandings();
   checkLeagueCompletion();
   if (phase === "knockout") checkKnockoutProgression();
-
-  const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
-  startLosersGame(losingTeam);
-}
-function registerCupHit(cupIndex) {
-  if (!losersGameActive || losersCupsHit.includes(cupIndex)) return;
-  
-  // Mark cup as hit
-  losersCupsHit.push(cupIndex);
-  
-  // Get the result for this cup
-  const result = losersCupResults[cupIndex];
-  
-  // Update cup appearance
-  const cupEl = document.querySelector(`.loser-cup[data-index="${cupIndex}"]`);
-  if (cupEl) {
-    cupEl.classList.add('hit');
-    if (result && result.color) {
-      cupEl.style.backgroundColor = result.color;
-    }
-  }
-  
-  // Show the result
-  document.getElementById('resultTitle').textContent = 'OSUMA!';
-  
-  const resultContent = document.getElementById('resultContent');
-  resultContent.innerHTML = `
-    <div class="result-drink" style="background-color:${result.color}20;color:${result.color};border-color:${result.color}">${result.type}</div>
-    <button class="btn" id="nextThrowBtn">${result.type === 'RETHROW' ? 'UUDELLEENHEITTO' : 'SEURAAVA HEITTÄJÄ'}</button>
-  `;
-  
-  document.getElementById('throwResult').style.display = 'block';
-  
-  // Add event listener for next button
-  document.getElementById('nextThrowBtn').addEventListener('click', () => {
-    document.getElementById('throwResult').style.display = 'none';
-    
-    // If result is RETHROW, stay with current player
-    if (result.type === 'RETHROW') {
-      // Current player throws again - UI stays the same
-    } else {
-      // Move to next player or end game if all players have thrown
-      currentLoserIndex++;
-      if (currentLoserIndex >= losersPlayers.length) {
-        // All players have thrown, end losers game
-        losersGameActive = false;
-        // Optional - show completion message
-        showBigAlert('Peli valmis', 'Häviäjien peli on päättynyt!', { autoCloseMs: 3000 });
-        // Hide the modal after the alert closes
-        setTimeout(() => {
-          document.getElementById('losersGameModal').style.display = 'none';
-        }, 3500);
-      } else {
-        // Update to show next player
-        document.getElementById('currentThrower').textContent = 
-          losersPlayers[currentLoserIndex] || 'Unknown';
-      }
-    }
-  });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  const finishBtn = document.getElementById('finishLosersGameBtn');
-  if (finishBtn) {
-    finishBtn.addEventListener('click', () => {
-      document.getElementById('losersGameModal').style.display = 'none';
-      losersGameActive = false;
-    });
-  }
-
-  const closeBtn = document.getElementById('closeLosersGameBtn');
-  if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-      document.getElementById('losersGameModal').style.display = 'none';
-      losersGameActive = false;
-    });
-  }
-});
-  
 window.generateAllResults = function() {
   if (!testFeaturesEnabled) return;
   const allMatches = [...fixtures, ...knockoutFixtures];
