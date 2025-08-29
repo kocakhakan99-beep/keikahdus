@@ -740,7 +740,7 @@
     
     <!-- Use the same cups-area styling as the match screen -->
     <div class="cups-area" style="height: 420px; min-height: 420px;">
-      <img src="table.png" class="table-img">
+      <img src="assets/table.png" class="table-img">
       <div class="cup-set center" style="transform: rotate(-90deg); display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(4, 1fr); gap: 10px; width: 280px; height: 280px;">
         <!-- Cups will be generated here by JavaScript -->
       </div>
@@ -888,7 +888,7 @@ function renderLosersCups() {
     btn.dataset.losersIndex = i; // Use a special attribute for losers cups
     
     const img = document.createElement('img');
-    img.src = 'cup.png'; // Use your existing cup image
+    img.src = 'assets/redcup.png'; // Use your existing cup image
     img.alt = 'Cup';
     btn.appendChild(img);
     
