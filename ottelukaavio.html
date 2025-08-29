@@ -161,6 +161,63 @@
     }
     .cup-set.left { transform: rotate(-90deg); }
     .cup-set.right { transform: rotate(90deg); }
+    .cup-set.center {
+      margin: 0 auto;
+      transform: rotate(-90deg);
+      justify-content: center;
+      align-items: center;
+    }   
+    .loser-cup-btn {
+      width: 45px;
+      height: 45px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: 2px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+      outline: none;
+      transition: transform 0.2s, filter 0.2s;
+    }
+    .loser-cup-btn img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+      border: 2px solid #ff00c8;
+      box-shadow: 0 0 12px #ff00c8;
+      background: #222;
+    }
+    .loser-cup-btn.hit img {
+      filter: grayscale(100%) brightness(0.4) drop-shadow(0 0 8px #00ffd0);
+      opacity: 0.3;
+      border: 2px solid #00ffd0;
+      box-shadow: 0 0 18px #00ffd0;
+    }    
+    .result-drink {
+      font-size: 2em;
+      font-weight: bold;
+      color: #00ffd0;
+      text-shadow: 0 0 5px #00ffd0;
+      font-family: 'Press Start 2P', 'Orbitron', sans-serif;
+      padding: 10px 20px;
+      background: #2b0057;
+      border-radius: 8px;
+      border: 2px solid #ff00c8;
+      box-shadow: 0 0 15px #ff00c8;
+      margin: 10px 0;
+    }
+    .result-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
     .cup-label {
       text-align: center;
       color: #00ffd0;
@@ -720,6 +777,11 @@ let knockoutFixtures = [];
 let cupStates = {};
 let ongoingMatchId = null;
 let timerInterval = null;
+let losersGameActive = false;
+let losersTeam = null;
+let losersPlayers = [];
+let currentLoserIndex = 0;
+let losersCupResults = [];
 
 // --- Test and sound toggles state and wiring ---
 let soundEnabled = false;
@@ -751,7 +813,138 @@ if (testFeaturesToggleEl) {
     renderFixtures(); // show/hide test controls in fixtures
   });
 }
+  
+const losersCupTypes = [
+  { type: 'BAILEYS', count: 4, color: '#A67B5B' },
+  { type: 'SALMARI', count: 4, color: '#000000' },
+  { type: 'JÄGERMEISTER', count: 1, color: '#72A331' },
+  { type: 'RETHROW', count: 2, color: '#3B88C3' },
+  { type: 'WILD', count: 2, color: '#FFB700' },
+  { type: 'MINTTU', count: 3, color: '#00ffd0' }
+];
+// Start losers game after a match ends
+function startLosersGame(losingTeam) {
+  console.log("Starting losers game for team:", losingTeam ? losingTeam.name : "unknown");
+  
+  if (!losingTeam || !losingTeam.players || losingTeam.players.length === 0) {
+    console.error('Invalid losing team provided to losers game');
+    return;
+  }
+  
+  losersTeam = losingTeam;
+  losersPlayers = [...losingTeam.players];
+  currentLoserIndex = 0;
+  losersGameActive = true;
+  
+  // Initialize cup results (randomly assign the drinks to positions)
+  losersCupResults = [];
+  const allResults = [];
+  
+  // Create the distribution according to counts
+  losersCupTypes.forEach(result => {
+    for (let i = 0; i < result.count; i++) {
+      allResults.push({...result});
+    }
+  });
+  
+  // Shuffle the results
+  for (let i = allResults.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [allResults[i], allResults[j]] = [allResults[j], allResults[i]];
+  }
+  
+  losersCupResults = allResults;
+  
+  // Update UI
+  document.getElementById('loserTeamName').textContent = losingTeam.name;
+  document.getElementById('currentThrower').textContent = losersPlayers[currentLoserIndex] || 'Unknown';
+  document.getElementById('throwResult').style.display = 'none';
+  
+  // Generate cups using the existing pattern but for losers game
+  renderLosersCups();
+  
+  // Show the modal
+  document.getElementById('losersGameModal').style.display = 'flex';
+}
 
+// Render the cups using your existing cup-btn pattern
+function renderLosersCups() {
+  const cupSet = document.querySelector('#losersGameModal .cup-set');
+  if (!cupSet) {
+    console.error("Cup set container not found!");
+    return;
+  }
+  
+  cupSet.innerHTML = '';
+  
+  // Create a 4x4 grid of cups
+  for (let i = 0; i < 16; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'cup-btn losers-cup'; // Use your existing cup-btn class plus our marker class
+    btn.dataset.losersIndex = i; // Use a special attribute for losers cups
+    
+    const img = document.createElement('img');
+    img.src = 'cup.png'; // Use your existing cup image
+    img.alt = 'Cup';
+    btn.appendChild(img);
+    
+    // Add click handler using your existing pattern but with our handler
+    btn.addEventListener('click', function() {
+      handleLosersCupClick(this, i);
+    });
+    
+    cupSet.appendChild(btn);
+  }
+}
+
+// Handle cup clicks for the losers game
+function handleLosersCupClick(cupBtn, index) {
+  if (!losersGameActive || cupBtn.classList.contains('hit')) return;
+  
+  // Mark cup as hit using your existing styling
+  cupBtn.classList.add('hit');
+  
+  // Get the result for this cup
+  const result = losersCupResults[index];
+  
+  // Show the result
+  document.getElementById('resultTitle').textContent = 'OSUMA!';
+  
+  const resultContent = document.getElementById('resultContent');
+  resultContent.innerHTML = `
+    <div class="result-drink" style="background-color:${result.color}20;color:${result.color};border-color:${result.color}">${result.type}</div>
+    <button class="btn" id="nextThrowBtn">${result.type === 'RETHROW' ? 'UUDELLEENHEITTO' : 'SEURAAVA HEITTÄJÄ'}</button>
+  `;
+  
+  document.getElementById('throwResult').style.display = 'block';
+  
+  // Add event listener for next button
+  document.getElementById('nextThrowBtn').addEventListener('click', () => {
+    document.getElementById('throwResult').style.display = 'none';
+    
+    // If result is RETHROW, stay with current player
+    if (result.type === 'RETHROW') {
+      // Current player throws again - UI stays the same
+    } else {
+      // Move to next player or end game if all players have thrown
+      currentLoserIndex++;
+      if (currentLoserIndex >= losersPlayers.length) {
+        // All players have thrown, end losers game
+        losersGameActive = false;
+        // Show completion message
+        showBigAlert('Peli valmis', 'Häviäjien peli on päättynyt!', { autoCloseMs: 3000 });
+        // Hide the modal after the alert closes
+        setTimeout(() => {
+          document.getElementById('losersGameModal').style.display = 'none';
+        }, 3500);
+      } else {
+        // Update to show next player
+        document.getElementById('currentThrower').textContent = 
+          losersPlayers[currentLoserIndex] || 'Unknown';
+      }
+    }
+  });
+}
 // --- Big alert modal helper functions ---
 const bigAlertModal = document.getElementById('bigAlertModal');
 const bigAlertTitleEl = document.getElementById('bigAlertTitle');
@@ -827,8 +1020,42 @@ function applyTestResultToMatch(match, winnerIdx, winnerScore, loserScore) {
   renderStandings();
   checkLeagueCompletion();
   if (phase === "knockout") checkKnockoutProgression();
+  
+  console.log("Match completed, initiating losers game...");
+  const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
+  startLosersGame(losingTeam);
 }
+}
+  
+document.addEventListener('DOMContentLoaded', function() {
+  const finishBtn = document.getElementById('finishLosersGameBtn');
+  if (finishBtn) {
+    finishBtn.addEventListener('click', () => {
+      document.getElementById('losersGameModal').style.display = 'none';
+      losersGameActive = false;
+    });
+  }
 
+  const closeBtn = document.getElementById('closeLosersGameBtn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      document.getElementById('losersGameModal').style.display = 'none';
+      losersGameActive = false;
+    });
+  }
+});
+
+window.testLosersGame = function() {
+  // Create a mock losing team
+  const mockTeam = {
+    name: "Test Losers",
+    players: ["Player 1", "Player 2"]
+  };
+  
+  console.log("Manually starting losers game with team:", mockTeam);
+  startLosersGame(mockTeam);
+};
+  
 window.generateAllResults = function() {
   if (!testFeaturesEnabled) return;
   const allMatches = [...fixtures, ...knockoutFixtures];
