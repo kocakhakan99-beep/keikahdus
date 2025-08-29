@@ -1051,20 +1051,34 @@ function applyTestResultToMatch(match, winnerIdx, winnerScore, loserScore) {
   
 // Modify the finish button handler to use the callback
 document.addEventListener('DOMContentLoaded', function() {
-  const finishBtn = document.getElementById('finishLosersGameBtn');
-  if (finishBtn) {
-    finishBtn.addEventListener('click', () => {
-      document.getElementById('losersGameModal').style.display = 'none';
-      losersGameActive = false;
-      
-      // Call the completion callback if it exists
-      if (window.losersGameCompleteCallback) {
-        window.losersGameCompleteCallback();
-        window.losersGameCompleteCallback = null;
-      }
+  // Find the "Nollaa" button by its ID
+  const resetBtn = document.getElementById('resetBtn');
+  
+  if (resetBtn && testFeaturesToggleEl) {
+    // Create the Viinaharava button
+    const viinaharavaBtn = document.createElement('button');
+    viinaharavaBtn.id = 'viinaharavaBtn';
+    viinaharavaBtn.className = resetBtn.className; // Use the same class
+    viinaharavaBtn.textContent = 'Viinaharava';
+    
+    // Insert it after the Nollaa button
+    resetBtn.parentNode.insertBefore(viinaharavaBtn, resetBtn.nextSibling);
+    
+    // Add initial disabled state based on test mode
+    viinaharavaBtn.disabled = !testFeaturesEnabled;
+    
+    // Update disabled state when test toggle changes
+    testFeaturesToggleEl.addEventListener('change', function() {
+      viinaharavaBtn.disabled = !this.checked;
+    });
+    
+    // Add click handler
+    viinaharavaBtn.addEventListener('click', function() {
+      if (!testFeaturesEnabled) return;
+      testLosersGame();
     });
   }
-
+});
   const closeBtn = document.getElementById('closeLosersGameBtn');
   if (closeBtn) {
     closeBtn.addEventListener('click', () => {
@@ -1665,6 +1679,19 @@ window.confirmAutoScore = function(matchId, winnerIdx, winnerScore, loserScore) 
   checkLeagueCompletion();
   if(phase === "knockout") checkKnockoutProgression();
   document.getElementById('fullscreenModal').style.display = 'none';
+  
+  // Trigger the losers game with the losing team
+  const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
+  
+  // Start losers game, then update the tournament UI when finished
+  startLosersGame(losingTeam, () => {
+    // This is a callback that will run when losers game completes
+    console.log("Losers game completed, returning to tournament view");
+    renderFixtures();
+    renderStandings();
+    checkLeagueCompletion();
+    if (phase === "knockout") checkKnockoutProgression();
+  });
 };
 
 window.returnToMatch = function(matchId) {
@@ -1834,6 +1861,7 @@ window.manualScore = function(matchId, winnerIdx) {
   let winnerScore = nCups;
   let loserScore = winnerIdx === 0 ? leftTeamScore : rightTeamScore;
   
+  // Keep existing match completion logic
   match.winner = match.teams[winnerIdx].name;
   match.score = winnerIdx === 0 ? [winnerScore, loserScore] : [loserScore, winnerScore];
   match.awaitingConfirm = false;
@@ -1842,11 +1870,19 @@ window.manualScore = function(matchId, winnerIdx) {
   
   if (timerInterval) clearInterval(timerInterval);
   
-  renderFixtures();
-  renderStandings();
-  checkLeagueCompletion();
-  if(phase === "knockout") checkKnockoutProgression();
   document.getElementById('fullscreenModal').style.display = 'none';
+  
+  // Trigger the losers game with the losing team
+  const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
+  
+  // Start losers game, then update the tournament UI when finished
+  startLosersGame(losingTeam, () => {
+    console.log("Losers game completed, returning to tournament view");
+    renderFixtures();
+    renderStandings();
+    checkLeagueCompletion();
+    if (phase === "knockout") checkKnockoutProgression();
+  });
 };
 
 function renderStandings() {
