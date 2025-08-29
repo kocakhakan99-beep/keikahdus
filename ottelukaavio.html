@@ -824,18 +824,35 @@ const losersCupTypes = [
 ];
 // Start losers game after a match ends
 function startLosersGame(losingTeam, onComplete) {
-  console.log("Starting losers game for team:", losingTeam ? losingTeam.name : "unknown");
+  // Clear any existing state that might interfere
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
   
+  console.log("=== STARTING LOSERS GAME ===");
+  console.log("Team:", losingTeam);
+  
+  // Validate input
   if (!losingTeam || !losingTeam.players || losingTeam.players.length === 0) {
     console.error('Invalid losing team provided to losers game');
     if (onComplete) onComplete();
     return;
   }
   
+  // Hide any other modals that might be showing
+  document.getElementById('fullscreenModal').style.display = 'none';
+  document.getElementById('matchIntroOverlay').style.display = 'none';
+  hideSidebar();
+  
+  // Clear any existing state
+  losersGameActive = true;
   losersTeam = losingTeam;
   losersPlayers = [...losingTeam.players];
   currentLoserIndex = 0;
-  losersGameActive = true;
+  
+  // Store the callback for later
+  window.losersGameCompleteCallback = onComplete;
   
   // Initialize cup results (randomly assign the drinks to positions)
   losersCupResults = [];
@@ -864,11 +881,47 @@ function startLosersGame(losingTeam, onComplete) {
   // Generate cups
   renderLosersCups();
   
-  // Store the callback to call when losers game completes
-  window.losersGameCompleteCallback = onComplete;
+  // Now show the modal - with a small delay to ensure other modals are hidden
+  setTimeout(() => {
+    console.log("Showing losers game modal");
+    document.getElementById('losersGameModal').style.display = 'flex';
+  }, 100);
+}
+
+// 3. Fix the renderLosersCups function to ensure cups are rendered properly
+function renderLosersCups() {
+  const cupSet = document.querySelector('#losersGameModal .cup-set');
+  if (!cupSet) {
+    console.error("Cup set container not found!");
+    return;
+  }
   
-  // Show the modal
-  document.getElementById('losersGameModal').style.display = 'flex';
+  console.log("Rendering losers cups in container:", cupSet);
+  cupSet.innerHTML = '';
+  
+  // Create a 4x4 grid of cups
+  for (let i = 0; i < 16; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'cup-btn losers-cup';
+    btn.dataset.losersIndex = i;
+    
+    const img = document.createElement('img');
+    // Fix image path - try both with and without assets/ prefix
+    img.src = 'assets/redcup.png';
+    img.onerror = function() {
+      this.src = 'redcup.png'; // Fallback if assets/redcup.png doesn't exist
+    };
+    img.alt = 'Cup';
+    btn.appendChild(img);
+    
+    // Use arrow function to preserve 'this' context
+    btn.addEventListener('click', () => {
+      console.log("Cup clicked:", i);
+      handleLosersCupClick(btn, i);
+    });
+    
+    cupSet.appendChild(btn);
+  }
 }
 
 // Render the cups using your existing cup-btn pattern
@@ -879,22 +932,28 @@ function renderLosersCups() {
     return;
   }
   
+  console.log("Rendering losers cups in container:", cupSet);
   cupSet.innerHTML = '';
   
   // Create a 4x4 grid of cups
   for (let i = 0; i < 16; i++) {
     const btn = document.createElement('button');
-    btn.className = 'cup-btn losers-cup'; // Use your existing cup-btn class plus our marker class
-    btn.dataset.losersIndex = i; // Use a special attribute for losers cups
+    btn.className = 'cup-btn losers-cup';
+    btn.dataset.losersIndex = i;
     
     const img = document.createElement('img');
-    img.src = 'assets/redcup.png'; // Use your existing cup image
+    // Fix image path - try both with and without assets/ prefix
+    img.src = 'assets/redcup.png';
+    img.onerror = function() {
+      this.src = 'redcup.png'; // Fallback if assets/redcup.png doesn't exist
+    };
     img.alt = 'Cup';
     btn.appendChild(img);
     
-    // Add click handler using your existing pattern but with our handler
-    btn.addEventListener('click', function() {
-      handleLosersCupClick(this, i);
+    // Use arrow function to preserve 'this' context
+    btn.addEventListener('click', () => {
+      console.log("Cup clicked:", i);
+      handleLosersCupClick(btn, i);
     });
     
     cupSet.appendChild(btn);
@@ -1058,48 +1117,92 @@ function applyTestResultToMatch(match, winnerIdx, winnerScore, loserScore) {
     if (phase === "knockout") checkKnockoutProgression();
   });
 }
-  
-// Modify the finish button handler to use the callback
 document.addEventListener('DOMContentLoaded', function() {
-  // Find the "Nollaa" button by its ID
-  const resetBtn = document.getElementById('resetBtn');
-  
-  if (resetBtn) {
-    // Create the Viinaharava button
-    const viinaharavaBtn = document.createElement('button');
-    viinaharavaBtn.id = 'viinaharavaBtn';
-    viinaharavaBtn.className = resetBtn.className; // Use the same class
-    viinaharavaBtn.textContent = 'Viinaharava';
-    
-    // Insert it after the Nollaa button
-    resetBtn.parentNode.insertBefore(viinaharavaBtn, resetBtn.nextSibling);
-    
-    // Add initial disabled state based on test mode
-    viinaharavaBtn.disabled = !testFeaturesEnabled;
-    
-    // Update disabled state when test toggle changes
-    if (testFeaturesToggleEl) {
-      testFeaturesToggleEl.addEventListener('change', function() {
-        viinaharavaBtn.disabled = !this.checked;
-      });
-    }
-    
-    // Add click handler with hardcoded values
-    viinaharavaBtn.addEventListener('click', function() {
-      // Define a hardcoded team that will always work
-      const hardcodedTeam = {
-        name: "Joukkue 1",
-        players: ["Pelaaja 1", "Pelaaja 2"]
-      };
+  const finishBtn = document.getElementById('finishLosersGameBtn');
+  if (finishBtn) {
+    finishBtn.addEventListener('click', function() {
+      console.log("Finish losers game button clicked");
+      document.getElementById('losersGameModal').style.display = 'none';
+      losersGameActive = false;
       
-      console.log("Launching Viinaharava with hardcoded team:", hardcodedTeam);
-      
-      // Direct call to startLosersGame with our hardcoded team
-      startLosersGame(hardcodedTeam, function() {
-        console.log("Test Viinaharava game completed");
-      });
+      if (window.losersGameCompleteCallback) {
+        window.losersGameCompleteCallback();
+        window.losersGameCompleteCallback = null;
+      }
     });
   }
+
+  const closeBtn = document.getElementById('closeLosersGameBtn');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function() {
+      console.log("Close losers game button clicked");
+      document.getElementById('losersGameModal').style.display = 'none';
+      losersGameActive = false;
+      
+      if (window.losersGameCompleteCallback) {
+        window.losersGameCompleteCallback();
+        window.losersGameCompleteCallback = null;
+      }
+    });
+  }
+});
+
+window.forceShowLosersGame = function() {
+  document.getElementById('losersGameModal').style.display = 'flex';
+  console.log("Forced losers game modal display");
+};
+  
+document.addEventListener('DOMContentLoaded', function() {
+  // Find the "Nollaa" button
+  const resetBtn = document.getElementById('resetBtn');
+  if (!resetBtn) return;
+  
+  // Create the Viinaharava button
+  const viinaharavaBtn = document.createElement('button');
+  viinaharavaBtn.id = 'viinaharavaBtn';
+  viinaharavaBtn.className = resetBtn.className;
+  viinaharavaBtn.textContent = 'Viinaharava';
+  
+  // Insert it after the Nollaa button
+  resetBtn.parentNode.insertBefore(viinaharavaBtn, resetBtn.nextSibling);
+  
+  // Add initial disabled state based on test mode
+  viinaharavaBtn.disabled = !testFeaturesEnabled;
+  
+  // Update disabled state when test toggle changes
+  if (testFeaturesToggleEl) {
+    testFeaturesToggleEl.addEventListener('change', function() {
+      viinaharavaBtn.disabled = !this.checked;
+    });
+  }
+  
+  // Add super simple click handler
+  viinaharavaBtn.addEventListener('click', function() {
+    console.log("Viinaharava button clicked");
+    
+    // Hide any other modals first
+    document.getElementById('fullscreenModal').style.display = 'none';
+    document.getElementById('matchIntroOverlay').style.display = 'none';
+    hideSidebar();
+    
+    // Define a hardcoded team
+    const hardcodedTeam = {
+      name: "Joukkue 1",
+      players: ["Pelaaja 1", "Pelaaja 2"]
+    };
+    
+    // Force any ongoing match to end
+    ongoingMatchId = null;
+    if (timerInterval) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    
+    // Start the losers game with delay to ensure UI is ready
+    setTimeout(() => {
+      startLosersGame(hardcodedTeam);
+    }, 200);
+  });
 });
   const closeBtn = document.getElementById('closeLosersGameBtn');
   if (closeBtn) {
@@ -1114,7 +1217,25 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   };
-
+  
+const style = document.createElement('style');
+style.textContent = `
+  #losersGameModal {
+    z-index: 20000 !important; /* Higher than any other element */
+  }
+  
+  .debug-visible {
+    border: 3px solid yellow; /* For debugging */
+  }
+  
+  /* Ensure cup buttons are clickable */
+  .losers-cup {
+    cursor: pointer !important;
+    pointer-events: all !important;
+  }
+`;
+document.head.appendChild(style)
+  
 window.testLosersGame = function() {
   // Create a hardcoded mock losing team
   const mockTeam = {
@@ -1685,30 +1806,32 @@ function showEndMatchModal(match, leftDown, rightDown) {
 }
 
 window.confirmAutoScore = function(matchId, winnerIdx, winnerScore, loserScore) {
-  console.log("Confirming match result:", matchId);
+  console.log("Confirming match result...");
   let match = getMatchById(matchId);
   if (!match || !match.teams || !match.teams[winnerIdx]) return;
   
+  // Record the match result
   match.winner = match.teams[winnerIdx].name;
   match.score = winnerIdx === 0 ? [winnerScore, loserScore] : [loserScore, winnerScore];
   match.awaitingConfirm = false;
-  const currentMatchId = ongoingMatchId;
-  ongoingMatchId = null;
   match.time = undefined;
+  ongoingMatchId = null;
   
-  if (timerInterval) clearInterval(timerInterval);
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
   
-  // Close the confirmation modal
+  // Hide the match modal completely
   document.getElementById('fullscreenModal').style.display = 'none';
+  hideSidebar();
   
-  // Log that we're starting the losers game
-  console.log("Match completed, starting losers game for team:", match.teams[winnerIdx === 0 ? 1 : 0].name);
-  
-  // Trigger the losers game with the losing team
-  const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
-  
-  // Start losers game AFTER all other operations
+  // Wait a moment to ensure UI is updated
   setTimeout(() => {
+    console.log("Match completed, launching losers game");
+    const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
+    
+    // Start the losers game with the losing team
     startLosersGame(losingTeam, () => {
       console.log("Losers game completed, updating tournament view");
       renderFixtures();
@@ -1716,8 +1839,9 @@ window.confirmAutoScore = function(matchId, winnerIdx, winnerScore, loserScore) 
       checkLeagueCompletion();
       if (phase === "knockout") checkKnockoutProgression();
     });
-  }, 100); // Small delay to ensure proper sequence
+  }, 300);
 };
+
 
 window.returnToMatch = function(matchId) {
   let match = getMatchById(matchId);
