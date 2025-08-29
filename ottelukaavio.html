@@ -903,13 +903,18 @@ function renderLosersCups() {
 
 // Also update the handleLosersCupClick function to call the callback when all players have completed
 function handleLosersCupClick(cupBtn, index) {
-  if (!losersGameActive || cupBtn.classList.contains('hit')) return;
+  console.log("Losers cup clicked:", index);
+  if (!losersGameActive || cupBtn.classList.contains('hit')) {
+    console.log("Cup already hit or game inactive, ignoring click");
+    return;
+  }
   
   // Mark cup as hit using your existing styling
   cupBtn.classList.add('hit');
   
   // Get the result for this cup
   const result = losersCupResults[index];
+  console.log("Cup result:", result);
   
   // Show the result
   document.getElementById('resultTitle').textContent = 'OSUMA!';
@@ -928,12 +933,16 @@ function handleLosersCupClick(cupBtn, index) {
     
     // If result is RETHROW, stay with current player
     if (result.type === 'RETHROW') {
+      console.log("Rethrow result - same player continues");
       // Current player throws again - UI stays the same
     } else {
       // Move to next player or end game if all players have thrown
       currentLoserIndex++;
+      console.log("Moving to next player:", currentLoserIndex, "of", losersPlayers.length);
+      
       if (currentLoserIndex >= losersPlayers.length) {
         // All players have thrown, end losers game
+        console.log("All players completed, ending losers game");
         losersGameActive = false;
         
         // Show completion message
@@ -945,6 +954,7 @@ function handleLosersCupClick(cupBtn, index) {
           
           // Call the completion callback if it exists
           if (window.losersGameCompleteCallback) {
+            console.log("Executing losers game completion callback");
             window.losersGameCompleteCallback();
             window.losersGameCompleteCallback = null;
           }
@@ -1054,7 +1064,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Find the "Nollaa" button by its ID
   const resetBtn = document.getElementById('resetBtn');
   
-  if (resetBtn && testFeaturesToggleEl) {
+  if (resetBtn) {
     // Create the Viinaharava button
     const viinaharavaBtn = document.createElement('button');
     viinaharavaBtn.id = 'viinaharavaBtn';
@@ -1068,14 +1078,26 @@ document.addEventListener('DOMContentLoaded', function() {
     viinaharavaBtn.disabled = !testFeaturesEnabled;
     
     // Update disabled state when test toggle changes
-    testFeaturesToggleEl.addEventListener('change', function() {
-      viinaharavaBtn.disabled = !this.checked;
-    });
+    if (testFeaturesToggleEl) {
+      testFeaturesToggleEl.addEventListener('change', function() {
+        viinaharavaBtn.disabled = !this.checked;
+      });
+    }
     
-    // Add click handler
+    // Add click handler with hardcoded values
     viinaharavaBtn.addEventListener('click', function() {
-      if (!testFeaturesEnabled) return;
-      testLosersGame();
+      // Define a hardcoded team that will always work
+      const hardcodedTeam = {
+        name: "Joukkue 1",
+        players: ["Pelaaja 1", "Pelaaja 2"]
+      };
+      
+      console.log("Launching Viinaharava with hardcoded team:", hardcodedTeam);
+      
+      // Direct call to startLosersGame with our hardcoded team
+      startLosersGame(hardcodedTeam, function() {
+        console.log("Test Viinaharava game completed");
+      });
     });
   }
 });
@@ -1094,15 +1116,16 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
 window.testLosersGame = function() {
-  // Create a mock losing team
+  // Create a hardcoded mock losing team
   const mockTeam = {
-    name: "Test Losers",
-    players: ["Player 1", "Player 2"]
+    name: "Joukkue 1",
+    players: ["Pelaaja 1", "Pelaaja 2"]
   };
   
   console.log("Manually starting losers game with team:", mockTeam);
   startLosersGame(mockTeam);
 };
+
   
 window.generateAllResults = function() {
   if (!testFeaturesEnabled) return;
@@ -1662,35 +1685,38 @@ function showEndMatchModal(match, leftDown, rightDown) {
 }
 
 window.confirmAutoScore = function(matchId, winnerIdx, winnerScore, loserScore) {
+  console.log("Confirming match result:", matchId);
   let match = getMatchById(matchId);
   if (!match || !match.teams || !match.teams[winnerIdx]) return;
   
   match.winner = match.teams[winnerIdx].name;
   match.score = winnerIdx === 0 ? [winnerScore, loserScore] : [loserScore, winnerScore];
   match.awaitingConfirm = false;
+  const currentMatchId = ongoingMatchId;
   ongoingMatchId = null;
   match.time = undefined;
   
   if (timerInterval) clearInterval(timerInterval);
   
-  renderFixtures();
-  renderStandings();
-  checkLeagueCompletion();
-  if(phase === "knockout") checkKnockoutProgression();
+  // Close the confirmation modal
   document.getElementById('fullscreenModal').style.display = 'none';
+  
+  // Log that we're starting the losers game
+  console.log("Match completed, starting losers game for team:", match.teams[winnerIdx === 0 ? 1 : 0].name);
   
   // Trigger the losers game with the losing team
   const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
   
-  // Start losers game, then update the tournament UI when finished
-  startLosersGame(losingTeam, () => {
-    // This is a callback that will run when losers game completes
-    console.log("Losers game completed, returning to tournament view");
-    renderFixtures();
-    renderStandings();
-    checkLeagueCompletion();
-    if (phase === "knockout") checkKnockoutProgression();
-  });
+  // Start losers game AFTER all other operations
+  setTimeout(() => {
+    startLosersGame(losingTeam, () => {
+      console.log("Losers game completed, updating tournament view");
+      renderFixtures();
+      renderStandings();
+      checkLeagueCompletion();
+      if (phase === "knockout") checkKnockoutProgression();
+    });
+  }, 100); // Small delay to ensure proper sequence
 };
 
 window.returnToMatch = function(matchId) {
@@ -1703,6 +1729,7 @@ window.returnToMatch = function(matchId) {
 };
 
 window.startMatch = function(matchId) {
+  console.log("Starting match:", matchId);
   ongoingMatchId = matchId;
   renderFixtures();
   playIntroAnimation(matchId, () => {
