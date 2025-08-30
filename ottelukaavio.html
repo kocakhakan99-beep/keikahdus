@@ -89,7 +89,7 @@
       text-shadow: 0 0 6px #00ffd0;
     }
 
-    /* Cups area (shared) */
+    /* Shared cups-area (match baseline) */
     .cups-area {
       position: relative;
       width: 420px;
@@ -395,14 +395,9 @@
       border-radius: 8px; cursor: pointer; font-weight: bold;
     }
 
-    /* === VIINAHARAVA (LOSERS GAME) ENHANCED LAYOUT === */
-    :root {
-      --vh-grid-size: 210px;  /* overall width/height of 4x4 grid */
-      --cup-size: 38px;       /* single cup size */
-      --table-scale: 0.9;     /* scale factor for rotated table image */
-      --grid-offset-y: 0px;   /* vertical nudge of cup grid */
-    }
-    #losersGameModal { z-index: 20050 !important; }
+    /* === UPDATED VIINAHARAVA (LOSERS GAME) LAYOUT FOR CONSISTENCY ===
+       Reuses standard .cups-area horizontally.
+       Centered 4x4 grid; geometric center sits at center of table area. */
     #losersGameModal .modal-content {
       max-width: 560px;
       display: flex;
@@ -410,13 +405,9 @@
       align-items: center;
     }
     #losersGameModal .cups-area {
-      width: 400px;
-      height: 640px;
-      min-height: 640px;
-      border-radius: 30px;
-      background: #2a0064;
-      overflow: hidden;
-      box-shadow: 0 0 40px #00ffd055, inset 0 0 20px #000;
+      width: 420px;
+      min-height: 200px;
+      height: 260px; /* Slightly taller to comfortably fit 4x4 */
     }
     #losersGameModal .cups-area .table-wrapper {
       position: absolute;
@@ -426,41 +417,32 @@
       justify-content: center;
       pointer-events: none;
     }
+    /* Remove previous rotation */
     #losersGameModal .cups-area .table-wrapper img.table-img {
-      width: auto;
+      width: 100%;
       height: 100%;
       max-height: 100%;
-      transform: rotate(90deg) scale(var(--table-scale));
+      transform: none;
       transform-origin: center center;
-      opacity: 0.9;
-      filter: drop-shadow(0 0 16px #000);
+      opacity: 0.85;
+      filter: drop-shadow(0 0 10px #000);
     }
-    #losersGameModal #losersGrid {
+    #losersGrid {
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-50%, calc(-50% + var(--grid-offset-y)));
-      width: var(--vh-grid-size);
-      height: var(--vh-grid-size);
+      transform: translate(-50%, -50%);
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       grid-template-rows: repeat(4, 1fr);
       gap: 14px;
       z-index: 5;
       pointer-events: auto;
+      /* Width/height determined by intrinsic cup size + gaps.
+         No fixed width keeps it flexible if cup size changes responsively. */
     }
-    #losersGameModal #losersGrid .cup-btn {
-      width: var(--cup-size);
-      height: var(--cup-size);
+    #losersGrid .cup-btn {
       margin: 0;
-    }
-    #losersGameModal #losersGrid .cup-btn img {
-      width: var(--cup-size);
-      height: var(--cup-size);
-      box-shadow: 0 0 10px #ff00c8;
-    }
-    #losersGameModal #losersGrid .cup-btn.hit img {
-      box-shadow: 0 0 16px #00ffd0;
     }
     #losersGameModal.losers-ended #losersGrid {
       opacity: 0.55;
@@ -497,16 +479,13 @@
       .sidebar-overlay table { font-size: 0.88em; }
       .top-right-controls { right: 8px; top: 8px; padding: 6px; gap: 8px; }
       #bigAlertInner { padding: 12px; border-radius: 10px; }
+
+      /* Losers game responsive */
       #losersGameModal .cups-area {
-        width: 310px;
-        height: 520px;
-        min-height: 520px;
+        width: 98vw;
+        height: 300px;
       }
-      :root {
-        --vh-grid-size: 185px;
-        --cup-size: 32px;
-        --table-scale: 0.82;
-      }
+      #losersGrid { gap: 10px; }
     }
   </style>
 </head>
@@ -596,7 +575,7 @@
     </div>
   </div>
 
-  <!-- Viinaharava modal -->
+  <!-- Viinaharava modal (updated layout) -->
   <div id="losersGameModal" class="fullscreen-modal" style="display:none;">
     <div class="modal-content">
       <h2>Viinaharava</h2>
@@ -669,6 +648,8 @@ if (testFeaturesToggleEl) {
     testFeaturesEnabled = e.target.checked;
     if (testModeBtn) testModeBtn.disabled = !testFeaturesEnabled;
     renderFixtures();
+    const viinaBtn = document.getElementById('viinaharavaBtn');
+    if (viinaBtn) viinaBtn.disabled = !testFeaturesEnabled;
   });
 }
 
@@ -784,7 +765,7 @@ function handleLosersCupClick(btn, idx) {
   const resultContent = document.getElementById('resultContent');
   resultContent.innerHTML = `
     <div class="result-drink"
-         style="background-color:${result.color}20;color:${result.color};border-color:${result.color}">
+         style="background-color:${result.color}20;color:${result.color};border:2px solid ${result.color};border-radius:10px;margin-bottom:12px;">
       ${result.type}
     </div>
     <button class="btn" id="nextThrowBtn">
@@ -1392,8 +1373,8 @@ window.showActiveMatch = function(matchId) {
         }
         if (secs > 0) {
           secs--;
-          timerEl.textContent = formatTime(secs);
-          match.time = secs;
+            timerEl.textContent = formatTime(secs);
+            match.time = secs;
         } else if (goldenGoalEnabled && !match.suddenDeath) {
           match.suddenDeath = true;
           timerEl.textContent = "Golden Goal!";
@@ -1714,7 +1695,7 @@ window.promptAndApplyResult = function(matchId) {
   showBigAlert('Tulos tallennettu', `${match.teams[0].name} ${left} - ${right} ${match.teams[1].name}`, { autoCloseMs: 2500 });
 };
 
-/* ===================== SIDEBAR ===================== */
+/* ===================== SIDEBAR (duplicate safe) ===================== */
 function showSidebar() {
   let sidebar = document.getElementById('sidebarOverlay');
   sidebar.innerHTML = `<h3>Sarjataulukko</h3>${renderSidebarStandings()}`;
@@ -1734,11 +1715,6 @@ document.addEventListener('DOMContentLoaded', () => {
     viinaharavaBtn.textContent = 'Viinaharava';
     viinaharavaBtn.disabled = !testFeaturesEnabled;
     resetBtn.parentNode.insertBefore(viinaharavaBtn, resetBtn.nextSibling);
-    if (testFeaturesToggleEl) {
-      testFeaturesToggleEl.addEventListener('change', function() {
-        viinaharavaBtn.disabled = !this.checked;
-      });
-    }
     viinaharavaBtn.addEventListener('click', () => {
       startLosersGame({ name: "Joukkue 1", players: ["Pelaaja 1", "Pelaaja 2"] });
     });
