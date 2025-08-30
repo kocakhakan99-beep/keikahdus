@@ -64,8 +64,8 @@
     --card: #fff7ea;
     --ink: #2b2117;
     --muted: #6d5f53;
-    --accent: #c1783d;   /* kuparinen */
-    --accent-2: #8c4a2f; /* paahteinen */
+    --accent: #c1783d;
+    --accent-2: #8c4a2f;
     --ok: #3b9c61;
     --warn: #c9693a;
     --border: #e2d5bf;
@@ -188,7 +188,7 @@
     justify-content: center;
     animation: overlayIn .5s cubic-bezier(.77,.2,.05,1) both;
     overflow-y: auto !important;
- 		-webkit-overflow-scrolling: touch;
+    -webkit-overflow-scrolling: touch;
   }
   
   @media (max-width: 600px) {
@@ -314,7 +314,6 @@
     }
   }
 
-  /* Even smaller screens */
   @media (max-width: 480px) {
     .team h4 {
       flex-direction: column;
@@ -334,17 +333,16 @@
     }
   }
 </style>
-</style>
 </head>
 <body>
-  <audio id="valkyries" src="valkyries.mp3" preload="auto"></audio>
-  <script src="music-sync.js"></script>
-
-<script src="https://static.app/js/static.js" type="text/javascript"></script>
+  <!-- Fixed asset references -->
+  <audio id="valkyries" src="assets/valkyries.mp3" preload="auto"></audio>
+  <script src="assets/music-sync.js"></script>
 </body>
 <body>
 <div class="navbar" id="myNavbar">
-  <a href="joukkuearvonta.html">Joukkuearvonta</a>
+  <a href="index">Joukkuearvonta</a>
+  <a href="ottelukaavio">Ottelukaavio</a>
   <a href="pyr">Shot Wheel</a>
   <a href="javascript:void(0);" class="icon" onclick="toggleNavbar()">
     ☰
@@ -384,7 +382,6 @@ function toggleNavbar() {
 
 <main class="wrap" style="margin-top:10px;">
   <div class="row">
-    <!-- Vasemman reunan ohjaimet -->
     <section class="card">
       <h2>Syötä nimet</h2>
       <p class="meta">Yksi nimi per rivi. Voit myös liittää CSV:stä – erotin tunnistetaan automaattisesti.</p>
@@ -418,7 +415,6 @@ function toggleNavbar() {
           </select>
         </div>
 
-        <!-- Nimigeneraattori joukkueille -->
         <div class="full">
           <label class="switch" title="Avaa joukkueiden nimigeneraattori">
             <input type="checkbox" id="genToggle" />
@@ -444,7 +440,6 @@ function toggleNavbar() {
       </div>
     </section>
 
-    <!-- Oikean reunan tulos -->
     <section class="card" id="tulosSection">
       <h2>Joukkueet</h2>
       <div class="meta" id="roundLabel">Kierrosta ei ole aloitettu</div>
@@ -464,7 +459,6 @@ function toggleNavbar() {
   </div>
 </main>
 
-<!-- Fullscreen Tulos Overlay -->
 <div id="resultOverlay">
   <div class="black-bar"></div>
   <div class="result-content"></div>
@@ -501,23 +495,104 @@ function toggleNavbar() {
   const status = $('#status');
   const tulosSection = $('#tulosSection');
   const sounds = {
-    cheer: new Audio('cheer.mp3'),
+    cheer: new Audio('assets/cheer.mp3'),
   };
 
   // Overlay elements
   const resultOverlay = $('#resultOverlay');
   const resultContent = resultOverlay.querySelector('.result-content');
   const closeOverlayBtn = $('#closeOverlayBtn');
-  const mainRow = $('.row'); // Container for sections
+  const mainRow = $('.row');
 
   // Local state
-  let lastAssignment = null; // { teams: string[][], bench: string[], teamSize, orderMeta }
+  let lastAssignment = null;
   let revealTimers = [];
   let audioCtx = null;
-  let currentTeamNames = []; // joukkueiden nimet (generaattorista tai manuaalisesti myöhemmin)
-  let teamNameLocks = [];  
+  let currentTeamNames = [];
+  let teamNameLocks = [];
+  let finalRevealScheduledId = null;
 
-  // Theme & settings persistence
+  // === Music Controller ADDED ===
+  const musicController = {
+    bg: $('#valkyries'),
+    boo: new Audio('assets/boo.mp3'),
+    state: 'idle', // idle | playing | fading | finished
+    fadeInterval: null,
+    fadePromise: null,
+    drawToken: 0, // increment each new draw to avoid race conditions
+    start(volume = 1.0) {
+      this.stopImmediate(); // ensure clean
+      if (!this.bg) return;
+      this.drawToken++;
+      const token = this.drawToken;
+      try {
+        this.bg.currentTime = 0;
+        this.bg.volume = volume;
+        this.bg.loop = true;
+        const playResult = this.bg.play();
+        if (playResult && typeof playResult.then === 'function') {
+          playResult.catch(e => console.warn('Autoplay prevented:', e));
+        }
+        this.state = 'playing';
+      } catch(e) {
+        console.warn('BG start error', e);
+      }
+    },
+    fadeOutAndBoo({duration=2000, stepMs=60} = {}) {
+      if (this.state !== 'playing') {
+        // Still play boo even if not currently playing music
+        this.playBoo();
+        return;
+      }
+      this.state = 'fading';
+      const startVol = this.bg.volume;
+      const startTime = performance.now();
+      return new Promise(res => {
+        if (this.fadeInterval) clearInterval(this.fadeInterval);
+        this.fadeInterval = setInterval(() => {
+          const elapsed = performance.now() - startTime;
+            const ratio = Math.min(1, elapsed / duration);
+            const newVol = startVol * (1 - ratio);
+            this.bg.volume = newVol;
+            if (ratio >= 1) {
+              clearInterval(this.fadeInterval);
+              this.fadeInterval = null;
+              try { this.bg.pause(); } catch(_) {}
+              this.state = 'finished';
+              this.playBoo();
+              res();
+            }
+        }, stepMs);
+      });
+    },
+    playBoo() {
+      try {
+        this.boo.currentTime = 0;
+        this.boo.volume = 1;
+        const r = this.boo.play();
+        if (r && r.catch) r.catch(()=>{});
+      } catch(e) { console.warn('boo play err', e); }
+    },
+    stopImmediate() {
+      if (this.fadeInterval) {
+        clearInterval(this.fadeInterval);
+        this.fadeInterval = null;
+      }
+      if (this.bg) {
+        try {
+          this.bg.pause();
+          this.bg.currentTime = 0;
+          this.bg.volume = 1;
+        } catch(_) {}
+      }
+      if (this.boo) {
+        try { this.boo.pause(); this.boo.currentTime = 0; } catch(_) {}
+      }
+      this.state = 'idle';
+    }
+  };
+
+  // Theme persistence
   const savedTheme = localStorage.getItem('bp_theme');
   if (savedTheme === 'dark') {
     document.body.setAttribute('data-theme', 'dark');
@@ -533,7 +608,7 @@ function toggleNavbar() {
     }
   });
 
-  // Sounds default OFF
+  // Sounds default ON (you set true in original)
   soundToggle.checked = true;
 
   function playPop() {
@@ -550,7 +625,6 @@ function toggleNavbar() {
     o.start(); o.stop(audioCtx.currentTime + 0.13);
   }
 
-// --- Team name editing & locking ---
   function setTeamName(idx, value) {
     currentTeamNames[idx] = value;
     applyTeamNamesToUI();
@@ -559,18 +633,15 @@ function toggleNavbar() {
     teamNameLocks[idx] = !teamNameLocks[idx];
     applyTeamNamesToUI();
   }
-  // --- Name helpers ---
+
   function parseNames(text) {
     if (!text) return [];
-    // Split by newlines or commas/semicolons
     const parts = text.split(/[\n,;]+/);
     return parts.map(s => s.trim()).filter(Boolean);
   }
-
   function unique(arr) {
     return Array.from(new Set(arr));
   }
-
   function updateNameCount() {
     const names = unique(parseNames(namesInput.value));
     nameCount.textContent = names.length + (names.length === 1 ? ' nimi' : ' nimeä');
@@ -580,90 +651,59 @@ function toggleNavbar() {
       ? `Arviolta ${teamsCount} joukkuetta (koko ${ts}).`
       : '';
   }
-
   namesInput.addEventListener('input', updateNameCount);
   teamSizeInput.addEventListener('input', updateNameCount);
-
   $('#cleanBtn').addEventListener('click', () => {
     const names = unique(parseNames(namesInput.value));
     namesInput.value = names.join('\n');
     updateNameCount();
   });
 
-  // --- Joukkueiden nimigeneraattori: TikTok brainrot + beer pong (FI) ---
-  // Prefixes: mostly blank, a few club/team variants
-const prefixes = [
-  "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", // Most results have no prefix
-  "AC", "PK", "Team", "FC", "SC",
-];
-
-// Adjectives: rude, funny, meme/brainrot, positive, Finnish
-const adjectives = [
-  // Finnish
-  "Paskat", "Surkeat", "Tyhmät", "Haisevat", "Likaiset", "Hikiset", "Känniset", "Sekavat", "Maansa myyneet", "Törpöt", "Ränsistyneet",
-  "Jurriset", "Ryyppäävät", "Säätävät", "Kaatuneet", "Mököttävät", "Kankeat", "Retkahtaneet", "Esimerkilliset", "Cave-dwelling",
-  // Meme/TikTok/brainrot
-  "Sigma", "Skibidi", "Gigachad", "Chad", "NPC", "Based", "Goofy", "Rizzaavat", "Clutch", "Goated", "W", "Low Effort", "Mewaavat", "Sussy",
-  // Positive/fun
-  "Mahtavat", "Legendaariset", "Luckyt", "Reippaat", "Sympaattiset", "Sankarilliset", "Pyhät", "Ystävälliset"
-];
-
-// Subjectives: street, party, funny, positive, political, and group plurals (Finnish)
-const subjectives = [
-  // Street/party/funny
-  "Spurgut", "Narkomaanit", "Sekopäät", "Duunarit", "Jampat", "Häiriköt", "Retkut", "Örkit", "Pultsarit", "Hulttiot", "Mallikansalaiet",
-  "Huijarit", "Tavan tallaajat", "Pongarit", "Kuppivelhot", "Kupinkaatajat", "Sankarit", "Psykopaatit", "Idiootit", "Luuserit", "Neckbeardit",
-  // Positive/fun/plurals
-  "Kokoomuslaiset", "Vassarit", "Kauppislaiset", "Vasikat", "Tollot", "Kaverukset",
-  "Kansalaiset", "Taiturit",
-];
-
-// Random item from array
-function r(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-// Team name generator
-function makeTeamName() {
-  // Structure: [optional prefix] [adjective] [subjective]
-  let prefix = r(prefixes);
-  let parts = [];
-  if (prefix) parts.push(prefix);
-  parts.push(r(adjectives));
-  parts.push(r(subjectives));
-  return parts.join(" ");
-}
-
-// Generate n unique team names
-function generateTeamNames(n, avoidSet = new Set()) {
-  const out = [];
-  let guard = 0;
-  while (out.length < n && guard < n * 30) {
-    const cand = makeTeamName();
-    guard++;
-    if (!avoidSet.has(cand)) {
-      avoidSet.add(cand);
-      out.push(cand);
-    }
+  const prefixes = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "AC", "PK", "Team", "FC", "SC"];
+  const adjectives = [
+    "Paskat","Surkeat","Tyhmät","Haisevat","Likaiset","Hikiset","Känniset","Sekavat","Maansa myyneet","Törpöt","Ränsistyneet",
+    "Jurriset","Ryyppäävät","Säätävät","Kaatuneet","Mököttävät","Kankeat","Retkahtaneet","Esimerkilliset","Cave-dwelling",
+    "Sigma","Skibidi","Gigachad","Chad","NPC","Based","Goofy","Rizzaavat","Clutch","Goated","W","Low Effort","Mewaavat","Sussy",
+    "Mahtavat","Legendaariset","Luckyt","Reippaat","Sympaattiset","Sankarilliset","Pyhät","Ystävälliset"
+  ];
+  const subjectives = [
+    "Spurgut","Narkomaanit","Sekopäät","Duunarit","Jampat","Häiriköt","Retkut","Örkit","Pultsarit","Hulttiot","Mallikansalaiet",
+    "Huijarit","Tavan tallaajat","Pongarit","Kuppivelhot","Kupinkaatajat","Sankarit","Psykopaatit","Idiootit","Luuserit","Neckbeardit",
+    "Kokoomuslaiset","Vassarit","Kauppislaiset","Vasikat","Tollot","Kaverukset","Kansalaiset","Taiturit"
+  ];
+  function r(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function makeTeamName() {
+    let prefix = r(prefixes);
+    let parts = [];
+    if (prefix) parts.push(prefix);
+    parts.push(r(adjectives));
+    parts.push(r(subjectives));
+    return parts.join(" ");
   }
-  return out;
-}
-
-// Example: 30 team names
-console.log(generateTeamNames(30).join('\n'));
-
+  function generateTeamNames(n, avoidSet = new Set()) {
+    const out = [];
+    let guard = 0;
+    while (out.length < n && guard < n * 30) {
+      const cand = makeTeamName();
+      guard++;
+      if (!avoidSet.has(cand)) {
+        avoidSet.add(cand);
+        out.push(cand);
+      }
+    }
+    return out;
+  }
   genToggle.addEventListener('change', () => {
     genPanel.style.display = genToggle.checked ? 'block' : 'none';
   });
-
   function estimateTeamCount() {
     const names = unique(parseNames(namesInput.value));
     const ts = Math.max(1, Number(teamSizeInput.value || 1));
     const mode = leftoverModeSel.value;
-    // Same logic as computeTargets to estimate teamSizes
     const teams = Math.ceil((names.length || 0) / ts);
     if (mode === 'bench') return Math.floor((names.length || 0) / ts);
     return teams || 0;
   }
-
   function applyTeamNamesToUI() {
     const cards = $$('.team');
     cards.forEach((card, i) => {
@@ -680,37 +720,30 @@ console.log(generateTeamNames(30).join('\n'));
       }
     });
   }
-
   genTeamNamesBtn.addEventListener('click', () => {
-  let count = estimateTeamCount();
-  if (count <= 0) {
-    count = 8;
-    status.textContent = 'Luotiin 8 joukkueen nimeä (ei vielä pelaajamäärää).';
-  } else {
-    status.textContent = `Luotiin ${count} joukkueen nimeä.`;
-  }
-
-  // Ensure arrays are the correct length
-  if (currentTeamNames.length < count) {
-    currentTeamNames = currentTeamNames.concat(Array(count - currentTeamNames.length).fill(""));
-  }
-  if (teamNameLocks.length < count) {
-    teamNameLocks = teamNameLocks.concat(Array(count - teamNameLocks.length).fill(false));
-  }
-
-  const avoidSet = new Set(currentTeamNames.filter((n, i) => teamNameLocks[i] && n));
-  let generated = generateTeamNames(count, avoidSet);
-
-  for (let i = 0; i < count; i++) {
-    if (!teamNameLocks[i]) {
-      currentTeamNames[i] = generated[i];
+    let count = estimateTeamCount();
+    if (count <= 0) {
+      count = 8;
+      status.textContent = 'Luotiin 8 joukkueen nimeä (ei vielä pelaajamäärää).';
+    } else {
+      status.textContent = `Luotiin ${count} joukkueen nimeä.`;
     }
-    // If locked, do not overwrite
-  }
-  if ($$('.team').length) applyTeamNamesToUI();
-});
+    if (currentTeamNames.length < count) {
+      currentTeamNames = currentTeamNames.concat(Array(count - currentTeamNames.length).fill(""));
+    }
+    if (teamNameLocks.length < count) {
+      teamNameLocks = teamNameLocks.concat(Array(count - teamNameLocks.length).fill(false));
+    }
+    const avoidSet = new Set(currentTeamNames.filter((n, i) => teamNameLocks[i] && n));
+    let generated = generateTeamNames(count, avoidSet);
+    for (let i = 0; i < count; i++) {
+      if (!teamNameLocks[i]) {
+        currentTeamNames[i] = generated[i];
+      }
+    }
+    if ($$('.team').length) applyTeamNamesToUI();
+  });
 
-  // --- Arvontalogiikka & jännitys ---
   function fisherYatesShuffle(arr) {
     const a = arr.slice();
     for (let i = a.length - 1; i > 0; i--) {
@@ -719,7 +752,6 @@ console.log(generateTeamNames(30).join('\n'));
     }
     return a;
   }
-	
   function computeTargets(nameCount, teamSize, mode) {
     if (nameCount === 0 || teamSize < 1) return {teamSizes:[], benchCount:0};
     const teams = Math.ceil(nameCount / teamSize);
@@ -736,7 +768,7 @@ console.log(generateTeamNames(30).join('\n'));
       const sizes = Array(fullTeams).fill(teamSize);
       const benchCount = nameCount - fullTeams * teamSize;
       return { teamSizes: sizes, benchCount };
-    } else { // spread
+    } else {
       const base = Math.floor(nameCount / teams);
       const extra = nameCount % teams;
       const sizes = Array(teams).fill(base);
@@ -748,28 +780,22 @@ console.log(generateTeamNames(30).join('\n'));
       return { teamSizes: sizes, benchCount: overflow };
     }
   }
-
   function renderTeamsPlaceholders(teamSizes) {
     teamsBox.innerHTML = '';
-	
-    // Preserve names
-	if (!currentTeamNames || currentTeamNames.length !== teamSizes.length) {
-	  const oldNames = currentTeamNames || [];
-	  currentTeamNames = Array(teamSizes.length).fill("");
-	  for (let i = 0; i < Math.min(oldNames.length, currentTeamNames.length); i++) {
-		currentTeamNames[i] = oldNames[i];
-	  }
-	}
-
-	// Preserve locks
-	if (!teamNameLocks || teamNameLocks.length !== teamSizes.length) {
-	  const oldLocks = teamNameLocks || [];
-	  teamNameLocks = Array(teamSizes.length).fill(false);
-	  for (let i = 0; i < Math.min(oldLocks.length, teamNameLocks.length); i++) {
-		teamNameLocks[i] = oldLocks[i];
-	  }
-	}
-
+    if (!currentTeamNames || currentTeamNames.length !== teamSizes.length) {
+      const oldNames = currentTeamNames || [];
+      currentTeamNames = Array(teamSizes.length).fill("");
+      for (let i = 0; i < Math.min(oldNames.length, currentTeamNames.length); i++) {
+        currentTeamNames[i] = oldNames[i];
+      }
+    }
+    if (!teamNameLocks || teamNameLocks.length !== teamSizes.length) {
+      const oldLocks = teamNameLocks || [];
+      teamNameLocks = Array(teamSizes.length).fill(false);
+      for (let i = 0; i < Math.min(oldLocks.length, teamNameLocks.length); i++) {
+        teamNameLocks[i] = oldLocks[i];
+      }
+    }
     teamSizes.forEach((size, ti) => {
       const name = currentTeamNames[ti] || `Joukkue ${ti+1}`;
       const locked = !!teamNameLocks[ti];
@@ -797,35 +823,33 @@ console.log(generateTeamNames(30).join('\n'));
       `;
       teamsBox.appendChild(card);
     });
-
-	$$('.tname-edit').forEach(inp => {
-		  inp.addEventListener('input', e => {
-			const idx = Number(inp.dataset.idx);
-			setTeamName(idx, inp.value);
-		  });
-		});
-		$$('.lock-btn').forEach(btn => {
-		  btn.addEventListener('click', e => {
-			const idx = Number(btn.dataset.idx);
-			toggleLock(idx);
-		  });
-		});
-	  }
-
-	  function clearTimers() {
+    $$('.tname-edit').forEach(inp => {
+      inp.addEventListener('input', () => {
+        const idx = Number(inp.dataset.idx);
+        setTeamName(idx, inp.value);
+      });
+    });
+    $$('.lock-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = Number(btn.dataset.idx);
+        toggleLock(idx);
+      });
+    });
+  }
+  function clearTimers() {
     for (const t of revealTimers) clearTimeout(t);
     revealTimers = [];
+    if (finalRevealScheduledId) {
+      clearTimeout(finalRevealScheduledId);
+      finalRevealScheduledId = null;
+    }
   }
 
-  // --- Overlay logic ---
   function showFullscreenTulos() {
-    // Move tulosSection into the overlay result-content
     resultContent.appendChild(tulosSection);
     resultOverlay.style.display = 'flex';
-    // document.body.style.overflow = 'hidden';
   }
   function hideFullscreenTulos() {
-    // Move tulosSection back to normal location
     mainRow.appendChild(tulosSection);
     resultOverlay.style.display = 'none';
     document.body.style.overflow = '';
@@ -833,6 +857,9 @@ console.log(generateTeamNames(30).join('\n'));
   closeOverlayBtn.addEventListener('click', hideFullscreenTulos);
 
   function doDraw() {
+    // Stop any previous music & sounds
+    musicController.stopImmediate();
+
     clearTimers();
     teamsBox.innerHTML = '';
     benchBox.style.display = 'none';
@@ -853,22 +880,19 @@ console.log(generateTeamNames(30).join('\n'));
 
     if (!teamSizes.length) { alert('Ei muodostettavia joukkueita.'); return; }
 
-    // Jos nimigeneraattori on luonut vähemmän nimiä kuin joukkueita, täydennä puuttuvat
     if (currentTeamNames.length < teamSizes.length && genToggle.checked) {
       const extra = generateTeamNames(teamSizes.length - currentTeamNames.length, new Set(currentTeamNames));
       currentTeamNames = currentTeamNames.concat(extra);
     }
-	
-	if (teamNameLocks.length !== teamSizes.length) {
+    if (teamNameLocks.length !== teamSizes.length) {
       teamNameLocks = Array(teamSizes.length).fill(false);
     }
 
     renderTeamsPlaceholders(teamSizes);
 
-    // Build reveal order: round-robin per kierros
     const totalSlots = teamSizes.reduce((a,b)=>a+b,0);
-    const revealOrder = []; // [{team, slotIndex, name}]
-    let idx = 0; // pointer into shuffled
+    const revealOrder = [];
+    let idx = 0;
     const maxRounds = Math.max(...teamSizes);
     for (let r = 0; r < maxRounds; r++) {
       for (let t = 0; t < teamSizes.length; t++) {
@@ -879,50 +903,54 @@ console.log(generateTeamNames(30).join('\n'));
     }
     const bench = (benchCount > 0) ? shuffled.slice(totalSlots) : [];
 
-    // UI
     roundLabel.textContent = `Kierros 1/${maxRounds}`;
     rerollBtn.disabled = true;
     drawBtn.disabled = true;
 
-    // --- Show overlay!
     showFullscreenTulos();
 
-    // Reveal with suspense
-	
+    // Start music if sounds are on
+    if (soundToggle.checked) {
+      musicController.start(1);
+    }
+
     const teamsEls = $$('.team');
     const totalReveals = revealOrder.length;
-		if (soundToggle.checked) {
-  playMusicAndReveal(speed, totalReveals);
-}
-		revealOrder.forEach((step, i) => {
-		  const delay = i * speed;
-		  const timer = setTimeout(() => {
-			const teamEl = teamsEls[step.team];
-			const slotEl = teamEl.querySelectorAll('.slot')[step.slot];
-			slotEl.textContent = step.name;
-			slotEl.classList.add('revealed');
-			playPop();
 
-			const progress = Math.round(((i+1) / totalReveals) * 100);
-			progressBar.style.width = progress + '%';
+    revealOrder.forEach((step, i) => {
+      const delay = i * speed;
+      const timer = setTimeout(() => {
+        const teamEl = teamsEls[step.team];
+        const slotEl = teamEl.querySelectorAll('.slot')[step.slot];
+        slotEl.textContent = step.name;
+        slotEl.classList.add('revealed');
+        playPop();
 
-			// Round label update
-			const currentRound = step.slot + 1;
-			roundLabel.textContent = `Kierros ${currentRound}/${maxRounds}`;
+        const progress = Math.round(((i+1) / totalReveals) * 100);
+        progressBar.style.width = progress + '%';
 
-			if (i+1 === totalReveals) {
-			  if (bench.length) {
-				benchBox.style.display = 'block';
-				benchList.innerHTML = bench.map(n => `<li class="slot revealed">${n}</li>`).join('');
-			  }
-			  rerollBtn.disabled = false;
-			  drawBtn.disabled = false;
-			  status.textContent = 'Valmis!';
-			}
-		  }, delay);
-		  revealTimers.push(timer);
-		});
+        const currentRound = step.slot + 1;
+        roundLabel.textContent = `Kierros ${currentRound}/${maxRounds}`;
 
+        if (i+1 === totalReveals) {
+          if (bench.length) {
+            benchBox.style.display = 'block';
+            benchList.innerHTML = bench.map(n => `<li class="slot revealed">${n}</li>`).join('');
+          }
+          // MUSIC: finish trigger at final reveal
+          if (soundToggle.checked) {
+            musicController.fadeOutAndBoo({duration: 1800});
+          } else {
+            // Even if sounds off, ensure music (if any) stops instantly
+            musicController.stopImmediate();
+          }
+          rerollBtn.disabled = false;
+          drawBtn.disabled = false;
+          status.textContent = 'Valmis!';
+        }
+      }, delay);
+      revealTimers.push(timer);
+    });
 
     lastAssignment = {
       teams: teamSizes.map(()=>[]),
@@ -930,13 +958,14 @@ console.log(generateTeamNames(30).join('\n'));
       teamSize,
       orderMeta: {maxRounds}
     };
-    // Fill teams in state (for export) following same order
-    revealOrder.forEach((step) => {
+    revealOrder.forEach(step => {
       lastAssignment.teams[step.team][step.slot] = step.name;
     });
   }
 
   function rerollAll() {
+    // Reroll mid-reveal: stop music; start new sequence
+    musicController.stopImmediate();
     doDraw();
   }
 
@@ -950,78 +979,59 @@ console.log(generateTeamNames(30).join('\n'));
     status.textContent = '';
     rerollBtn.disabled = true;
     drawBtn.disabled = false;
-    // Restore normal layout if overlay is open
     hideFullscreenTulos();
-    // Huom: currentTeamNames jätetään talteen, jotta otsikot pysyvät seuraavassa arvonnassa
+    // Stop music immediately and discard boo
+    musicController.stopImmediate();
   }
 
   function exportCSV() {
-  // Exporttaa JoukkueNimi;Pelaaja -rivit + Varapelaajat
-  const rows = [];
-  const teamCards = $$('.team');
-  if (teamCards.length) {
-    teamCards.forEach((card, i) => {
-      // Use value from the editable input for team name
-      const tname = (card.querySelector('.tname-edit')?.value || `Joukkue ${i+1}`).trim();
-      card.querySelectorAll('.slot').forEach(li => {
-        const val = (li.textContent || '').trim();
-        if (val) rows.push({ team: tname, name: val });
+    const rows = [];
+    const teamCards = $$('.team');
+    if (teamCards.length) {
+      teamCards.forEach((card, i) => {
+        const tname = (card.querySelector('.tname-edit')?.value || `Joukkue ${i+1}`).trim();
+        card.querySelectorAll('.slot').forEach(li => {
+          const val = (li.textContent || '').trim();
+            if (val) rows.push({ team: tname, name: val });
+        });
       });
-    });
-    benchList.querySelectorAll('li').forEach(li => {
-      const val = (li.textContent || '').trim();
-      if (val) rows.push({ team: 'Varapelaajat', name: val });
-    });
-  } else if (lastAssignment) {
-    // Fallback tilaan, jossa UI ei ole piirtynyt (harvinainen)
-    lastAssignment.teams.forEach((t,i)=> {
-      const tname = currentTeamNames[i] || `Joukkue ${i+1}`;
-      t.forEach(n => rows.push({team: tname, name:n}));
-    });
-    (lastAssignment.bench||[]).forEach(n => rows.push({team:'Varapelaajat', name:n}));
+      benchList.querySelectorAll('li').forEach(li => {
+        const val = (li.textContent || '').trim();
+        if (val) rows.push({ team: 'Varapelaajat', name: val });
+      });
+    } else if (lastAssignment) {
+      lastAssignment.teams.forEach((t,i)=> {
+        const tname = currentTeamNames[i] || `Joukkue ${i+1}`;
+        t.forEach(n => rows.push({team: tname, name:n}));
+      });
+      (lastAssignment.bench||[]).forEach(n => rows.push({team:'Varapelaajat', name:n}));
+    }
+    if (!rows.length) { alert('Ei vietävää. Arvo joukkueet ensin.'); return; }
+    const header = 'Joukkue;Nimi';
+    const body = rows.map(r => `${r.team};${r.name}`).join('\n');
+    const csv = '\uFEFF' + header + '\n' + body;
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'beer-pong-jako.csv';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
   }
-  if (!rows.length) { alert('Ei vietävää. Arvo joukkueet ensin.'); return; }
-  const header = 'Joukkue;Nimi';
-  const body = rows.map(r => `${r.team};${r.name}`).join('\n');
-  const csv = '\uFEFF' + header + '\n' + body;
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'beer-pong-jako.csv';
-  document.body.appendChild(a); a.click();
-  setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 0);
- }
 
-  // Buttons
   drawBtn.addEventListener('click', doDraw);
   rerollBtn.addEventListener('click', rerollAll);
   clearBtn.addEventListener('click', clearResult);
   exportCsvBtn.addEventListener('click', exportCSV);
 
-  // Generator toggle
-  genToggle.addEventListener('change', () => {
-    genPanel.style.display = genToggle.checked ? 'block' : 'none';
-  });
-
-  // Keyboard shortcuts
-  document.addEventListener('keydown', (e) => {
-    // Ignore if focus is in an input or textarea
-    const tag = document.activeElement.tagName.toLowerCase();
-    if (tag === 'textarea' || tag === 'input' || document.activeElement.isContentEditable) {
-      return;
+  // Replaced placeholder with redirect to new controller if needed elsewhere
+  window.playMusicAndReveal = function() {
+    // (Kept for backward compatibility if music-sync.js calls it)
+    if (soundToggle.checked) {
+      musicController.start(1);
     }
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doDraw(); }
-    if (e.key.toLowerCase() === 'r') { rerollAll(); }
-    if (e.key.toLowerCase() === 'l') { themeToggle.click(); }
-    if (e.key === 'Escape') { clearResult(); }
-  });
-
-  // Live counters
-  updateNameCount();
+  };
 
 })();
 </script>
-
-<script src="https://static.app/js/static.js" type="text/javascript"></script>
 </body>
 </html>
