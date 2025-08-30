@@ -103,6 +103,10 @@
       box-shadow: 0 0 32px #00ffd099;
       overflow: hidden;
     }
+    /* NEW: Slight inward offset for 10-cup matches */
+    .cups-area.cups-10 .cup-set.left  { transform: rotate(-90deg) translateY(12px); }
+    .cups-area.cups-10 .cup-set.right { transform: rotate(90deg)  translateY(-12px); }
+
     .table-img {
       position: absolute;
       left: 0; top: 0;
@@ -395,9 +399,7 @@
       border-radius: 8px; cursor: pointer; font-weight: bold;
     }
 
-    /* === UPDATED VIINAHARAVA (LOSERS GAME) LAYOUT FOR CONSISTENCY ===
-       Reuses standard .cups-area horizontally.
-       Centered 4x4 grid; geometric center sits at center of table area. */
+    /* === UPDATED VIINAHARAVA (LOSERS GAME) LAYOUT (unchanged from prior revision) === */
     #losersGameModal .modal-content {
       max-width: 560px;
       display: flex;
@@ -407,7 +409,7 @@
     #losersGameModal .cups-area {
       width: 420px;
       min-height: 200px;
-      height: 260px; /* Slightly taller to comfortably fit 4x4 */
+      height: 260px;
     }
     #losersGameModal .cups-area .table-wrapper {
       position: absolute;
@@ -417,7 +419,6 @@
       justify-content: center;
       pointer-events: none;
     }
-    /* Remove previous rotation */
     #losersGameModal .cups-area .table-wrapper img.table-img {
       width: 100%;
       height: 100%;
@@ -438,8 +439,6 @@
       gap: 14px;
       z-index: 5;
       pointer-events: auto;
-      /* Width/height determined by intrinsic cup size + gaps.
-         No fixed width keeps it flexible if cup size changes responsively. */
     }
     #losersGrid .cup-btn {
       margin: 0;
@@ -480,7 +479,6 @@
       .top-right-controls { right: 8px; top: 8px; padding: 6px; gap: 8px; }
       #bigAlertInner { padding: 12px; border-radius: 10px; }
 
-      /* Losers game responsive */
       #losersGameModal .cups-area {
         width: 98vw;
         height: 300px;
@@ -575,7 +573,7 @@
     </div>
   </div>
 
-  <!-- Viinaharava modal (updated layout) -->
+  <!-- Viinaharava modal -->
   <div id="losersGameModal" class="fullscreen-modal" style="display:none;">
     <div class="modal-content">
       <h2>Viinaharava</h2>
@@ -709,12 +707,10 @@ function startLosersGame(losingTeam, onComplete) {
   losersGameActive = true;
   losersGameEnded = false;
   losersTeam = losingTeam;
-  // Only first two players matter for the early end rule
   losersPlayers = losingTeam.players.slice(0, 2);
   currentLoserIndex = 0;
   window.losersGameCompleteCallback = onComplete || null;
 
-  // Distribution
   const allResults = [];
   losersCupTypes.forEach(t => {
     for (let i = 0; i < t.count; i++) allResults.push({...t});
@@ -779,13 +775,10 @@ function handleLosersCupClick(btn, idx) {
   document.getElementById('nextThrowBtn').addEventListener('click', () => {
     document.getElementById('throwResult').style.display = 'none';
 
-    // Rethrow: same player
     if (result.type === 'RETHROW') return;
 
-    // Move to next player
     currentLoserIndex++;
 
-    // End if second player has thrown a non-rethrow (or no second player exists)
     if (currentLoserIndex >= 2 || currentLoserIndex >= losersPlayers.length) {
       endLosersGame();
     } else {
@@ -825,7 +818,6 @@ function finishLosersGame() {
   }
 }
 
-/* Expose some test helpers */
 window.testLosersGame = function() {
   startLosersGame({ name: "Joukkue 1", players: ["Pelaaja 1", "Pelaaja 2"] });
 };
@@ -1104,7 +1096,6 @@ function renderFixtures() {
   let showKnockout = phase === "knockout";
   let arr = showKnockout ? knockoutFixtures : fixtures;
 
-  // Test feature button
   if (testFeaturesEnabled) {
     const headerDiv = document.createElement('div');
     headerDiv.style.display = 'flex';
@@ -1341,7 +1332,7 @@ window.showActiveMatch = function(matchId) {
       <span style="color:#ffb700;text-shadow:0 0 8px #ffb700; margin:0 10px;">VS</span>
       <span style="color:#ff00c8;text-shadow:0 0 8px #ff00c8;">${match.teams[1].name}</span>
     </h2>
-    <div class="cups-area">
+    <div class="cups-area ${match.cups === 10 ? 'cups-10' : ''}">
       <img src="assets/table.png" class="table-img" alt="Table">
       ${leftCupSet}
       ${rightCupSet}
@@ -1373,8 +1364,8 @@ window.showActiveMatch = function(matchId) {
         }
         if (secs > 0) {
           secs--;
-            timerEl.textContent = formatTime(secs);
-            match.time = secs;
+          timerEl.textContent = formatTime(secs);
+          match.time = secs;
         } else if (goldenGoalEnabled && !match.suddenDeath) {
           match.suddenDeath = true;
           timerEl.textContent = "Golden Goal!";
@@ -1661,6 +1652,7 @@ window.generateAllResults = function() {
   showBigAlert('Testitulokset', 'Testitulokset generoitu.', { autoCloseMs: 3000 });
 };
 
+/* UPDATED: launches losers game after setting result */
 window.promptAndApplyResult = function(matchId) {
   if (!testFeaturesEnabled) return;
   const match = getMatchById(matchId);
@@ -1688,14 +1680,18 @@ window.promptAndApplyResult = function(matchId) {
   match.awaitingConfirm = false;
   ongoingMatchId = null;
   match.time = undefined;
-  renderFixtures();
-  renderStandings();
-  checkLeagueCompletion();
-  if (phase === "knockout") checkKnockoutProgression();
-  showBigAlert('Tulos tallennettu', `${match.teams[0].name} ${left} - ${right} ${match.teams[1].name}`, { autoCloseMs: 2500 });
+
+  const losingTeam = match.teams[winnerIdx === 0 ? 1 : 0];
+  startLosersGame(losingTeam, () => {
+    renderFixtures();
+    renderStandings();
+    checkLeagueCompletion();
+    if (phase === "knockout") checkKnockoutProgression();
+    showBigAlert('Tulos tallennettu', `${match.teams[0].name} ${left} - ${right} ${match.teams[1].name}`, { autoCloseMs: 2500 });
+  });
 };
 
-/* ===================== SIDEBAR (duplicate safe) ===================== */
+/* ===================== SIDEBAR ===================== */
 function showSidebar() {
   let sidebar = document.getElementById('sidebarOverlay');
   sidebar.innerHTML = `<h3>Sarjataulukko</h3>${renderSidebarStandings()}`;
